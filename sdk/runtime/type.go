@@ -11,6 +11,7 @@ import (
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/jxo-me/plus-core/sdk/pkg/amqp/pool"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
+	"github.com/jxo-me/plus-core/sdk/storage"
 )
 
 type Runtime interface {
@@ -46,4 +47,9 @@ type Runtime interface {
 	SetAmqp(key string, amqp *pool.ConnPool)
 	GetAmqp() map[string]*pool.ConnPool
 	GetAmqpKey(key string) *pool.ConnPool
+
+	GetMemoryQueue(prefix string) storage.AdapterQueue
+	SetQueueAdapter(c storage.AdapterQueue)
+	GetQueueAdapter() storage.AdapterQueue
+	GetQueuePrefix(key string) storage.AdapterQueue
 }

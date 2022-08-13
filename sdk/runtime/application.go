@@ -165,3 +165,22 @@ func (e *Application) GetAmqpKey(key string) *pool.ConnPool {
 	}
 	return e.amqp[key]
 }
+
+func (e *Application) GetMemoryQueue(prefix string) storage.AdapterQueue {
+	return NewQueue(prefix, e.memoryQueue)
+}
+
+// SetQueueAdapter 设置队列适配器
+func (e *Application) SetQueueAdapter(c storage.AdapterQueue) {
+	e.queue = c
+}
+
+// GetQueueAdapter 获取队列适配器
+func (e *Application) GetQueueAdapter() storage.AdapterQueue {
+	return NewQueue("", e.queue)
+}
+
+// GetQueuePrefix 获取带租户标记的queue
+func (e *Application) GetQueuePrefix(key string) storage.AdapterQueue {
+	return NewQueue(key, e.queue)
+}
