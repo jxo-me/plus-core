@@ -13,27 +13,32 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/plus-core/sdk/pkg/amqp/pool"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
+	"github.com/jxo-me/plus-core/sdk/storage"
+	"github.com/jxo-me/plus-core/sdk/storage/queue"
 	"sync"
 )
 
 type Application struct {
-	server    *ghttp.Server
-	casbins   map[string]*casbin.SyncedEnforcer
-	mux       sync.RWMutex
-	jwt       map[string]*jwt.GfJWTMiddleware
-	lang      *gi18n.Manager
-	config    *gcfg.Config
-	cache     *gcache.Cache
-	websocket *ws.Instance
-	amqp      map[string]*pool.ConnPool
+	server      *ghttp.Server
+	casbins     map[string]*casbin.SyncedEnforcer
+	mux         sync.RWMutex
+	jwt         map[string]*jwt.GfJWTMiddleware
+	lang        *gi18n.Manager
+	config      *gcfg.Config
+	cache       *gcache.Cache
+	websocket   *ws.Instance
+	memoryQueue storage.AdapterQueue
+	amqp        map[string]*pool.ConnPool
+	queue       storage.AdapterQueue
 }
 
 // NewConfig 默认值
 func NewConfig() *Application {
 	return &Application{
-		casbins: make(map[string]*casbin.SyncedEnforcer),
-		jwt:     make(map[string]*jwt.GfJWTMiddleware),
-		cache:   gcache.New(),
+		casbins:     make(map[string]*casbin.SyncedEnforcer),
+		jwt:         make(map[string]*jwt.GfJWTMiddleware),
+		amqp:        make(map[string]*pool.ConnPool),
+		memoryQueue: queue.NewMemory(10000),
 	}
 }
 
