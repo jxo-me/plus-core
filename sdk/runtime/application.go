@@ -11,6 +11,7 @@ import (
 	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/sdk/pkg/amqp/pool"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"sync"
 )
@@ -24,6 +25,7 @@ type Application struct {
 	config    *gcfg.Config
 	cache     *gcache.Cache
 	websocket *ws.Instance
+	amqp      map[string]*pool.ConnPool
 }
 
 // NewConfig 默认值
@@ -137,4 +139,24 @@ func (e *Application) WebSocket() *ws.Instance {
 
 func (e *Application) GetWebSocket() *ws.Instance {
 	return e.websocket
+}
+
+func (e *Application) SetAmqp(key string, amqp *pool.ConnPool) {
+	e.mux.Lock()
+	defer e.mux.Unlock()
+	e.amqp[key] = amqp
+}
+
+func (e *Application) GetAmqp() map[string]*pool.ConnPool {
+	return e.amqp
+}
+
+// GetAmqpKey 根据key获取amqp
+func (e *Application) GetAmqpKey(key string) *pool.ConnPool {
+	e.mux.Lock()
+	defer e.mux.Unlock()
+	if e, ok := e.amqp["*"]; ok {
+		return e
+	}
+	return e.amqp[key]
 }

@@ -7,6 +7,7 @@ require (
 	github.com/gogf/gf-jwt/v2 v2.0.1
 	github.com/gogf/gf/v2 v2.1.2
 	github.com/gorilla/websocket v1.5.0
+	github.com/streadway/amqp v1.0.0
 	golang.org/x/text v0.3.8-0.20211105212822-18b340fc7af2
 )
 

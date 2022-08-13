@@ -9,6 +9,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/gogf/gf/v2/os/gcfg"
+	"github.com/jxo-me/plus-core/sdk/pkg/amqp/pool"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 )
 
@@ -41,4 +42,8 @@ type Runtime interface {
 	SetWebSocket(s *ws.Instance)
 	WebSocket() *ws.Instance
 	GetWebSocket() *ws.Instance
+	// SetAmqp rabbitmq amqp
+	SetAmqp(key string, amqp *pool.ConnPool)
+	GetAmqp() map[string]*pool.ConnPool
+	GetAmqpKey(key string) *pool.ConnPool
 }
