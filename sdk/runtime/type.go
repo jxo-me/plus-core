@@ -9,6 +9,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/gogf/gf/v2/os/gcfg"
+	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 )
 
 type Runtime interface {
@@ -35,4 +36,8 @@ type Runtime interface {
 	SetCache(c *gcache.Cache)
 	GetCache() *gcache.Cache
 	Cache() *gcache.Cache
+	// SetWebSocket websocket
+	SetWebSocket(s *ws.Instance)
+	WebSocket() *ws.Instance
+	GetWebSocket() *ws.Instance
 }

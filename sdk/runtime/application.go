@@ -10,17 +10,19 @@ import (
 	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"sync"
 )
 
 type Application struct {
-	server  *ghttp.Server
-	casbins map[string]*casbin.SyncedEnforcer
-	mux     sync.RWMutex
-	jwt     map[string]*jwt.GfJWTMiddleware
-	lang    *gi18n.Manager
-	config  *gcfg.Config
-	cache   *gcache.Cache
+	server    *ghttp.Server
+	casbins   map[string]*casbin.SyncedEnforcer
+	mux       sync.RWMutex
+	jwt       map[string]*jwt.GfJWTMiddleware
+	lang      *gi18n.Manager
+	config    *gcfg.Config
+	cache     *gcache.Cache
+	websocket *ws.Instance
 }
 
 // NewConfig 默认值
@@ -117,4 +119,16 @@ func (e *Application) SetCache(c *gcache.Cache) {
 // GetCache 获取缓存
 func (e *Application) GetCache() *gcache.Cache {
 	return e.cache
+}
+
+func (e *Application) SetWebSocket(s *ws.Instance) {
+	e.websocket = s
+}
+
+func (e *Application) WebSocket() *ws.Instance {
+	return e.websocket
+}
+
+func (e *Application) GetWebSocket() *ws.Instance {
+	return e.websocket
 }
