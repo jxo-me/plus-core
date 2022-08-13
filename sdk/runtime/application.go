@@ -184,3 +184,12 @@ func (e *Application) GetQueueAdapter() storage.AdapterQueue {
 func (e *Application) GetQueuePrefix(key string) storage.AdapterQueue {
 	return NewQueue(key, e.queue)
 }
+
+// GetStreamMessage 获取队列需要用的message
+func (e *Application) GetStreamMessage(id, stream string, value map[string]interface{}) (storage.Messager, error) {
+	message := &queue.Message{}
+	message.SetID(id)
+	message.SetStream(stream)
+	message.SetValues(value)
+	return message, nil
+}
