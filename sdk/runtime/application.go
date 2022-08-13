@@ -39,6 +39,7 @@ func NewConfig() *Application {
 		jwt:         make(map[string]*jwt.GfJWTMiddleware),
 		amqp:        make(map[string]*pool.ConnPool),
 		memoryQueue: queue.NewMemory(10000),
+		cache:       gcache.New(),
 	}
 }
 
