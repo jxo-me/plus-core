@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+	"fmt"
 	"github.com/casbin/casbin/v2"
 	"github.com/gogf/gf-jwt/v2"
 	"github.com/gogf/gf/v2/container/gvar"
@@ -80,6 +81,11 @@ func (e *Application) GetJwtKey(moduleKey string) *jwt.GfJWTMiddleware {
 		return j
 	}
 	return e.jwt[moduleKey]
+}
+
+// Lang 多语言翻译
+func (e *Application) Lang(ctx context.Context, langKey string) string {
+	return e.GetLang().Translate(ctx, fmt.Sprintf(`{#%s}`, langKey))
 }
 
 func (e *Application) SetLang(lang *gi18n.Manager) {

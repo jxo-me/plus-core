@@ -28,6 +28,7 @@ type Runtime interface {
 	// SetLang gi18n
 	SetLang(lang *gi18n.Manager)
 	GetLang() *gi18n.Manager
+	Lang(ctx context.Context, langKey string) string
 	// SetConfig config
 	SetConfig(c *gcfg.Config)
 	GetConfig() *gcfg.Config
