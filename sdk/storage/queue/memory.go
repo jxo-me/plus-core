@@ -37,7 +37,7 @@ func (m *Memory) makeQueue() queue {
 	return make(queue, m.PoolNum)
 }
 
-func (m *Memory) Append(message storage.Messager) error {
+func (m *Memory) Append(ctx context.Context, message storage.Messager) error {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
 	memoryMessage := new(Message)
@@ -97,11 +97,11 @@ func (m *Memory) Register(ctx context.Context, name string, f storage.ConsumerFu
 	}(q, f)
 }
 
-func (m *Memory) Run() {
+func (m *Memory) Run(ctx context.Context) {
 	m.wait.Add(1)
 	m.wait.Wait()
 }
 
-func (m *Memory) Shutdown() {
+func (m *Memory) Shutdown(ctx context.Context) {
 	m.wait.Done()
 }

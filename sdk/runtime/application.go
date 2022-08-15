@@ -8,10 +8,8 @@ import (
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/i18n/gi18n"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/sdk/pkg/amqp/pool"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/storage/queue"
@@ -25,11 +23,10 @@ type Application struct {
 	jwt         map[string]*jwt.GfJWTMiddleware
 	lang        *gi18n.Manager
 	config      *gcfg.Config
-	cache       *gcache.Cache
+	cache       storage.AdapterCache
 	websocket   *ws.Instance
 	memoryQueue storage.AdapterQueue
-	amqp        map[string]*pool.ConnPool
-	queue       storage.AdapterQueue
+	queue       map[string]storage.AdapterQueue
 }
 
 // NewConfig 默认值
@@ -37,9 +34,8 @@ func NewConfig() *Application {
 	return &Application{
 		casbins:     make(map[string]*casbin.SyncedEnforcer),
 		jwt:         make(map[string]*jwt.GfJWTMiddleware),
-		amqp:        make(map[string]*pool.ConnPool),
+		queue:       make(map[string]storage.AdapterQueue),
 		memoryQueue: queue.NewMemory(10000),
-		cache:       gcache.New(),
 	}
 }
 
@@ -120,19 +116,19 @@ func (e *Application) Config(ctx context.Context, pattern string) *gvar.Var {
 	return c
 }
 
-// Cache 获取缓存实例
-func (e *Application) Cache() *gcache.Cache {
-	return e.cache
-}
-
-// SetCache 设置缓存
-func (e *Application) SetCache(c *gcache.Cache) {
+// SetCacheAdapter 设置缓存
+func (e *Application) SetCacheAdapter(c storage.AdapterCache) {
 	e.cache = c
 }
 
-// GetCache 获取缓存
-func (e *Application) GetCache() *gcache.Cache {
-	return e.cache
+// GetCacheAdapter 获取缓存
+func (e *Application) GetCacheAdapter() storage.AdapterCache {
+	return NewCache("", e.cache, "")
+}
+
+// GetCachePrefix 获取带租户标记的cache
+func (e *Application) GetCachePrefix(key string) storage.AdapterCache {
+	return NewCache(key, e.cache, "")
 }
 
 func (e *Application) SetWebSocket(s *ws.Instance) {
@@ -147,43 +143,37 @@ func (e *Application) GetWebSocket() *ws.Instance {
 	return e.websocket
 }
 
-func (e *Application) SetAmqp(key string, amqp *pool.ConnPool) {
-	e.mux.Lock()
-	defer e.mux.Unlock()
-	e.amqp[key] = amqp
-}
-
-func (e *Application) GetAmqp() map[string]*pool.ConnPool {
-	return e.amqp
-}
-
-// GetAmqpKey 根据key获取amqp
-func (e *Application) GetAmqpKey(key string) *pool.ConnPool {
-	e.mux.Lock()
-	defer e.mux.Unlock()
-	if e, ok := e.amqp["*"]; ok {
-		return e
-	}
-	return e.amqp[key]
-}
-
 func (e *Application) GetMemoryQueue(prefix string) storage.AdapterQueue {
 	return NewQueue(prefix, e.memoryQueue)
 }
 
 // SetQueueAdapter 设置队列适配器
-func (e *Application) SetQueueAdapter(c storage.AdapterQueue) {
-	e.queue = c
+func (e *Application) SetQueueAdapter(key string, c storage.AdapterQueue) {
+	e.mux.Lock()
+	defer e.mux.Unlock()
+	e.queue[key] = c
 }
 
 // GetQueueAdapter 获取队列适配器
-func (e *Application) GetQueueAdapter() storage.AdapterQueue {
-	return NewQueue("", e.queue)
+func (e *Application) GetQueueAdapter(key string) storage.AdapterQueue {
+	e.mux.Lock()
+	defer e.mux.Unlock()
+	// 优先返回全局
+	if j, ok := e.queue["*"]; ok {
+		return j
+	}
+	return e.queue[key]
 }
 
 // GetQueuePrefix 获取带租户标记的queue
 func (e *Application) GetQueuePrefix(key string) storage.AdapterQueue {
-	return NewQueue(key, e.queue)
+	e.mux.Lock()
+	defer e.mux.Unlock()
+	// 优先返回全局
+	if j, ok := e.queue["*"]; ok {
+		return NewQueue(key, j)
+	}
+	return NewQueue(key, e.queue[key])
 }
 
 // GetStreamMessage 获取队列需要用的message

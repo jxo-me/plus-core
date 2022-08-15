@@ -7,9 +7,7 @@ import (
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/i18n/gi18n"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/gogf/gf/v2/os/gcfg"
-	"github.com/jxo-me/plus-core/sdk/pkg/amqp/pool"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"github.com/jxo-me/plus-core/sdk/storage"
 )
@@ -35,22 +33,18 @@ type Runtime interface {
 	SetConfig(c *gcfg.Config)
 	GetConfig() *gcfg.Config
 	Config(ctx context.Context, pattern string) *gvar.Var
-	// SetCache cache
-	SetCache(c *gcache.Cache)
-	GetCache() *gcache.Cache
-	Cache() *gcache.Cache
+	// SetCacheAdapter cache
+	SetCacheAdapter(storage.AdapterCache)
+	GetCacheAdapter() storage.AdapterCache
+	GetCachePrefix(string) storage.AdapterCache
 	// SetWebSocket websocket
 	SetWebSocket(s *ws.Instance)
 	WebSocket() *ws.Instance
 	GetWebSocket() *ws.Instance
-	// SetAmqp rabbitmq amqp
-	SetAmqp(key string, amqp *pool.ConnPool)
-	GetAmqp() map[string]*pool.ConnPool
-	GetAmqpKey(key string) *pool.ConnPool
 
 	GetMemoryQueue(prefix string) storage.AdapterQueue
-	SetQueueAdapter(c storage.AdapterQueue)
-	GetQueueAdapter() storage.AdapterQueue
+	SetQueueAdapter(key string, c storage.AdapterQueue)
+	GetQueueAdapter(key string) storage.AdapterQueue
 	GetQueuePrefix(key string) storage.AdapterQueue
 	GetStreamMessage(id, stream string, value map[string]interface{}) (storage.Messager, error)
 }

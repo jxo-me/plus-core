@@ -5,18 +5,18 @@ go 1.19
 require (
 	github.com/bsm/redislock v0.7.2
 	github.com/casbin/casbin/v2 v2.51.2
-	github.com/go-redis/redis/v7 v7.3.0
+	github.com/go-redis/redis/v7 v7.4.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gogf/gf-jwt/v2 v2.0.1
 	github.com/gogf/gf/v2 v2.1.2
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/json-iterator/go v1.1.12
+	github.com/jxo-me/rabbitmq-go v1.0.0
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/robinjoseph08/redisqueue/v2 v2.1.0
 	github.com/spf13/cast v1.5.0
-	github.com/streadway/amqp v1.0.0
 	golang.org/x/text v0.3.8-0.20211105212822-18b340fc7af2
 )
 
@@ -47,6 +47,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/rabbitmq/amqp091-go v1.4.0 // indirect
 	github.com/tsuyoshiwada/go-gitcmd v0.0.0-20180205145712-5f1f5f9475df // indirect
 	github.com/urfave/cli v1.20.0 // indirect
 	go.opentelemetry.io/otel v1.7.0 // indirect

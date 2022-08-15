@@ -51,7 +51,7 @@ func (r *Redis) newProducer(options *redisqueue.ProducerOptions) (*redisqueue.Pr
 	return redisqueue.NewProducerWithOptions(options)
 }
 
-func (r *Redis) Append(message storage.Messager) error {
+func (r *Redis) Append(ctx context.Context, message storage.Messager) error {
 	err := r.producer.Enqueue(&redisqueue.Message{
 		ID:     message.GetID(),
 		Stream: message.GetStream(),
@@ -70,10 +70,10 @@ func (r *Redis) Register(ctx context.Context, name string, f storage.ConsumerFun
 	})
 }
 
-func (r *Redis) Run() {
+func (r *Redis) Run(ctx context.Context) {
 	r.consumer.Run()
 }
 
-func (r *Redis) Shutdown() {
+func (r *Redis) Shutdown(ctx context.Context) {
 	r.consumer.Shutdown()
 }

@@ -28,23 +28,23 @@ func (e *Queue) Register(ctx context.Context, name string, f storage.ConsumerFun
 }
 
 // Append 增加数据到生产者
-func (e *Queue) Append(message storage.Messager) error {
+func (e *Queue) Append(ctx context.Context, message storage.Messager) error {
 	values := message.GetValues()
 	if values == nil {
 		values = make(map[string]interface{})
 	}
 	values[storage.PrefixKey] = e.prefix
-	return e.queue.Append(message)
+	return e.queue.Append(ctx, message)
 }
 
 // Run 运行
-func (e *Queue) Run() {
-	e.queue.Run()
+func (e *Queue) Run(ctx context.Context) {
+	e.queue.Run(ctx)
 }
 
 // Shutdown 停止
-func (e *Queue) Shutdown() {
+func (e *Queue) Shutdown(ctx context.Context) {
 	if e.queue != nil {
-		e.queue.Shutdown()
+		e.queue.Shutdown(ctx)
 	}
 }
