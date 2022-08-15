@@ -1,29 +1,22 @@
 package cache
 
 import (
+	"context"
 	"fmt"
-	"strconv"
-	"sync"
+	"github.com/gogf/gf/v2/container/gvar"
+	"github.com/gogf/gf/v2/os/gcache"
 	"time"
-
-	"github.com/spf13/cast"
 )
-
-type item struct {
-	Value   string
-	Expired time.Time
-}
 
 // NewMemory memory模式
 func NewMemory() *Memory {
 	return &Memory{
-		items: new(sync.Map),
+		cache: gcache.New(),
 	}
 }
 
 type Memory struct {
-	items *sync.Map
-	mutex sync.RWMutex
+	cache *gcache.Cache
 }
 
 func (*Memory) String() string {
@@ -33,115 +26,74 @@ func (*Memory) String() string {
 func (m *Memory) connect() {
 }
 
-func (m *Memory) Get(key string) (string, error) {
-	item, err := m.getItem(key)
-	if err != nil || item == nil {
-		return "", err
-	}
-	return item.Value, nil
+func (m *Memory) Get(ctx context.Context, key string) (*gvar.Var, error) {
+	return m.getItem(ctx, key)
 }
 
-func (m *Memory) getItem(key string) (*item, error) {
-	var err error
-	i, ok := m.items.Load(key)
-	if !ok {
-		return nil, nil
-	}
-	switch i.(type) {
-	case *item:
-		item := i.(*item)
-		if item.Expired.Before(time.Now()) {
-			//过期
-			_ = m.del(key)
-			//过期后删除
-			return nil, nil
-		}
-		return item, nil
-	default:
-		err = fmt.Errorf("value of %s type error", key)
+func (m *Memory) getItem(ctx context.Context, key string) (*gvar.Var, error) {
+	return m.cache.Get(ctx, key)
+}
+
+func (m *Memory) Set(ctx context.Context, key string, val interface{}, expire int) error {
+	return m.setItem(ctx, key, val, expire)
+}
+
+func (m *Memory) setItem(ctx context.Context, key string, item interface{}, expire int) error {
+	return m.cache.Set(ctx, key, item, time.Duration(expire))
+}
+
+func (m *Memory) Del(ctx context.Context, key string) error {
+	return m.del(ctx, key)
+}
+
+func (m *Memory) del(ctx context.Context, key string) error {
+	_, err := m.cache.Remove(ctx, key)
+	return err
+}
+
+func (m *Memory) HashGet(ctx context.Context, hk, key string) (*gvar.Var, error) {
+	v, err := m.getItem(ctx, fmt.Sprintf("%s:%s", hk, key))
+	if err != nil || v == nil {
 		return nil, err
 	}
+	return v, err
 }
 
-func (m *Memory) Set(key string, val interface{}, expire int) error {
-	s, err := cast.ToStringE(val)
+func (m *Memory) HashDel(ctx context.Context, hk, key string) error {
+	return m.del(ctx, fmt.Sprintf("%s:%s", hk, key))
+}
+
+func (m *Memory) Increase(ctx context.Context, key string) error {
+	return m.calculate(ctx, key, 1)
+}
+
+func (m *Memory) Decrease(ctx context.Context, key string) error {
+	return m.calculate(ctx, key, -1)
+}
+
+func (m *Memory) calculate(ctx context.Context, key string, num int) error {
+	v, err := m.getItem(ctx, key)
 	if err != nil {
 		return err
 	}
-	item := &item{
-		Value:   s,
-		Expired: time.Now().Add(time.Duration(expire) * time.Second),
+	if v == nil {
+		return fmt.Errorf("%s not exist", key)
 	}
-	return m.setItem(key, item)
-}
-
-func (m *Memory) setItem(key string, item *item) error {
-	m.items.Store(key, item)
-	return nil
-}
-
-func (m *Memory) Del(key string) error {
-	return m.del(key)
-}
-
-func (m *Memory) del(key string) error {
-	m.items.Delete(key)
-	return nil
-}
-
-func (m *Memory) HashGet(hk, key string) (string, error) {
-	item, err := m.getItem(hk + key)
-	if err != nil || item == nil {
-		return "", err
-	}
-	return item.Value, err
-}
-
-func (m *Memory) HashDel(hk, key string) error {
-	return m.del(hk + key)
-}
-
-func (m *Memory) Increase(key string) error {
-	return m.calculate(key, 1)
-}
-
-func (m *Memory) Decrease(key string) error {
-	return m.calculate(key, -1)
-}
-
-func (m *Memory) calculate(key string, num int) error {
-	m.mutex.RLock()
-	defer m.mutex.RUnlock()
-	item, err := m.getItem(key)
+	expire, err := m.cache.GetExpire(ctx, key)
 	if err != nil {
 		return err
 	}
+	return m.cache.Set(ctx, key, v.Int()+num, expire)
+}
 
-	if item == nil {
+func (m *Memory) Expire(ctx context.Context, key string, dur time.Duration) error {
+	v, err := m.getItem(ctx, key)
+	if err != nil {
+		return err
+	}
+	if v == nil {
 		err = fmt.Errorf("%s not exist", key)
 		return err
 	}
-	var n int
-	n, err = cast.ToIntE(item.Value)
-	if err != nil {
-		return err
-	}
-	n += num
-	item.Value = strconv.Itoa(n)
-	return m.setItem(key, item)
-}
-
-func (m *Memory) Expire(key string, dur time.Duration) error {
-	m.mutex.RLock()
-	defer m.mutex.RUnlock()
-	item, err := m.getItem(key)
-	if err != nil {
-		return err
-	}
-	if item == nil {
-		err = fmt.Errorf("%s not exist", key)
-		return err
-	}
-	item.Expired = time.Now().Add(dur)
-	return m.setItem(key, item)
+	return m.cache.Set(ctx, key, v, dur)
 }
