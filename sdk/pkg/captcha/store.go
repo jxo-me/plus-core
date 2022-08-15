@@ -1,19 +1,20 @@
 package captcha
 
 import (
+	"context"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/mojocn/base64Captcha"
 )
 
 type cacheStore struct {
-	cache      storage.AdapterCache
+	cache      storage.AdapterGCache
 	expiration int
 }
 
 // NewCacheStore returns a new standard memory store for captchas with the
 // given collection threshold and expiration time (duration). The returned
 // store must be registered with SetCustomStore to replace the default one.
-func NewCacheStore(cache storage.AdapterCache, expiration int) base64Captcha.Store {
+func NewCacheStore(cache storage.AdapterGCache, expiration int) base64Captcha.Store {
 	s := new(cacheStore)
 	s.cache = cache
 	s.expiration = expiration
@@ -22,18 +23,18 @@ func NewCacheStore(cache storage.AdapterCache, expiration int) base64Captcha.Sto
 
 // Set sets the digits for the captcha id.
 func (e *cacheStore) Set(id string, value string) error {
-	return e.cache.Set(id, value, e.expiration)
+	return e.cache.Set(context.Background(), id, value, e.expiration)
 }
 
 // Get returns stored digits for the captcha id. Clear indicates
 // whether the captcha must be deleted from the store.
 func (e *cacheStore) Get(id string, clear bool) string {
-	v, err := e.cache.Get(id)
+	v, err := e.cache.Get(context.Background(), id)
 	if err == nil {
 		if clear {
-			_ = e.cache.Del(id)
+			_ = e.cache.Del(context.Background(), id)
 		}
-		return v
+		return v.String()
 	}
 	return ""
 }
