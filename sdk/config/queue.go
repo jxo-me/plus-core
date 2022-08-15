@@ -56,6 +56,9 @@ func (e Queue) Setup(ctx context.Context) (storage.AdapterQueue, error) {
 		e.Redis.Consumer.RedisClient = client
 		return queue.NewRedis(e.Redis.Producer, e.Redis.Consumer)
 	}
+	// todo rabbitmq queue
+	// todo rocketmq queue
+	
 	if e.NSQ != nil {
 		cfg, err := e.NSQ.GetNSQOptions()
 		if err != nil {
