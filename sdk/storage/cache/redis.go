@@ -1,30 +1,29 @@
 package cache
 
 import (
-	"context"
-	"github.com/gogf/gf/v2/container/gvar"
-	"github.com/gogf/gf/v2/database/gredis"
 	"time"
+
+	"github.com/go-redis/redis/v7"
 )
 
-// NewGredis redis模式
-func NewGredis(client *gredis.Redis, options *gredis.Config) (*Redis, error) {
-	var err error
+// NewRedis redis模式
+func NewRedis(client *redis.Client, options *redis.Options) (*Redis, error) {
 	if client == nil {
-		client, err = gredis.New(options)
-		if err != nil {
-			return nil, err
-		}
+		client = redis.NewClient(options)
 	}
 	r := &Redis{
 		client: client,
+	}
+	err := r.connect()
+	if err != nil {
+		return nil, err
 	}
 	return r, nil
 }
 
 // Redis cache implement
 type Redis struct {
-	client *gredis.Redis
+	client *redis.Client
 }
 
 func (*Redis) String() string {
@@ -33,55 +32,50 @@ func (*Redis) String() string {
 
 // connect connect test
 func (r *Redis) connect() error {
-	return nil
+	var err error
+	_, err = r.client.Ping().Result()
+	return err
 }
 
 // Get from key
-func (r *Redis) Get(ctx context.Context, key string) (*gvar.Var, error) {
-	return r.client.Do(ctx, "GET", key)
+func (r *Redis) Get(key string) (string, error) {
+	return r.client.Get(key).Result()
 }
 
 // Set value with key and expire time
-func (r *Redis) Set(ctx context.Context, key string, val interface{}, expire int) error {
-	_, err := r.client.Do(ctx, "SET", key, val, time.Duration(expire)*time.Second)
-	return err
+func (r *Redis) Set(key string, val interface{}, expire int) error {
+	return r.client.Set(key, val, time.Duration(expire)*time.Second).Err()
 }
 
 // Del delete key in redis
-func (r *Redis) Del(ctx context.Context, key string) error {
-	_, err := r.client.Do(ctx, "DEL", key)
-	return err
+func (r *Redis) Del(key string) error {
+	return r.client.Del(key).Err()
 }
 
 // HashGet from key
-func (r *Redis) HashGet(ctx context.Context, hk, key string) (*gvar.Var, error) {
-	return r.client.Do(ctx, "HGET", hk, key)
+func (r *Redis) HashGet(hk, key string) (string, error) {
+	return r.client.HGet(hk, key).Result()
 }
 
 // HashDel delete key in specify redis's hashtable
-func (r *Redis) HashDel(ctx context.Context, hk, key string) error {
-	_, err := r.client.Do(ctx, "HDEL", hk, key)
-	return err
+func (r *Redis) HashDel(hk, key string) error {
+	return r.client.HDel(hk, key).Err()
 }
 
-// Increase get Increase
-func (r *Redis) Increase(ctx context.Context, key string) error {
-	_, err := r.client.Do(ctx, "INCRBY", key)
-	return err
+func (r *Redis) Increase(key string) error {
+	return r.client.Incr(key).Err()
 }
 
-func (r *Redis) Decrease(ctx context.Context, key string) error {
-	_, err := r.client.Do(ctx, "DECRBY", key)
-	return err
+func (r *Redis) Decrease(key string) error {
+	return r.client.Decr(key).Err()
 }
 
 // Expire Set ttl
-func (r *Redis) Expire(ctx context.Context, key string, dur time.Duration) error {
-	_, err := r.client.Do(ctx, "EXPIRE", key, dur)
-	return err
+func (r *Redis) Expire(key string, dur time.Duration) error {
+	return r.client.Expire(key, dur).Err()
 }
 
 // GetClient 暴露原生client
-func (r *Redis) GetClient() *gredis.Redis {
+func (r *Redis) GetClient() *redis.Client {
 	return r.client
 }
