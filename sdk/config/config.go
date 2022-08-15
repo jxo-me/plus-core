@@ -13,6 +13,8 @@ var (
 // Settings 兼容原先的配置结构
 type Settings struct {
 	Settings  Config `yaml:"settings"`
+	Cache     *Cache `yaml:"cache"`
+	Queue     *Queue `yaml:"queue"`
 	callbacks []func()
 }
 
@@ -34,6 +36,8 @@ func (e *Settings) init() {
 // Config 配置集合
 type Config struct {
 	Jwt    *Jwt        `yaml:"jwt"`
+	Cache  *Cache      `yaml:"cache"`
+	Queue  *Queue      `yaml:"queue"`
 	Extend interface{} `yaml:"extend"`
 }
 
@@ -42,6 +46,8 @@ func Setup(s *gcfg.Config, fs ...func()) {
 	_cfg = &Settings{
 		Settings: Config{
 			Jwt:    JwtConfig,
+			Cache:  CacheConfig,
+			Queue:  QueueConfig,
 			Extend: ExtendConfig,
 		},
 		callbacks: fs,
