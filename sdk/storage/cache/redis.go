@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-// NewRedis redis模式
-func NewRedis(client *gredis.Redis, options *gredis.Config) (*Redis, error) {
+// NewGredis redis模式
+func NewGredis(client *gredis.Redis, options *gredis.Config) (*Redis, error) {
 	var err error
 	if client == nil {
 		client, err = gredis.New(options)

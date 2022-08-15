@@ -23,7 +23,7 @@ type Application struct {
 	jwt         map[string]*jwt.GfJWTMiddleware
 	lang        *gi18n.Manager
 	config      *gcfg.Config
-	cache       storage.AdapterCache
+	cache       storage.AdapterGCache
 	websocket   *ws.Instance
 	memoryQueue storage.AdapterQueue
 	queue       map[string]storage.AdapterQueue
@@ -117,18 +117,18 @@ func (e *Application) Config(ctx context.Context, pattern string) *gvar.Var {
 }
 
 // SetCacheAdapter 设置缓存
-func (e *Application) SetCacheAdapter(c storage.AdapterCache) {
+func (e *Application) SetCacheAdapter(c storage.AdapterGCache) {
 	e.cache = c
 }
 
 // GetCacheAdapter 获取缓存
-func (e *Application) GetCacheAdapter() storage.AdapterCache {
-	return NewCache("", e.cache, "")
+func (e *Application) GetCacheAdapter() storage.AdapterGCache {
+	return NewGCache("", e.cache, "")
 }
 
 // GetCachePrefix 获取带租户标记的cache
-func (e *Application) GetCachePrefix(key string) storage.AdapterCache {
-	return NewCache(key, e.cache, "")
+func (e *Application) GetCachePrefix(key string) storage.AdapterGCache {
+	return NewGCache(key, e.cache, "")
 }
 
 func (e *Application) SetWebSocket(s *ws.Instance) {
