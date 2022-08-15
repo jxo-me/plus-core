@@ -7,7 +7,7 @@ import (
 )
 
 type Cache struct {
-	Redis  *RedisConnectOptions
+	Redis  *GredisConnectOptions
 	Memory interface{}
 }
 
@@ -17,16 +17,16 @@ var CacheConfig = new(Cache)
 // Setup 构造cache 顺序 redis > 其他 > memory
 func (e Cache) Setup(ctx context.Context) (storage.AdapterCache, error) {
 	if e.Redis != nil {
-		options, err := e.Redis.GetRedisOptions()
+		options, err := e.Redis.GetGredisOptions()
 		if err != nil {
 			return nil, err
 		}
-		r, err := cache.NewRedis(GetRedisClient(), options)
+		r, err := cache.NewRedis(GetGredisClient(), options)
 		if err != nil {
 			return nil, err
 		}
 		if _redis == nil {
-			_redis = r.GetClient()
+			_gredis = r.GetClient()
 		}
 		return r, nil
 	}
