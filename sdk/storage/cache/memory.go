@@ -39,7 +39,7 @@ func (m *Memory) Set(ctx context.Context, key string, val interface{}, expire in
 }
 
 func (m *Memory) setItem(ctx context.Context, key string, item interface{}, expire int) error {
-	return m.cache.Set(ctx, key, item, time.Duration(expire))
+	return m.cache.Set(ctx, key, item, time.Duration(expire)*time.Second)
 }
 
 func (m *Memory) Del(ctx context.Context, key string) error {

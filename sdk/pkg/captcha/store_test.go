@@ -1,7 +1,6 @@
 package captcha
 
 import (
-	"context"
 	"fmt"
 	"math/rand"
 	"testing"
@@ -22,9 +21,8 @@ func TestSetGet(t *testing.T) {
 	s := NewCacheStore(getStore(t), _expiration)
 	id := "captcha id"
 	d := "random-string"
-	ctx := context.Background()
-	s.Set(ctx, id, d)
-	d2 := s.Get(ctx, id, false)
+	s.Set(id, d)
+	d2 := s.Get(id, false)
 	if d2 != d {
 		t.Errorf("saved %v, getDigits returned got %v", d, d2)
 	}
@@ -34,13 +32,12 @@ func TestGetClear(t *testing.T) {
 	s := NewCacheStore(getStore(t), _expiration)
 	id := "captcha id"
 	d := "932839jfffjkdss"
-	ctx := context.Background()
-	s.Set(ctx, id, d)
-	d2 := s.Get(ctx, id, true)
+	s.Set(id, d)
+	d2 := s.Get(id, true)
 	if d != d2 {
 		t.Errorf("saved %v, getDigitsClear returned got %v", d, d2)
 	}
-	d2 = s.Get(ctx, id, false)
+	d2 = s.Get(id, false)
 	if d2 != "" {
 		t.Errorf("getDigitClear didn't clear (%q=%v)", id, d2)
 	}
@@ -52,36 +49,34 @@ func BenchmarkSetCollect(b *testing.B) {
 	d := "fdskfew9832232r"
 	s := NewCacheStore(store, -1)
 	ids := make([]string, 1000)
-	ctx := context.Background()
 	for i := range ids {
 		ids[i] = fmt.Sprintf("%d", rand.Int63())
 	}
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		for j := 0; j < 1000; j++ {
-			s.Set(ctx, ids[j], d)
+			s.Set(ids[j], d)
 		}
 	}
 }
 func TestStore_SetGoCollect(t *testing.T) {
 	s := NewCacheStore(getStore(t), -1)
-	ctx := context.Background()
 	for i := 0; i <= 100; i++ {
-		s.Set(ctx, fmt.Sprint(i), fmt.Sprint(i))
+		s.Set(fmt.Sprint(i), fmt.Sprint(i))
 	}
 }
 
 func TestStore_CollectNotExpire(t *testing.T) {
 	s := NewCacheStore(getStore(t), 36000)
-	ctx := context.Background()
 	for i := 0; i < 50; i++ {
-		s.Set(ctx, fmt.Sprint(i), fmt.Sprint(i))
+		s.Set(fmt.Sprint(i), fmt.Sprint(i))
 	}
 
 	// let background goroutine to go
 	time.Sleep(time.Second)
 
-	if v := s.Get(ctx, "0", false); v != "0" {
+	if v := s.Get("0", false); v != "0" {
+		fmt.Println("v:", v)
 		t.Error("cache store get failed")
 	}
 }
