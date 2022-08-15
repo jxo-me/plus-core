@@ -5,35 +5,35 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"github.com/gogf/gf/v2/database/gredis"
+	"github.com/gogf/gf/v2/os/glog"
 	"io/ioutil"
-
-	"github.com/go-redis/redis/v7"
 )
 
-var _redis *redis.Client
+var _redis *gredis.Redis
 
 // GetRedisClient 获取redis客户端
-func GetRedisClient() *redis.Client {
+func GetRedisClient() *gredis.Redis {
 	return _redis
 }
 
 // SetRedisClient 设置redis客户端
-func SetRedisClient(ctx context.Context, c *redis.Client) {
+func SetRedisClient(ctx context.Context, c *gredis.Redis) {
 	if _redis != nil && _redis != c {
-		_redis.Shutdown()
+		err := _redis.Close(ctx)
+		if err != nil {
+			glog.Warning(ctx, "gRedis close error:", err)
+		}
 	}
 	_redis = c
 }
 
 type RedisConnectOptions struct {
-	Network    string `yaml:"network" json:"network"`
-	Addr       string `yaml:"addr" json:"addr"`
-	Username   string `yaml:"username" json:"username"`
-	Password   string `yaml:"password" json:"password"`
-	DB         int    `yaml:"db" json:"db"`
-	PoolSize   int    `yaml:"pool_size" json:"pool_size"`
-	Tls        *Tls   `yaml:"tls" json:"tls"`
-	MaxRetries int    `yaml:"max_retries" json:"max_retries"`
+	Addr     string `yaml:"addr" json:"addr"`
+	Username string `yaml:"username" json:"username"`
+	Password string `yaml:"password" json:"password"`
+	DB       int    `yaml:"db" json:"db"`
+	Tls      *Tls   `yaml:"tls" json:"tls"`
 }
 
 type Tls struct {
@@ -42,15 +42,11 @@ type Tls struct {
 	Ca   string `yaml:"ca" json:"ca"`
 }
 
-func (e RedisConnectOptions) GetRedisOptions() (*redis.Options, error) {
-	r := &redis.Options{
-		Network:    e.Network,
-		Addr:       e.Addr,
-		Username:   e.Username,
-		Password:   e.Password,
-		DB:         e.DB,
-		MaxRetries: e.MaxRetries,
-		PoolSize:   e.PoolSize,
+func (e RedisConnectOptions) GetRedisOptions() (*gredis.Config, error) {
+	r := &gredis.Config{
+		Address: e.Addr,
+		Pass:    e.Password,
+		Db:      e.DB,
 	}
 	var err error
 	r.TLSConfig, err = getTLS(e.Tls)
