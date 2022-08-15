@@ -7,14 +7,14 @@ import (
 )
 
 type cacheStore struct {
-	cache      storage.AdapterGCache
+	cache      storage.AdapterCache
 	expiration int
 }
 
 // NewCacheStore returns a new standard memory store for captchas with the
 // given collection threshold and expiration time (duration). The returned
 // store must be registered with SetCustomStore to replace the default one.
-func NewCacheStore(cache storage.AdapterGCache, expiration int) base64Captcha.Store {
+func NewCacheStore(cache storage.AdapterCache, expiration int) base64Captcha.Store {
 	s := new(cacheStore)
 	s.cache = cache
 	s.expiration = expiration
