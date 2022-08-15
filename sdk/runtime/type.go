@@ -34,9 +34,9 @@ type Runtime interface {
 	GetConfig() *gcfg.Config
 	Config(ctx context.Context, pattern string) *gvar.Var
 	// SetCacheAdapter cache
-	SetCacheAdapter(storage.AdapterGCache)
-	GetCacheAdapter() storage.AdapterGCache
-	GetCachePrefix(string) storage.AdapterGCache
+	SetCacheAdapter(storage.AdapterCache)
+	GetCacheAdapter() storage.AdapterCache
+	GetCachePrefix(string) storage.AdapterCache
 	// SetWebSocket websocket
 	SetWebSocket(s *ws.Instance)
 	WebSocket() *ws.Instance
