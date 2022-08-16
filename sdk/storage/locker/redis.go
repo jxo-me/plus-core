@@ -1,32 +1,32 @@
 package locker
 
 import (
-	"context"
-	"github.com/go-redis/redis/v8"
+	glib "github.com/gogf/gf/v2/database/gredis"
+	"github.com/jxo-me/redislock"
+	"github.com/jxo-me/redislock/redis/gredis"
 	"time"
-
-	"github.com/bsm/redislock"
 )
 
 // NewRedis 初始化locker
-func NewRedis(c *redis.Client) *Redis {
+func NewRedis(c *glib.Redis) *Redis {
 	return &Redis{
 		client: c,
 	}
 }
 
 type Redis struct {
-	client *redis.Client
-	mutex  *redislock.Client
+	client *glib.Redis
+	mutex  *redislock.Lock
 }
 
 func (Redis) String() string {
 	return "redis"
 }
 
-func (r *Redis) Lock(key string, ttl int64, options *redislock.Options) (*redislock.Lock, error) {
+func (r *Redis) Lock(key string, ttl int64, options ...redislock.Option) (*redislock.Mutex, error) {
 	if r.mutex == nil {
-		r.mutex = redislock.New(r.client)
+		r.mutex = redislock.New(gredis.NewPool(r.client))
 	}
-	return r.mutex.Obtain(context.Background(), key, time.Duration(ttl)*time.Second, options)
+	options = append(options, redislock.WithExpiry(time.Duration(ttl)*time.Second))
+	return r.mutex.NewMutex(key, options...), nil
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/gogf/gf/v2/container/gvar"
 	"time"
 
-	"github.com/bsm/redislock"
+	"github.com/jxo-me/redislock"
 )
 
 const (
@@ -49,5 +49,5 @@ type ConsumerFunc func(ctx context.Context, msg Messager) error
 
 type AdapterLocker interface {
 	String() string
-	Lock(key string, ttl int64, options *redislock.Options) (*redislock.Lock, error)
+	Lock(key string, ttl int64, options ...redislock.Option) (*redislock.Mutex, error)
 }

@@ -4,7 +4,6 @@ go 1.19
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
-	github.com/bsm/redislock v0.7.2
 	github.com/casbin/casbin/v2 v2.51.2
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/go-redis/redis/v8 v8.11.5
@@ -14,6 +13,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/rabbitmq-go v1.0.0
+	github.com/jxo-me/redislock v0.0.0-20220816080406-ef28c5fd8c8a
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/robinjoseph08/redisqueue/v2 v2.1.0
@@ -37,6 +37,8 @@ require (
 	github.com/golang/mock v1.4.4 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/grokify/html-strip-tags-go v0.0.1 // indirect
+	github.com/hashicorp/errwrap v1.0.0 // indirect
+	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/imdario/mergo v0.3.7 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
