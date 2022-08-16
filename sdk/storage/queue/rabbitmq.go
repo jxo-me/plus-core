@@ -9,6 +9,38 @@ import (
 	"github.com/jxo-me/rabbitmq-go"
 )
 
+func NewRabbitMQ(
+	ctx context.Context,
+	dsn string,
+	routingKeys []string,
+	exchange string,
+	exchangeType string,
+	consumerOptions *rabbitmq.ConsumerOptions,
+	publisherOptions *rabbitmq.PublisherOptions,
+	cfg rabbitmq.Config) (*RabbitMQ, error) {
+	var err error
+	var consumer rabbitmq.Consumer
+	r := &RabbitMQ{
+		Url:              dsn,
+		RoutingKeys:      routingKeys,
+		Exchange:         exchange,
+		ExchangeType:     exchangeType,
+		Config:           cfg,
+		ConsumerOptions:  consumerOptions,
+		PublisherOptions: publisherOptions,
+	}
+	consumer, err = r.newConsumer(ctx, r.ConsumerOptions)
+	if err != nil {
+		return nil, err
+	}
+	r.consumer = &consumer
+	r.producer, err = r.newProducer(ctx, r.PublisherOptions)
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
+}
+
 // RabbitMQ cache implement
 type RabbitMQ struct {
 	Url              string

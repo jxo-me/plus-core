@@ -5,14 +5,17 @@ import (
 	"github.com/go-redis/redis/v7"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/storage/queue"
+	"github.com/jxo-me/rabbitmq-go"
 	"github.com/robinjoseph08/redisqueue/v2"
 	"time"
 )
 
 type Queue struct {
-	Redis  *QueueRedis
-	Memory *QueueMemory
-	NSQ    *QueueNSQ `json:"nsq" yaml:"nsq"`
+	Redis  *QueueRedis  `json:"redis" yaml:"redis"`
+	Memory *QueueMemory `json:"memory" yaml:"memory"`
+	Rabbit *QueueRabbit `json:"rabbit" yaml:"rabbit"`
+	Rocket *QueueRocket `json:"rocket" yaml:"rocket"`
+	NSQ    *QueueNSQ    `json:"nsq" yaml:"nsq"`
 }
 
 type QueueRedis struct {
@@ -25,6 +28,16 @@ type QueueMemory struct {
 	PoolSize uint
 }
 
+type QueueRabbit struct {
+	RabbitOptions
+	Producer *rabbitmq.PublisherOptions
+	Consumer *rabbitmq.ConsumeOptions
+}
+
+type QueueRocket struct {
+	RocketOptions
+}
+
 type QueueNSQ struct {
 	NSQOptions
 	ChannelPrefix string
@@ -34,7 +47,7 @@ var QueueConfig = new(Queue)
 
 // Empty 空设置
 func (e Queue) Empty() bool {
-	return e.Memory == nil && e.Redis == nil && e.NSQ == nil
+	return e.Memory == nil && e.Redis == nil && e.NSQ == nil && e.Rabbit == nil && e.Rocket == nil
 }
 
 // Setup 启用顺序 redis > 其他 > memory
@@ -56,9 +69,20 @@ func (e Queue) Setup(ctx context.Context) (storage.AdapterQueue, error) {
 		e.Redis.Consumer.RedisClient = client
 		return queue.NewRedis(e.Redis.Producer, e.Redis.Consumer)
 	}
-	// todo rabbitmq queue
-	// todo rocketmq queue
-
+	// rabbitmq queue
+	if e.Rabbit != nil {
+		options, err := e.Rabbit.GetRabbitOptions()
+		if err != nil {
+			return nil, err
+		}
+		dsn := e.Rabbit.GetDsn()
+		return queue.NewRabbitMQ()
+	}
+	// rocketmq queue
+	if e.Rocket != nil {
+		return queue.NewRocketMQ()
+	}
+	// NSQ
 	if e.NSQ != nil {
 		cfg, err := e.NSQ.GetNSQOptions()
 		if err != nil {

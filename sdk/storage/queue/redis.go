@@ -9,10 +9,8 @@ import (
 )
 
 // NewRedis redis模式
-func NewRedis(
-	producerOptions *redisqueue.ProducerOptions,
-	consumerOptions *redisqueue.ConsumerOptions,
-) (*Redis, error) {
+func NewRedis(producerOptions *redisqueue.ProducerOptions,
+	consumerOptions *redisqueue.ConsumerOptions) (*Redis, error) {
 	var err error
 	r := &Redis{}
 	r.producer, err = r.newProducer(producerOptions)

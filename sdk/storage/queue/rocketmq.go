@@ -12,13 +12,38 @@ import (
 	"github.com/jxo-me/plus-core/sdk/storage"
 )
 
+func NewRocketMQ(
+	ctx context.Context,
+	urls []string,
+	consumerOptions *ConsumerOptions,
+	producerOptions *ProducerOptions,
+	credentials primitive.Credentials,
+) (*RocketMQ, error) {
+	var err error
+	r := &RocketMQ{
+		Urls:            urls,
+		ConsumerOptions: consumerOptions,
+		ProducerOptions: producerOptions,
+		Credentials:     credentials,
+	}
+	r.consumer, err = r.newConsumer(ctx, r.ConsumerOptions)
+	if err != nil {
+		return nil, err
+	}
+	r.producer, err = r.newProducer(ctx, r.ProducerOptions)
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
+}
+
 // RocketMQ cache implement
 type RocketMQ struct {
-	Url             []string
+	Urls            []string
 	consumer        rocketmq.PushConsumer
-	consumerOptions *ConsumerOptions
+	ConsumerOptions *ConsumerOptions
 	producer        rocketmq.Producer
-	producerOptions *ProducerOptions
+	ProducerOptions *ProducerOptions
 	Credentials     primitive.Credentials
 }
 
@@ -38,17 +63,17 @@ type ProducerOptions struct {
 
 func (r *RocketMQ) newConsumer(ctx context.Context, options *ConsumerOptions) (rocketmq.PushConsumer, error) {
 	if options == nil {
-		r.consumerOptions = &ConsumerOptions{
+		r.ConsumerOptions = &ConsumerOptions{
 			GroupName:         "DEFAULT_CONSUMER",
 			MaxReconsumeTimes: -1,
 		}
 	}
 	return rocketmq.NewPushConsumer(
 		//consumer.WithGroupName("GAME_RECORD"),
-		consumer.WithGroupName(r.consumerOptions.GroupName),
-		consumer.WithNsResolver(primitive.NewPassthroughResolver(r.Url)),
+		consumer.WithGroupName(r.ConsumerOptions.GroupName),
+		consumer.WithNsResolver(primitive.NewPassthroughResolver(r.Urls)),
 		consumer.WithConsumerModel(consumer.Clustering),
-		consumer.WithMaxReconsumeTimes(r.consumerOptions.MaxReconsumeTimes),
+		consumer.WithMaxReconsumeTimes(r.ConsumerOptions.MaxReconsumeTimes),
 		consumer.WithCredentials(r.Credentials),
 		//consumer.WithCredentials(primitive.Credentials{
 		//	AccessKey: "RocketMQ",
@@ -59,14 +84,14 @@ func (r *RocketMQ) newConsumer(ctx context.Context, options *ConsumerOptions) (r
 
 func (r *RocketMQ) newProducer(ctx context.Context, options *ProducerOptions) (rocketmq.Producer, error) {
 	if options == nil {
-		r.producerOptions = &ProducerOptions{
+		r.ProducerOptions = &ProducerOptions{
 			GroupName:  "DEFAULT_CONSUMER",
 			RetryTimes: 3,
 		}
 	}
 	return rocketmq.NewProducer(
-		producer.WithNsResolver(primitive.NewPassthroughResolver(r.Url)),
-		producer.WithRetry(r.producerOptions.RetryTimes),
+		producer.WithNsResolver(primitive.NewPassthroughResolver(r.Urls)),
+		producer.WithRetry(r.ProducerOptions.RetryTimes),
 		producer.WithCredentials(r.Credentials),
 		//producer.WithCredentials(primitive.Credentials{
 		//	AccessKey: "RocketMQ",
