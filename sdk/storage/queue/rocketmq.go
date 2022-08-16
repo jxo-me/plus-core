@@ -78,6 +78,7 @@ func (r *RocketMQ) newProducer(ctx context.Context, options *ProducerOptions) (r
 
 // Publish 消息入生产者
 func (r *RocketMQ) Publish(ctx context.Context, message storage.Messager) error {
+	//
 	rb, err := json.Marshal(message.GetValues())
 	if err != nil {
 		return err

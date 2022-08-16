@@ -2,16 +2,17 @@ package queue
 
 import (
 	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/robinjoseph08/redisqueue/v2"
 )
 
 type Message struct {
-	redisqueue.Message
+	Id         string
+	Stream     string
+	Values     map[string]interface{}
 	ErrorCount int
 }
 
 func (m *Message) GetId() string {
-	return m.ID
+	return m.Id
 }
 
 func (m *Message) GetStream() string {
@@ -23,7 +24,7 @@ func (m *Message) GetValues() map[string]interface{} {
 }
 
 func (m *Message) SetId(id string) {
-	m.ID = id
+	m.Id = id
 }
 
 func (m *Message) SetStream(stream string) {

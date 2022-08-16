@@ -45,6 +45,7 @@ func (r *RabbitMQ) newProducer(ctx context.Context, options *rabbitmq.PublisherO
 
 // Publish 消息入生产者
 func (r *RabbitMQ) Publish(ctx context.Context, message storage.Messager) error {
+	// exchange exchangeType routingKey
 	rb, err := json.Marshal(message.GetValues())
 	if err != nil {
 		return err
