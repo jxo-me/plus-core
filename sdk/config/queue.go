@@ -76,11 +76,30 @@ func (e Queue) Setup(ctx context.Context) (storage.AdapterQueue, error) {
 			return nil, err
 		}
 		dsn := e.Rabbit.GetDsn()
-		return queue.NewRabbitMQ()
+		routerKeys := []string{}
+		exchange := ""
+		exchangeType := ""
+		return queue.NewRabbitMQ(
+			ctx, dsn, routerKeys, exchange,
+			exchangeType, options,
+			&rabbitmq.ConsumerOptions{ReconnectInterval: time.Duration(60) * time.Second},
+			&rabbitmq.PublisherOptions{ReconnectInterval: time.Duration(60) * time.Second},
+		)
 	}
 	// rocketmq queue
 	if e.Rocket != nil {
-		return queue.NewRocketMQ()
+		_, err := e.Rocket.GetRocketOptions()
+		if err != nil {
+			return nil, err
+		}
+		urls := []string{}
+		return queue.NewRocketMQ(
+			ctx,
+			urls,
+			&queue.ConsumerOptions{},
+			&queue.ProducerOptions{},
+			nil,
+		)
 	}
 	// NSQ
 	if e.NSQ != nil {

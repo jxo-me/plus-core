@@ -17,14 +17,17 @@ func NewRocketMQ(
 	urls []string,
 	consumerOptions *ConsumerOptions,
 	producerOptions *ProducerOptions,
-	credentials primitive.Credentials,
+	credentials *primitive.Credentials,
 ) (*RocketMQ, error) {
 	var err error
 	r := &RocketMQ{
 		Urls:            urls,
 		ConsumerOptions: consumerOptions,
 		ProducerOptions: producerOptions,
-		Credentials:     credentials,
+		Credentials:     *credentials,
+	}
+	if credentials != nil {
+		r.Credentials = *credentials
 	}
 	r.consumer, err = r.newConsumer(ctx, r.ConsumerOptions)
 	if err != nil {

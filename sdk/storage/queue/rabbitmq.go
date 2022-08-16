@@ -15,9 +15,10 @@ func NewRabbitMQ(
 	routingKeys []string,
 	exchange string,
 	exchangeType string,
+	cfg *rabbitmq.Config,
 	consumerOptions *rabbitmq.ConsumerOptions,
 	publisherOptions *rabbitmq.PublisherOptions,
-	cfg rabbitmq.Config) (*RabbitMQ, error) {
+) (*RabbitMQ, error) {
 	var err error
 	var consumer rabbitmq.Consumer
 	r := &RabbitMQ{
@@ -25,9 +26,11 @@ func NewRabbitMQ(
 		RoutingKeys:      routingKeys,
 		Exchange:         exchange,
 		ExchangeType:     exchangeType,
-		Config:           cfg,
 		ConsumerOptions:  consumerOptions,
 		PublisherOptions: publisherOptions,
+	}
+	if cfg != nil {
+		r.Config = *cfg
 	}
 	consumer, err = r.newConsumer(ctx, r.ConsumerOptions)
 	if err != nil {
