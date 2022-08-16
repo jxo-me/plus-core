@@ -38,6 +38,7 @@ type Config struct {
 	Jwt    *Jwt        `yaml:"jwt"`
 	Cache  *Cache      `yaml:"cache"`
 	Queue  *Queue      `yaml:"queue"`
+	Locker *Locker     `yaml:"locker"`
 	Extend interface{} `yaml:"extend"`
 }
 
@@ -49,6 +50,7 @@ func Setup(s *gcfg.Config, fs ...func()) {
 			Cache:  CacheConfig,
 			Queue:  QueueConfig,
 			Extend: ExtendConfig,
+			Locker: LockerConfig,
 		},
 		callbacks: fs,
 	}

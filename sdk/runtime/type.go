@@ -47,4 +47,8 @@ type Runtime interface {
 	GetQueueAdapter(key string) storage.AdapterQueue
 	GetQueuePrefix(key string) storage.AdapterQueue
 	GetStreamMessage(id, stream string, value map[string]interface{}) (storage.Messager, error)
+
+	SetLockerAdapter(storage.AdapterLocker)
+	GetLockerAdapter() storage.AdapterLocker
+	GetLockerPrefix(string) storage.AdapterLocker
 }

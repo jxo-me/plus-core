@@ -24,6 +24,7 @@ type Application struct {
 	lang        *gi18n.Manager
 	config      *gcfg.Config
 	cache       storage.AdapterCache
+	locker      storage.AdapterLocker
 	websocket   *ws.Instance
 	memoryQueue storage.AdapterQueue
 	queue       map[string]storage.AdapterQueue
@@ -183,4 +184,18 @@ func (e *Application) GetStreamMessage(id, stream string, value map[string]inter
 	message.SetStream(stream)
 	message.SetValues(value)
 	return message, nil
+}
+
+// SetLockerAdapter 设置分布式锁
+func (e *Application) SetLockerAdapter(c storage.AdapterLocker) {
+	e.locker = c
+}
+
+// GetLockerAdapter 获取分布式锁
+func (e *Application) GetLockerAdapter() storage.AdapterLocker {
+	return NewLocker("", e.locker)
+}
+
+func (e *Application) GetLockerPrefix(key string) storage.AdapterLocker {
+	return NewLocker(key, e.locker)
 }

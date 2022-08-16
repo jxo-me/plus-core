@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	interval = "/"
+	intervalTenant = "/"
 )
 
 // NewCache 创建对应上下文缓存
@@ -50,38 +50,38 @@ func (e Cache) Connect() error {
 
 // Get val in cache
 func (e Cache) Get(ctx context.Context, key string) (*gvar.Var, error) {
-	return e.store.Get(ctx, e.prefix+interval+key)
+	return e.store.Get(ctx, e.prefix+intervalTenant+key)
 }
 
 // Set val in cache
 func (e Cache) Set(ctx context.Context, key string, val interface{}, expire int) error {
-	return e.store.Set(ctx, e.prefix+interval+key, val, expire)
+	return e.store.Set(ctx, e.prefix+intervalTenant+key, val, expire)
 }
 
 // Del delete key in cache
 func (e Cache) Del(ctx context.Context, key string) error {
-	return e.store.Del(ctx, e.prefix+interval+key)
+	return e.store.Del(ctx, e.prefix+intervalTenant+key)
 }
 
 // HashGet get val in hashtable cache
 func (e Cache) HashGet(ctx context.Context, hk, key string) (*gvar.Var, error) {
-	return e.store.HashGet(ctx, hk, e.prefix+interval+key)
+	return e.store.HashGet(ctx, hk, e.prefix+intervalTenant+key)
 }
 
 // HashDel delete one key:value pair in hashtable cache
 func (e Cache) HashDel(ctx context.Context, hk, key string) error {
-	return e.store.HashDel(ctx, hk, e.prefix+interval+key)
+	return e.store.HashDel(ctx, hk, e.prefix+intervalTenant+key)
 }
 
 // Increase value
 func (e Cache) Increase(ctx context.Context, key string) error {
-	return e.store.Increase(ctx, e.prefix+interval+key)
+	return e.store.Increase(ctx, e.prefix+intervalTenant+key)
 }
 
 func (e Cache) Decrease(ctx context.Context, key string) error {
-	return e.store.Decrease(ctx, e.prefix+interval+key)
+	return e.store.Decrease(ctx, e.prefix+intervalTenant+key)
 }
 
 func (e Cache) Expire(ctx context.Context, key string, dur time.Duration) error {
-	return e.store.Expire(ctx, e.prefix+interval+key, dur)
+	return e.store.Expire(ctx, e.prefix+intervalTenant+key, dur)
 }
