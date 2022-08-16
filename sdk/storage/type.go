@@ -33,10 +33,10 @@ type AdapterQueue interface {
 }
 
 type Messager interface {
-	SetID(string)
+	SetId(string)
 	SetStream(string)
 	SetValues(map[string]interface{})
-	GetID() string
+	GetId() string
 	GetStream() string
 	GetValues() map[string]interface{}
 	GetPrefix() string

@@ -7,7 +7,6 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/rabbitmq-go"
-	"log"
 )
 
 // RabbitMQ cache implement
@@ -66,11 +65,11 @@ func (r *RabbitMQ) Publish(ctx context.Context, message storage.Messager) error 
 func (r *RabbitMQ) Consumer(ctx context.Context, name string, f storage.ConsumerFunc) {
 	err := r.consumer.StartConsuming(ctx,
 		func(d rabbitmq.Delivery) rabbitmq.Action {
-			log.Printf("consumed: %v", string(d.Body))
+			glog.Printf(ctx, "rabbitmq consumed: %s\n", string(d.Body))
 			m := new(Message)
 			m.SetValues(gconv.Map(d.Body))
 			m.SetStream(d.RoutingKey)
-			m.SetID(d.MessageId)
+			m.SetId(d.MessageId)
 			err := f(ctx, m)
 			if err != nil {
 				return rabbitmq.NackRequeue

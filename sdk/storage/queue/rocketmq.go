@@ -99,11 +99,11 @@ func (r *RocketMQ) Consumer(ctx context.Context, name string, f storage.Consumer
 		func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 			for i := range msgs {
 				if len(msgs[i].Body) > 0 {
-					glog.Printf(ctx, "consumed: %v", string(msgs[i].Body))
+					glog.Printf(ctx, "rocketmq consumed: %s\n", string(msgs[i].Body))
 					m := new(Message)
 					m.SetValues(gconv.Map(msgs[i].Body))
 					m.SetStream(msgs[i].GetTags())
-					m.SetID(msgs[i].MsgId)
+					m.SetId(msgs[i].MsgId)
 					err := f(ctx, m)
 					if err != nil {
 						return consumer.Rollback, err

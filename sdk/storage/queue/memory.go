@@ -2,11 +2,9 @@ package queue
 
 import (
 	"context"
-	"sync"
-
 	"github.com/google/uuid"
-
 	"github.com/jxo-me/plus-core/sdk/storage"
+	"sync"
 )
 
 type queue chan storage.Messager
@@ -42,7 +40,7 @@ func (m *Memory) Publish(ctx context.Context, message storage.Messager) error {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
 	memoryMessage := new(Message)
-	memoryMessage.SetID(message.GetID())
+	memoryMessage.SetId(message.GetId())
 	memoryMessage.SetStream(message.GetStream())
 	memoryMessage.SetValues(message.GetValues())
 
@@ -64,7 +62,7 @@ func (m *Memory) Publish(ctx context.Context, message storage.Messager) error {
 		m.queue.Store(message.GetStream(), q)
 	}
 	go func(gm storage.Messager, gq queue) {
-		gm.SetID(uuid.New().String())
+		gm.SetId(uuid.New().String())
 		gq <- gm
 	}(memoryMessage, q)
 	return nil

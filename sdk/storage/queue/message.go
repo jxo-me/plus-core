@@ -10,7 +10,7 @@ type Message struct {
 	ErrorCount int
 }
 
-func (m *Message) GetID() string {
+func (m *Message) GetId() string {
 	return m.ID
 }
 
@@ -22,7 +22,7 @@ func (m *Message) GetValues() map[string]interface{} {
 	return m.Values
 }
 
-func (m *Message) SetID(id string) {
+func (m *Message) SetId(id string) {
 	m.ID = id
 }
 
