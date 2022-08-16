@@ -41,15 +41,14 @@ func (m *Memory) Publish(ctx context.Context, message storage.Messager) error {
 	defer m.mutex.RUnlock()
 	memoryMessage := new(Message)
 	memoryMessage.SetId(message.GetId())
-	memoryMessage.SetStream(message.GetStream())
+	memoryMessage.SetRoutingKey(message.GetRoutingKey())
 	memoryMessage.SetValues(message.GetValues())
-
-	v, ok := m.queue.Load(message.GetStream())
+	v, ok := m.queue.Load(message.GetRoutingKey())
 
 	// TODO: 错误超出5次将放弃
 	if !ok && memoryMessage.GetErrorCount() < 5 {
 		v = m.makeQueue()
-		m.queue.Store(message.GetStream(), v)
+		m.queue.Store(message.GetRoutingKey(), v)
 		memoryMessage.SetErrorCount()
 	}
 
@@ -59,7 +58,7 @@ func (m *Memory) Publish(ctx context.Context, message storage.Messager) error {
 		q = v.(queue)
 	default:
 		q = m.makeQueue()
-		m.queue.Store(message.GetStream(), q)
+		m.queue.Store(message.GetRoutingKey(), q)
 	}
 	go func(gm storage.Messager, gq queue) {
 		gm.SetId(uuid.New().String())

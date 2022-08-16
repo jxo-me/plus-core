@@ -6,8 +6,9 @@ import (
 
 type Message struct {
 	Id         string
-	Stream     string
+	RoutingKey string
 	Values     map[string]interface{}
+	GroupId    string
 	ErrorCount int
 }
 
@@ -15,8 +16,8 @@ func (m *Message) GetId() string {
 	return m.Id
 }
 
-func (m *Message) GetStream() string {
-	return m.Stream
+func (m *Message) GetRoutingKey() string {
+	return m.RoutingKey
 }
 
 func (m *Message) GetValues() map[string]interface{} {
@@ -27,12 +28,20 @@ func (m *Message) SetId(id string) {
 	m.Id = id
 }
 
-func (m *Message) SetStream(stream string) {
-	m.Stream = stream
+func (m *Message) SetRoutingKey(routingKey string) {
+	m.RoutingKey = routingKey
 }
 
 func (m *Message) SetValues(values map[string]interface{}) {
 	m.Values = values
+}
+
+func (m *Message) SetGroupId(group string) {
+	m.GroupId = group
+}
+
+func (m *Message) GetGroupId() string {
+	return m.GroupId
 }
 
 func (m *Message) GetPrefix() (prefix string) {

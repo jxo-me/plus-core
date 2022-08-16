@@ -86,16 +86,16 @@ func (r *RocketMQ) Publish(ctx context.Context, message storage.Messager) error 
 	_, err = r.producer.SendSync(
 		ctx,
 		&primitive.Message{
-			Topic: message.GetStream(),
+			Topic: message.GetRoutingKey(),
 			Body:  rb,
 		})
 	return err
 }
 
 // Consumer 监听消费者
-func (r *RocketMQ) Consumer(ctx context.Context, name string, f storage.ConsumerFunc) {
+func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f storage.ConsumerFunc) {
 	err := r.consumer.Subscribe(
-		name,
+		topicName,
 		consumer.MessageSelector{},
 		func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 			for i := range msgs {
@@ -103,7 +103,7 @@ func (r *RocketMQ) Consumer(ctx context.Context, name string, f storage.Consumer
 					glog.Printf(ctx, "rocketmq consumed: %s\n", string(msgs[i].Body))
 					m := new(Message)
 					m.SetValues(gconv.Map(msgs[i].Body))
-					m.SetStream(msgs[i].GetTags())
+					m.SetRoutingKey(msgs[i].GetTags())
 					m.SetId(msgs[i].MsgId)
 					err := f(ctx, m)
 					if err != nil {

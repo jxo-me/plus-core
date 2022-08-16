@@ -177,11 +177,14 @@ func (e *Application) GetQueuePrefix(key string) storage.AdapterQueue {
 	return NewQueue(key, e.queue[key])
 }
 
-// GetStreamMessage 获取队列需要用的message
-func (e *Application) GetStreamMessage(id, stream string, value map[string]interface{}) (storage.Messager, error) {
+// GetQueueMessage 获取队列需要用的message
+func (e *Application) GetQueueMessage(id, routingKey string, value map[string]interface{}, groupId string) (storage.Messager, error) {
 	message := &queue.Message{}
-	message.SetID(id)
-	message.SetStream(stream)
+	message.SetId(id)
+	if groupId != "" {
+		message.SetGroupId(groupId)
+	}
+	message.SetRoutingKey(routingKey)
 	message.SetValues(value)
 	return message, nil
 }

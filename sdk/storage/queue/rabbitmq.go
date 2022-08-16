@@ -12,6 +12,9 @@ import (
 // RabbitMQ cache implement
 type RabbitMQ struct {
 	Url              string
+	RoutingKeys      []string
+	Exchange         string
+	ExchangeType     string
 	Config           rabbitmq.Config
 	consumer         *rabbitmq.Consumer
 	ConsumerOptions  *rabbitmq.ConsumerOptions
@@ -46,6 +49,10 @@ func (r *RabbitMQ) newProducer(ctx context.Context, options *rabbitmq.PublisherO
 // Publish 消息入生产者
 func (r *RabbitMQ) Publish(ctx context.Context, message storage.Messager) error {
 	// exchange exchangeType routingKey
+	exchange := "events"
+	if message.GetGroupId() != "" {
+		exchange = message.GetGroupId()
+	}
 	rb, err := json.Marshal(message.GetValues())
 	if err != nil {
 		return err
@@ -53,23 +60,24 @@ func (r *RabbitMQ) Publish(ctx context.Context, message storage.Messager) error 
 	err = r.producer.Publish(
 		ctx,
 		rb,
-		[]string{message.GetStream()},
+		[]string{message.GetRoutingKey()},
 		rabbitmq.WithPublishOptionsContentType("application/json"),
 		rabbitmq.WithPublishOptionsMandatory,
 		rabbitmq.WithPublishOptionsPersistentDelivery,
-		rabbitmq.WithPublishOptionsExchange("events"),
+		rabbitmq.WithPublishOptionsExchange(exchange),
 	)
 	return err
 }
 
 // Consumer 监听消费者
-func (r *RabbitMQ) Consumer(ctx context.Context, name string, f storage.ConsumerFunc) {
+func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.ConsumerFunc) {
+	// exchange exchangeType routingKey
 	err := r.consumer.StartConsuming(ctx,
 		func(d rabbitmq.Delivery) rabbitmq.Action {
 			glog.Printf(ctx, "rabbitmq consumed: %s\n", string(d.Body))
 			m := new(Message)
 			m.SetValues(gconv.Map(d.Body))
-			m.SetStream(d.RoutingKey)
+			m.SetRoutingKey(d.RoutingKey)
 			m.SetId(d.MessageId)
 			err := f(ctx, m)
 			if err != nil {
@@ -78,15 +86,15 @@ func (r *RabbitMQ) Consumer(ctx context.Context, name string, f storage.Consumer
 			// rabbitmq.Ack, rabbitmq.NackDiscard, rabbitmq.NackRequeue
 			return rabbitmq.Ack
 		},
-		name,
-		[]string{"routing_key", "routing_key_2"},
+		queueName,
+		r.RoutingKeys,
 		rabbitmq.WithConsumeOptionsConcurrency(10),
 		rabbitmq.WithConsumeOptionsQueueDurable,
 		rabbitmq.WithConsumeOptionsQuorum,
-		rabbitmq.WithConsumeOptionsBindingExchangeName("events"),
-		rabbitmq.WithConsumeOptionsBindingExchangeKind("topic"),
+		rabbitmq.WithConsumeOptionsBindingExchangeName(r.Exchange),
+		rabbitmq.WithConsumeOptionsBindingExchangeKind(r.ExchangeType),
 		rabbitmq.WithConsumeOptionsBindingExchangeDurable,
-		rabbitmq.WithConsumeOptionsConsumerName(name),
+		rabbitmq.WithConsumeOptionsConsumerName(queueName),
 	)
 	if err != nil {
 		glog.Errorf(ctx, "rabbitmq consumer StartConsuming error:%v", err)

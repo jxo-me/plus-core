@@ -70,7 +70,7 @@ func (e *NSQ) Publish(ctx context.Context, message storage.Messager) error {
 	if err != nil {
 		return err
 	}
-	return e.producer.Publish(message.GetStream(), rb)
+	return e.producer.Publish(message.GetRoutingKey(), rb)
 }
 
 // Consumer 监听消费者
