@@ -58,7 +58,7 @@ func (e Queue) Setup(ctx context.Context) (storage.AdapterQueue, error) {
 	}
 	// todo rabbitmq queue
 	// todo rocketmq queue
-	
+
 	if e.NSQ != nil {
 		cfg, err := e.NSQ.GetNSQOptions()
 		if err != nil {

@@ -6,7 +6,6 @@ require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
 	github.com/casbin/casbin/v2 v2.51.2
 	github.com/go-redis/redis/v7 v7.4.1
-	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gogf/gf-jwt/v2 v2.0.1
 	github.com/gogf/gf/v2 v2.1.2
 	github.com/google/uuid v1.3.0
@@ -32,6 +31,7 @@ require (
 	github.com/git-chglog/git-chglog v0.0.0-20190611050339-63a4e637021f // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/mock v1.4.4 // indirect

@@ -2,7 +2,7 @@ package queue
 
 import (
 	"context"
-	"github.com/go-redis/redis/v8"
+	"github.com/go-redis/redis/v7"
 	"github.com/robinjoseph08/redisqueue/v2"
 
 	"github.com/jxo-me/plus-core/sdk/storage"
