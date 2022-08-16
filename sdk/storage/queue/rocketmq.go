@@ -76,7 +76,8 @@ func (r *RocketMQ) newProducer(ctx context.Context, options *ProducerOptions) (r
 	)
 }
 
-func (r *RocketMQ) Append(ctx context.Context, message storage.Messager) error {
+// Publish 消息入生产者
+func (r *RocketMQ) Publish(ctx context.Context, message storage.Messager) error {
 	rb, err := json.Marshal(message.GetValues())
 	if err != nil {
 		return err
@@ -90,7 +91,8 @@ func (r *RocketMQ) Append(ctx context.Context, message storage.Messager) error {
 	return err
 }
 
-func (r *RocketMQ) Register(ctx context.Context, name string, f storage.ConsumerFunc) {
+// Consumer 监听消费者
+func (r *RocketMQ) Consumer(ctx context.Context, name string, f storage.ConsumerFunc) {
 	err := r.consumer.Subscribe(
 		name,
 		consumer.MessageSelector{},

@@ -64,8 +64,8 @@ func (e *NSQ) newConsumer(topic string, h nsq.Handler) (err error) {
 	return err
 }
 
-// Append 消息入生产者
-func (e *NSQ) Append(ctx context.Context, message storage.Messager) error {
+// Publish 消息入生产者
+func (e *NSQ) Publish(ctx context.Context, message storage.Messager) error {
 	rb, err := json.Marshal(message.GetValues())
 	if err != nil {
 		return err
@@ -73,8 +73,8 @@ func (e *NSQ) Append(ctx context.Context, message storage.Messager) error {
 	return e.producer.Publish(message.GetStream(), rb)
 }
 
-// Register 监听消费者
-func (e *NSQ) Register(ctx context.Context, name string, f storage.ConsumerFunc) {
+// Consumer 监听消费者
+func (e *NSQ) Consumer(ctx context.Context, name string, f storage.ConsumerFunc) {
 	h := &nsqConsumerHandler{f}
 	err := e.newConsumer(name, h)
 	if err != nil {

@@ -26,8 +26,8 @@ type AdapterCache interface {
 
 type AdapterQueue interface {
 	String() string
-	Append(ctx context.Context, message Messager) error
-	Register(ctx context.Context, name string, f ConsumerFunc)
+	Publish(ctx context.Context, message Messager) error
+	Consumer(ctx context.Context, name string, f ConsumerFunc)
 	Run(ctx context.Context)
 	Shutdown(ctx context.Context)
 }

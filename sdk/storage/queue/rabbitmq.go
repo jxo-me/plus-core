@@ -44,7 +44,8 @@ func (r *RabbitMQ) newProducer(ctx context.Context, options *rabbitmq.PublisherO
 	)
 }
 
-func (r *RabbitMQ) Append(ctx context.Context, message storage.Messager) error {
+// Publish 消息入生产者
+func (r *RabbitMQ) Publish(ctx context.Context, message storage.Messager) error {
 	rb, err := json.Marshal(message.GetValues())
 	if err != nil {
 		return err
@@ -61,7 +62,8 @@ func (r *RabbitMQ) Append(ctx context.Context, message storage.Messager) error {
 	return err
 }
 
-func (r *RabbitMQ) Register(ctx context.Context, name string, f storage.ConsumerFunc) {
+// Consumer 监听消费者
+func (r *RabbitMQ) Consumer(ctx context.Context, name string, f storage.ConsumerFunc) {
 	err := r.consumer.StartConsuming(ctx,
 		func(d rabbitmq.Delivery) rabbitmq.Action {
 			log.Printf("consumed: %v", string(d.Body))

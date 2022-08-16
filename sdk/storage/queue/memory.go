@@ -37,7 +37,8 @@ func (m *Memory) makeQueue() queue {
 	return make(queue, m.PoolNum)
 }
 
-func (m *Memory) Append(ctx context.Context, message storage.Messager) error {
+// Publish 消息入生产者
+func (m *Memory) Publish(ctx context.Context, message storage.Messager) error {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
 	memoryMessage := new(Message)
@@ -69,7 +70,8 @@ func (m *Memory) Append(ctx context.Context, message storage.Messager) error {
 	return nil
 }
 
-func (m *Memory) Register(ctx context.Context, name string, f storage.ConsumerFunc) {
+// Consumer 监听消费者
+func (m *Memory) Consumer(ctx context.Context, name string, f storage.ConsumerFunc) {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
 	v, ok := m.queue.Load(name)
