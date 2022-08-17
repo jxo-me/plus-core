@@ -15,8 +15,8 @@ import (
 func NewRocketMQ(
 	ctx context.Context,
 	urls []string,
-	consumerOptions *ConsumerOptions,
-	producerOptions *ProducerOptions,
+	consumerOptions *RocketConsumerOptions,
+	producerOptions *RocketProducerOptions,
 	credentials *primitive.Credentials,
 ) (*RocketMQ, error) {
 	var err error
@@ -44,9 +44,9 @@ func NewRocketMQ(
 type RocketMQ struct {
 	Urls            []string
 	consumer        rocketmq.PushConsumer
-	ConsumerOptions *ConsumerOptions
+	ConsumerOptions *RocketConsumerOptions
 	producer        rocketmq.Producer
-	ProducerOptions *ProducerOptions
+	ProducerOptions *RocketProducerOptions
 	Credentials     primitive.Credentials
 }
 
@@ -54,19 +54,19 @@ func (RocketMQ) String() string {
 	return "rocketmq"
 }
 
-type ConsumerOptions struct {
+type RocketConsumerOptions struct {
 	GroupName         string
 	MaxReconsumeTimes int32
 }
 
-type ProducerOptions struct {
+type RocketProducerOptions struct {
 	GroupName  string
 	RetryTimes int
 }
 
-func (r *RocketMQ) newConsumer(ctx context.Context, options *ConsumerOptions) (rocketmq.PushConsumer, error) {
+func (r *RocketMQ) newConsumer(ctx context.Context, options *RocketConsumerOptions) (rocketmq.PushConsumer, error) {
 	if options == nil {
-		r.ConsumerOptions = &ConsumerOptions{
+		r.ConsumerOptions = &RocketConsumerOptions{
 			GroupName:         "DEFAULT_CONSUMER",
 			MaxReconsumeTimes: -1,
 		}
@@ -85,9 +85,9 @@ func (r *RocketMQ) newConsumer(ctx context.Context, options *ConsumerOptions) (r
 	)
 }
 
-func (r *RocketMQ) newProducer(ctx context.Context, options *ProducerOptions) (rocketmq.Producer, error) {
+func (r *RocketMQ) newProducer(ctx context.Context, options *RocketProducerOptions) (rocketmq.Producer, error) {
 	if options == nil {
-		r.ProducerOptions = &ProducerOptions{
+		r.ProducerOptions = &RocketProducerOptions{
 			GroupName:  "DEFAULT_CONSUMER",
 			RetryTimes: 3,
 		}
