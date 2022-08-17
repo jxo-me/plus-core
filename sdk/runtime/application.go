@@ -178,12 +178,9 @@ func (e *Application) GetQueuePrefix(key string) storage.AdapterQueue {
 }
 
 // GetQueueMessage 获取队列需要用的message
-func (e *Application) GetQueueMessage(id, routingKey string, value map[string]interface{}, groupId string) (storage.Messager, error) {
+func (e *Application) GetQueueMessage(id, routingKey string, value map[string]interface{}) (storage.Messager, error) {
 	message := &queue.Message{}
 	message.SetId(id)
-	if groupId != "" {
-		message.SetGroupId(groupId)
-	}
 	message.SetRoutingKey(routingKey)
 	message.SetValues(value)
 	return message, nil
