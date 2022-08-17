@@ -112,7 +112,7 @@ func (e *Application) GetConfig() *gcfg.Config {
 func (e *Application) Config(ctx context.Context, pattern string) *gvar.Var {
 	c, err := e.GetConfig().Get(ctx, pattern)
 	if err != nil {
-		glog.Errorf(ctx, "Runtime Get Global Config error:", err)
+		glog.Error(ctx, "Runtime Get Global Config error:", err)
 	}
 	return c
 }
