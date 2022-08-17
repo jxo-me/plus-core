@@ -96,8 +96,8 @@ func (e Queue) Setup(ctx context.Context) (storage.AdapterQueue, error) {
 		return queue.NewRocketMQ(
 			ctx,
 			urls,
-			&queue.ConsumerOptions{},
-			&queue.ProducerOptions{},
+			&queue.RocketConsumerOptions{},
+			&queue.RocketProducerOptions{},
 			nil,
 		)
 	}
