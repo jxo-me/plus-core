@@ -16,17 +16,33 @@ type MemorySpec struct {
 	RoutingKey string
 }
 
-type AmqpTask interface {
-	GetSpec(ctx context.Context) *AmqpSpec
+type RabbitMqTask interface {
+	GetSpec(ctx context.Context) *RabbitMqSpec
 }
 
-type AmqpSpec struct {
+type RabbitMqSpec struct {
 	TaskName     string
 	RoutingKey   string
 	Exchange     string
 	ExchangeType string
 	QueueName    string
 	RoutingMap   map[string]Consumer
+	ConsumerNum  int
+	CTag         string
+}
+
+type RocketMqTask interface {
+	GetSpec(ctx context.Context) *RocketMqSpec
+}
+
+type RocketMqSpec struct {
+	TaskName     string
+	RoutingKey   string
+	Exchange     string
+	ExchangeType string
+	QueueName    string
+	RoutingMap   map[string]Consumer
+	ConsumerNum  int
 	CTag         string
 }
 
@@ -54,10 +70,10 @@ type ConsumerHandler interface {
 func WrapHandler(ctx context.Context, handler ConsumerHandler) Consumer {
 	return ConsumerFunc(
 		func(body []byte) error {
-			glog.Debug(ctx, "handler result:", body)
+			glog.Debug(ctx, "handler result:", string(body))
 			_, err := handler.Handle(ctx, body)
 			if err != nil {
-				glog.Error(ctx, "amqp task handler error", err.Error())
+				glog.Error(ctx, "rabbitmq task handler error", err.Error())
 			}
 			return nil
 		},
