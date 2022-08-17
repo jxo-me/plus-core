@@ -110,7 +110,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 	// exchange exchangeType routingKey
 	err := r.consumer.StartConsuming(ctx,
 		func(d rabbitmq.Delivery) rabbitmq.Action {
-			glog.Debug(ctx, "rabbitmq consumed: %s\n", string(d.Body))
+			glog.Debugf(ctx, "rabbitmq consumed: %s\n", string(d.Body))
 			m := new(Message)
 			m.SetValues(gconv.Map(d.Body))
 			m.SetRoutingKey(d.RoutingKey)

@@ -72,11 +72,11 @@ func (r *RocketMQ) newConsumer(ctx context.Context, options *RocketConsumerOptio
 		}
 	}
 	return rocketmq.NewPushConsumer(
-		//consumer.WithGroupName("GAME_RECORD"),
 		consumer.WithGroupName(r.ConsumerOptions.GroupName),
 		consumer.WithNsResolver(primitive.NewPassthroughResolver(r.Urls)),
 		consumer.WithConsumerModel(consumer.Clustering),
 		consumer.WithMaxReconsumeTimes(r.ConsumerOptions.MaxReconsumeTimes),
+		consumer.WithAutoCommit(false),
 		consumer.WithCredentials(r.Credentials),
 		//consumer.WithCredentials(primitive.Credentials{
 		//	AccessKey: "RocketMQ",
@@ -128,7 +128,7 @@ func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f storage.Con
 		func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 			for i := range msgs {
 				if len(msgs[i].Body) > 0 {
-					glog.Printf(ctx, "rocketmq consumed: %s\n", string(msgs[i].Body))
+					glog.Debugf(ctx, "rocketmq consumed: %s\n", string(msgs[i].Body))
 					m := new(Message)
 					m.SetValues(gconv.Map(msgs[i].Body))
 					m.SetRoutingKey(msgs[i].GetTags())

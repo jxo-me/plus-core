@@ -43,10 +43,10 @@ type Runtime interface {
 	GetWebSocket() *ws.Instance
 
 	GetMemoryQueue(prefix string) storage.AdapterQueue
-	SetQueueAdapter(key string, c storage.AdapterQueue)
+	SetQueueAdapter(string, storage.AdapterQueue)
 	GetQueueAdapter(key string) storage.AdapterQueue
 	GetQueuePrefix(key string) storage.AdapterQueue
-	GetQueueMessage(id, stream string, value map[string]interface{}) (storage.Messager, error)
+	GetQueueMessage(id, routingKey string, value map[string]interface{}) (storage.Messager, error)
 
 	SetLockerAdapter(storage.AdapterLocker)
 	GetLockerAdapter() storage.AdapterLocker
