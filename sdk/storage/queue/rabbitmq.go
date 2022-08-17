@@ -127,7 +127,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 		rabbitmq.WithConsumeOptionsConsumerName(queueName),
 		rabbitmq.WithConsumeOptionsBindingExchangeName(r.Exchange),
 		rabbitmq.WithConsumeOptionsBindingExchangeKind(r.ExchangeType),
-		rabbitmq.WithConsumeOptionsConcurrency(10), // goroutine num
+		rabbitmq.WithConsumeOptionsConcurrency(1), // goroutine num
 		rabbitmq.WithConsumeOptionsConsumerAutoAck(true),
 		rabbitmq.WithConsumeOptionsBindingExchangeDurable,
 		rabbitmq.WithConsumeOptionsQueueDurable,
