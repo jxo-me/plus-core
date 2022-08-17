@@ -34,13 +34,11 @@ type AdapterQueue interface {
 
 type Messager interface {
 	SetId(string)
-	SetRoutingKey(string)
-	SetValues(map[string]interface{})
-	SetGroupId(string)
 	GetId() string
+	SetRoutingKey(string)
 	GetRoutingKey() string
+	SetValues(map[string]interface{})
 	GetValues() map[string]interface{}
-	GetGroupId() string
 	GetPrefix() string
 	SetPrefix(string)
 	SetErrorCount()

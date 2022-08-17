@@ -27,6 +27,8 @@ type Application struct {
 	locker      storage.AdapterLocker
 	websocket   *ws.Instance
 	memoryQueue storage.AdapterQueue
+	rabbitQueue storage.AdapterQueue
+	rocketQueue storage.AdapterQueue
 	queue       map[string]storage.AdapterQueue
 }
 
@@ -146,6 +148,14 @@ func (e *Application) GetWebSocket() *ws.Instance {
 
 func (e *Application) GetMemoryQueue(prefix string) storage.AdapterQueue {
 	return NewQueue(prefix, e.memoryQueue)
+}
+
+func (e *Application) GetRabbitQueue(prefix string) storage.AdapterQueue {
+	return NewQueue(prefix, e.rabbitQueue)
+}
+
+func (e *Application) GetRocketQueue(prefix string) storage.AdapterQueue {
+	return NewQueue(prefix, e.rocketQueue)
 }
 
 // SetQueueAdapter 设置队列适配器

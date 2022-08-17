@@ -43,6 +43,8 @@ type Runtime interface {
 	GetWebSocket() *ws.Instance
 
 	GetMemoryQueue(prefix string) storage.AdapterQueue
+	GetRabbitQueue(prefix string) storage.AdapterQueue
+	GetRocketQueue(prefix string) storage.AdapterQueue
 	SetQueueAdapter(string, storage.AdapterQueue)
 	GetQueueAdapter(key string) storage.AdapterQueue
 	GetQueuePrefix(key string) storage.AdapterQueue

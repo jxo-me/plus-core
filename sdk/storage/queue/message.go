@@ -36,14 +36,6 @@ func (m *Message) SetValues(values map[string]interface{}) {
 	m.Values = values
 }
 
-func (m *Message) SetGroupId(group string) {
-	m.GroupId = group
-}
-
-func (m *Message) GetGroupId() string {
-	return m.GroupId
-}
-
 func (m *Message) GetPrefix() (prefix string) {
 	if m.Values == nil {
 		return

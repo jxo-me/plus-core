@@ -86,9 +86,6 @@ func (r *RabbitMQ) newProducer(ctx context.Context, options *rabbitmq.PublisherO
 func (r *RabbitMQ) Publish(ctx context.Context, message storage.Messager) error {
 	// exchange exchangeType routingKey
 	exchange := "events"
-	if message.GetGroupId() != "" {
-		exchange = message.GetGroupId()
-	}
 	rb, err := json.Marshal(message.GetValues())
 	if err != nil {
 		return err

@@ -29,11 +29,6 @@ func (e *Queue) Consumer(ctx context.Context, name string, f storage.ConsumerFun
 
 // Publish 数据生产者
 func (e *Queue) Publish(ctx context.Context, message storage.Messager) error {
-	values := message.GetValues()
-	if values == nil {
-		values = make(map[string]interface{})
-	}
-	values[storage.PrefixKey] = e.prefix
 	return e.queue.Publish(ctx, message)
 }
 
