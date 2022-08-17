@@ -47,6 +47,7 @@ func NewRabbitMQ(
 // RabbitMQ cache implement
 type RabbitMQ struct {
 	Url              string
+	Handler          []rabbitmq.Handler
 	RoutingKeys      []string
 	Exchange         string
 	ExchangeType     string
@@ -109,7 +110,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 	// exchange exchangeType routingKey
 	err := r.consumer.StartConsuming(ctx,
 		func(d rabbitmq.Delivery) rabbitmq.Action {
-			glog.Printf(ctx, "rabbitmq consumed: %s\n", string(d.Body))
+			glog.Debug(ctx, "rabbitmq consumed: %s\n", string(d.Body))
 			m := new(Message)
 			m.SetValues(gconv.Map(d.Body))
 			m.SetRoutingKey(d.RoutingKey)
@@ -123,13 +124,13 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 		},
 		queueName,
 		r.RoutingKeys,
-		rabbitmq.WithConsumeOptionsConcurrency(10),
-		rabbitmq.WithConsumeOptionsQueueDurable,
-		rabbitmq.WithConsumeOptionsQuorum,
+		rabbitmq.WithConsumeOptionsConsumerName(queueName),
 		rabbitmq.WithConsumeOptionsBindingExchangeName(r.Exchange),
 		rabbitmq.WithConsumeOptionsBindingExchangeKind(r.ExchangeType),
+		rabbitmq.WithConsumeOptionsConcurrency(10), // goroutine num
+		rabbitmq.WithConsumeOptionsConsumerAutoAck(true),
 		rabbitmq.WithConsumeOptionsBindingExchangeDurable,
-		rabbitmq.WithConsumeOptionsConsumerName(queueName),
+		rabbitmq.WithConsumeOptionsQueueDurable,
 	)
 	if err != nil {
 		glog.Errorf(ctx, "rabbitmq consumer StartConsuming error:%v", err)
