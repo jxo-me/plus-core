@@ -78,5 +78,4 @@ func WrapHandler(ctx context.Context, handler ConsumerHandler) Consumer {
 			return nil
 		},
 	)
-
 }
