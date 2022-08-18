@@ -1,4 +1,4 @@
-package task
+package common
 
 import (
 	"context"
@@ -41,7 +41,7 @@ type RabbitMqSpec struct {
 	Exchange     string
 	ExchangeType string
 	QueueName    string
-	RoutingMap   map[string]Handler
+	RoutingMap   map[string]ConsumerHandler
 	ConsumerNum  int
 	CTag         string
 }
@@ -57,7 +57,7 @@ type RocketMqSpec struct {
 	Exchange     string
 	ExchangeType string
 	QueueName    string
-	RoutingMap   map[string]Handler
+	RoutingMap   map[string]ConsumerHandler
 	ConsumerNum  int
 	CTag         string
 }
@@ -73,20 +73,13 @@ type NsqSpec struct {
 	Exchange     string
 	ExchangeType string
 	QueueName    string
-	RoutingMap   map[string]Handler
+	RoutingMap   map[string]ConsumerHandler
 	ConsumerNum  int
 	CTag         string
 }
 
-// ConsumerFunc 将一个符合签名要求的函数转换成 Consumer 接口/*
-type ConsumerFunc func(context.Context, storage.Messager) error
-
-func (f ConsumerFunc) Handle(ctx context.Context, msg storage.Messager) error {
-	return f(ctx, msg)
-}
-
-func WrapHandler(handler ConsumerHandler) Handler {
-	return ConsumerFunc(
+func WrapHandler(handler ConsumerHandler) storage.ConsumerFunc {
+	return storage.ConsumerFunc(
 		func(ctx context.Context, msg storage.Messager) error {
 			glog.Debug(ctx, "handler result:", msg)
 			_, err := handler.Handle(ctx, msg)
@@ -101,8 +94,8 @@ func WrapHandler(handler ConsumerHandler) Handler {
 // CallbackFunc 消费结果统一回调
 type CallbackFunc func(context.Context, interface{}) error
 
-func CallbackWrapHandler(handler ConsumerHandler, callback CallbackFunc) Handler {
-	return ConsumerFunc(
+func CallbackWrapHandler(handler ConsumerHandler, callback CallbackFunc) storage.ConsumerFunc {
+	return storage.ConsumerFunc(
 		func(ctx context.Context, msg storage.Messager) error {
 			glog.Debug(ctx, "handler result:", msg)
 			data, err := handler.Handle(ctx, msg)
