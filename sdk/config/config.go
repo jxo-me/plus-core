@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"log"
 )
@@ -12,25 +13,26 @@ var (
 
 // Settings 兼容原先的配置结构
 type Settings struct {
+	Config    *gcfg.Config
 	Settings  Config `yaml:"settings"`
 	Cache     *Cache `yaml:"cache"`
 	Queue     *Queue `yaml:"queue"`
-	callbacks []func()
+	callbacks []func(ctx context.Context, cf *gcfg.Config)
 }
 
-func (e *Settings) runCallback() {
+func (e *Settings) runCallback(ctx context.Context) {
 	for i := range e.callbacks {
-		e.callbacks[i]()
+		e.callbacks[i](ctx, e.Config)
 	}
 }
 
-func (e *Settings) Init() {
-	e.init()
+func (e *Settings) Init(ctx context.Context) {
+	e.init(ctx)
 	log.Println("!!! config init")
 }
 
-func (e *Settings) init() {
-	e.runCallback()
+func (e *Settings) init(ctx context.Context) {
+	e.runCallback(ctx)
 }
 
 // Config 配置集合
@@ -43,8 +45,9 @@ type Config struct {
 }
 
 // Setup 载入配置文件
-func Setup(s *gcfg.Config, fs ...func()) {
+func Setup(ctx context.Context, s *gcfg.Config, fs ...func(ctx context.Context, s *gcfg.Config)) {
 	_cfg = &Settings{
+		Config: s,
 		Settings: Config{
 			Jwt:    JwtConfig,
 			Cache:  CacheConfig,
@@ -55,5 +58,5 @@ func Setup(s *gcfg.Config, fs ...func()) {
 		callbacks: fs,
 	}
 
-	_cfg.Init()
+	_cfg.Init(ctx)
 }

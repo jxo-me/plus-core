@@ -151,11 +151,25 @@ func (e *Application) GetMemoryQueue(prefix string) storage.AdapterQueue {
 }
 
 func (e *Application) GetRabbitQueue(prefix string) storage.AdapterQueue {
-	return NewQueue(prefix, e.rabbitQueue)
+	e.mux.Lock()
+	defer e.mux.Unlock()
+	if q, ok := e.queue[prefix]; ok {
+		return q
+	}
+	q := NewQueue(prefix, e.rabbitQueue)
+	e.queue[prefix] = q
+	return q
 }
 
 func (e *Application) GetRocketQueue(prefix string) storage.AdapterQueue {
-	return NewQueue(prefix, e.rocketQueue)
+	e.mux.Lock()
+	defer e.mux.Unlock()
+	if q, ok := e.queue[prefix]; ok {
+		return q
+	}
+	q := NewQueue(prefix, e.rocketQueue)
+	e.queue[prefix] = q
+	return q
 }
 
 // SetQueueAdapter 设置队列适配器
