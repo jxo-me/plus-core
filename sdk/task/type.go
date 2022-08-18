@@ -6,9 +6,23 @@ import (
 	"github.com/jxo-me/plus-core/sdk/storage"
 )
 
+// Handler 任务MQ路由的回调接口/**/
+type Handler interface {
+	Handle(ctx context.Context, msg storage.Messager) error
+}
+
+type ConsumerHandler interface {
+	Handle(ctx context.Context, msg storage.Messager) (interface{}, error)
+}
+
+type Task interface {
+	String() string
+	Start(ctx context.Context)
+}
+
 type MemoryTask interface {
 	GetSpec() *MemorySpec
-	Handle(ctx context.Context, msg storage.Messager) error
+	Handler
 }
 
 type MemorySpec struct {
@@ -18,6 +32,7 @@ type MemorySpec struct {
 
 type RabbitMqTask interface {
 	GetSpec(ctx context.Context) *RabbitMqSpec
+	ConsumerHandler
 }
 
 type RabbitMqSpec struct {
@@ -26,13 +41,14 @@ type RabbitMqSpec struct {
 	Exchange     string
 	ExchangeType string
 	QueueName    string
-	RoutingMap   map[string]Consumer
+	RoutingMap   map[string]Handler
 	ConsumerNum  int
 	CTag         string
 }
 
 type RocketMqTask interface {
 	GetSpec(ctx context.Context) *RocketMqSpec
+	ConsumerHandler
 }
 
 type RocketMqSpec struct {
@@ -41,41 +57,64 @@ type RocketMqSpec struct {
 	Exchange     string
 	ExchangeType string
 	QueueName    string
-	RoutingMap   map[string]Consumer
+	RoutingMap   map[string]Handler
 	ConsumerNum  int
 	CTag         string
 }
 
-// ConsumePart /*
-type ConsumePart interface {
-	Route(routingKey string) (handler Consumer, ifExist bool)
+type NsqTask interface {
+	GetSpec(ctx context.Context) *NsqSpec
+	ConsumerHandler
 }
 
-// Consumer 任务MQ路由的回调接口/**/
-type Consumer interface {
-	Handle(body []byte) error
+type NsqSpec struct {
+	TaskName     string
+	RoutingKey   string
+	Exchange     string
+	ExchangeType string
+	QueueName    string
+	RoutingMap   map[string]Handler
+	ConsumerNum  int
+	CTag         string
 }
 
 // ConsumerFunc 将一个符合签名要求的函数转换成 Consumer 接口/*
-type ConsumerFunc func([]byte) error
+type ConsumerFunc func(context.Context, storage.Messager) error
 
-func (f ConsumerFunc) Handle(body []byte) error {
-	return f(body)
+func (f ConsumerFunc) Handle(ctx context.Context, msg storage.Messager) error {
+	return f(ctx, msg)
 }
 
-type ConsumerHandler interface {
-	Handle(ctx context.Context, body []byte) (interface{}, error)
-}
-
-func WrapHandler(ctx context.Context, handler ConsumerHandler) Consumer {
+func WrapHandler(handler ConsumerHandler) Handler {
 	return ConsumerFunc(
-		func(body []byte) error {
-			glog.Debug(ctx, "handler result:", string(body))
-			_, err := handler.Handle(ctx, body)
+		func(ctx context.Context, msg storage.Messager) error {
+			glog.Debug(ctx, "handler result:", msg)
+			_, err := handler.Handle(ctx, msg)
 			if err != nil {
-				glog.Error(ctx, "rabbitmq task handler error", err.Error())
+				glog.Error(ctx, "task handler error", err.Error())
 			}
-			return nil
+			return err
+		},
+	)
+}
+
+// CallbackFunc 消费结果统一回调
+type CallbackFunc func(context.Context, interface{}) error
+
+func CallbackWrapHandler(handler ConsumerHandler, callback CallbackFunc) Handler {
+	return ConsumerFunc(
+		func(ctx context.Context, msg storage.Messager) error {
+			glog.Debug(ctx, "handler result:", msg)
+			data, err := handler.Handle(ctx, msg)
+			if err != nil {
+				glog.Error(ctx, "task handler error", err.Error())
+			}
+			err = callback(ctx, data)
+			if err != nil {
+				glog.Error(ctx, "task CallbackFunc error", err.Error())
+				return err
+			}
+			return err
 		},
 	)
 }
