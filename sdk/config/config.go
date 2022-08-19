@@ -3,13 +3,17 @@ package config
 import (
 	"context"
 	"github.com/gogf/gf/v2/os/gcfg"
-	"log"
+	"github.com/gogf/gf/v2/os/glog"
 )
 
 var (
 	ExtendConfig interface{}
 	_cfg         *Settings
 )
+
+type Initialize interface {
+	Init(ctx context.Context, cf *gcfg.Config) error
+}
 
 // Settings 兼容原先的配置结构
 type Settings struct {
@@ -28,7 +32,7 @@ func (e *Settings) runCallback(ctx context.Context) {
 
 func (e *Settings) Init(ctx context.Context) {
 	e.init(ctx)
-	log.Println("!!! config init")
+	glog.Debug(ctx, "!!! config init")
 }
 
 func (e *Settings) init(ctx context.Context) {
