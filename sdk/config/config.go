@@ -47,10 +47,9 @@ type Config struct {
 	Extend interface{} `yaml:"extend"`
 }
 
-// Setup 载入配置文件
-func Setup(ctx context.Context, s *gcfg.Config, fs ...Initialize) {
+// Bootstrap 载入启动配置文件
+func Bootstrap(ctx context.Context, fs ...Initialize) {
 	_cfg = &Settings{
-		Config: s,
 		Settings: Config{
 			Jwt:    JwtConfig,
 			Cache:  CacheConfig,
@@ -60,6 +59,5 @@ func Setup(ctx context.Context, s *gcfg.Config, fs ...Initialize) {
 		},
 		callbacks: fs,
 	}
-
 	_cfg.Init(ctx)
 }
