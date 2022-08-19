@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
 )
@@ -12,6 +13,7 @@ var (
 )
 
 type Initialize interface {
+	String() string
 	Init(ctx context.Context, s *Settings) error
 }
 
@@ -24,16 +26,15 @@ type Settings struct {
 
 func (e *Settings) runCallback(ctx context.Context) {
 	for i := range e.callbacks {
-		e.callbacks[i](ctx, e)
+		err := e.callbacks[i].Init(ctx, e)
+		if err != nil {
+			glog.Error(ctx, fmt.Sprintf("runCallback %s error: %v", e.callbacks[i].String(), err))
+		}
 	}
 }
 
 func (e *Settings) Init(ctx context.Context) {
-	e.init(ctx)
 	glog.Debug(ctx, "!!! config init")
-}
-
-func (e *Settings) init(ctx context.Context) {
 	e.runCallback(ctx)
 }
 
