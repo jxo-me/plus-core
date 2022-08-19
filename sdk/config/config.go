@@ -21,7 +21,7 @@ type Settings struct {
 	Settings  Config `yaml:"settings"`
 	Cache     *Cache `yaml:"cache"`
 	Queue     *Queue `yaml:"queue"`
-	callbacks []func(ctx context.Context, cf *gcfg.Config)
+	callbacks []Initialize
 }
 
 func (e *Settings) runCallback(ctx context.Context) {
@@ -49,7 +49,7 @@ type Config struct {
 }
 
 // Setup 载入配置文件
-func Setup(ctx context.Context, s *gcfg.Config, fs ...func(ctx context.Context, s *gcfg.Config)) {
+func Setup(ctx context.Context, s *gcfg.Config, fs ...Initialize) {
 	_cfg = &Settings{
 		Config: s,
 		Settings: Config{
