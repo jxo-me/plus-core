@@ -12,21 +12,19 @@ var (
 )
 
 type Initialize interface {
-	Init(ctx context.Context, cf *gcfg.Config) error
+	Init(ctx context.Context, s *Settings) error
 }
 
 // Settings 兼容原先的配置结构
 type Settings struct {
 	Config    *gcfg.Config
 	Settings  Config `yaml:"settings"`
-	Cache     *Cache `yaml:"cache"`
-	Queue     *Queue `yaml:"queue"`
 	callbacks []Initialize
 }
 
 func (e *Settings) runCallback(ctx context.Context) {
 	for i := range e.callbacks {
-		e.callbacks[i](ctx, e.Config)
+		e.callbacks[i](ctx, e)
 	}
 }
 
