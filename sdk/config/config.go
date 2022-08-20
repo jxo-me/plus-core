@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
 )
@@ -19,6 +20,7 @@ type Initialize interface {
 
 // Settings 兼容原先的配置结构
 type Settings struct {
+	server    *ghttp.Server
 	Config    *gcfg.Config
 	Settings  Config `yaml:"settings"`
 	callbacks []Initialize
