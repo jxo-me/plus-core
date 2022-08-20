@@ -36,7 +36,6 @@ func (e *Settings) runCallback(ctx context.Context) {
 }
 
 func (e *Settings) Init(ctx context.Context) {
-	glog.Debug(ctx, "!!! config init")
 	e.runCallback(ctx)
 }
 
