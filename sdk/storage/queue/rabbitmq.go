@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/rabbitmq-go"
 )
@@ -66,9 +65,11 @@ func (r *RabbitMQ) newConsumer(ctx context.Context, options *rabbitmq.ConsumerOp
 	if options == nil {
 		r.ConsumerOptions = &rabbitmq.ConsumerOptions{}
 	}
-	return rabbitmq.NewConsumer(ctx, r.Url, r.Config,
-		rabbitmq.WithConsumerOptionsLogger(r.ConsumerOptions.Logger),
-		rabbitmq.WithConsumerOptionsReconnectInterval(r.ConsumerOptions.ReconnectInterval),
+	return rabbitmq.NewConsumer(ctx,
+		r.Url,
+		r.Config,
+		//rabbitmq.WithConsumerOptionsLogger(r.ConsumerOptions.Logger),
+		//rabbitmq.WithConsumerOptionsReconnectInterval(r.ConsumerOptions.ReconnectInterval),
 	)
 }
 
@@ -76,9 +77,11 @@ func (r *RabbitMQ) newProducer(ctx context.Context, options *rabbitmq.PublisherO
 	if options == nil {
 		r.PublisherOptions = &rabbitmq.PublisherOptions{}
 	}
-	return rabbitmq.NewPublisher(ctx, r.Url, r.Config,
-		rabbitmq.WithPublisherOptionsLogger(r.PublisherOptions.Logger),
-		rabbitmq.WithPublisherOptionsReconnectInterval(r.PublisherOptions.ReconnectInterval),
+	return rabbitmq.NewPublisher(ctx,
+		r.Url,
+		r.Config,
+		//rabbitmq.WithPublisherOptionsLogger(r.PublisherOptions.Logger),
+		//rabbitmq.WithPublisherOptionsReconnectInterval(r.PublisherOptions.ReconnectInterval),
 	)
 }
 
@@ -107,9 +110,11 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 	// exchange exchangeType routingKey
 	err := r.consumer.StartConsuming(ctx,
 		func(d rabbitmq.Delivery) rabbitmq.Action {
-			glog.Debugf(ctx, "rabbitmq consumed: %s\n", string(d.Body))
+			glog.Debug(ctx, "Delivery:", d)
 			m := new(Message)
-			m.SetValues(gconv.Map(d.Body))
+			m.SetValues(map[string]interface{}{
+				"body": string(d.Body),
+			})
 			m.SetRoutingKey(d.RoutingKey)
 			m.SetId(d.MessageId)
 			err := f(ctx, m)
