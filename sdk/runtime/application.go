@@ -10,6 +10,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/sdk/cron"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/storage/queue"
@@ -29,6 +30,7 @@ type Application struct {
 	memoryQueue storage.AdapterQueue
 	rabbitQueue storage.AdapterQueue
 	rocketQueue storage.AdapterQueue
+	crontab     cron.Adapter
 	queue       map[string]storage.AdapterQueue
 }
 
@@ -42,11 +44,19 @@ func NewConfig() *Application {
 	}
 }
 
+func (e *Application) SetCron(srv cron.Adapter) {
+	e.crontab = srv
+}
+
+func (e *Application) Cron() cron.Adapter {
+	return e.crontab
+}
+
 func (e *Application) SetServer(srv *ghttp.Server) {
 	e.server = srv
 }
 
-func (e *Application) GetServer() *ghttp.Server {
+func (e *Application) Server() *ghttp.Server {
 	return e.server
 }
 

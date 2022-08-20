@@ -8,6 +8,7 @@ import (
 	"github.com/gogf/gf/v2/i18n/gi18n"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
+	"github.com/jxo-me/plus-core/sdk/cron"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"github.com/jxo-me/plus-core/sdk/storage"
 )
@@ -15,7 +16,7 @@ import (
 type Runtime interface {
 	// SetServer Http Server
 	SetServer(srv *ghttp.Server)
-	GetServer() *ghttp.Server
+	Server() *ghttp.Server
 
 	// SetCasbin casbin module
 	SetCasbin(key string, enforcer *casbin.SyncedEnforcer)
@@ -54,4 +55,7 @@ type Runtime interface {
 	SetLockerAdapter(storage.AdapterLocker)
 	GetLockerAdapter() storage.AdapterLocker
 	GetLockerPrefix(string) storage.AdapterLocker
+
+	SetCron(srv cron.Adapter)
+	Cron() cron.Adapter
 }
