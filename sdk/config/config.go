@@ -20,7 +20,7 @@ type Initialize interface {
 
 // Settings 兼容原先的配置结构
 type Settings struct {
-	server    *ghttp.Server
+	Server    *ghttp.Server
 	Config    *gcfg.Config
 	Settings  Config `yaml:"settings"`
 	callbacks []Initialize
