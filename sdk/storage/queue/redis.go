@@ -50,7 +50,7 @@ func (r *Redis) newProducer(options *redisqueue.ProducerOptions) (*redisqueue.Pr
 }
 
 // Publish 消息入生产者
-func (r *Redis) Publish(ctx context.Context, message storage.Messager) error {
+func (r *Redis) Publish(ctx context.Context, message storage.Messager, optionFuncs ...func(*PublishOptions)) error {
 	err := r.producer.Enqueue(&redisqueue.Message{
 		ID:     message.GetId(),
 		Stream: message.GetRoutingKey(),
@@ -60,7 +60,7 @@ func (r *Redis) Publish(ctx context.Context, message storage.Messager) error {
 }
 
 // Consumer 监听消费者
-func (r *Redis) Consumer(ctx context.Context, name string, f storage.ConsumerFunc) {
+func (r *Redis) Consumer(ctx context.Context, name string, f storage.ConsumerFunc, optionFuncs ...func(*ConsumeOptions)) {
 	r.consumer.Register(name, func(message *redisqueue.Message) error {
 		m := new(Message)
 		m.SetValues(message.Values)

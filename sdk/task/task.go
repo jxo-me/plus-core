@@ -11,7 +11,7 @@ type Handler interface {
 	Handle(ctx context.Context, msg storage.Messager) error
 }
 
-type ConsumerHandler interface {
+type SubHandler interface {
 	Handle(ctx context.Context, msg storage.Messager) (interface{}, error)
 }
 
@@ -32,23 +32,34 @@ type MemorySpec struct {
 
 type RabbitMqTask interface {
 	GetSpec(ctx context.Context) *RabbitMqSpec
-	ConsumerHandler
+	Handler
 }
 
 type RabbitMqSpec struct {
 	TaskName     string
+	RoutingKeys  []string
 	RoutingKey   string
 	Exchange     string
 	ExchangeType string
 	QueueName    string
-	RoutingMap   map[string]ConsumerHandler
+	RoutingMap   map[string]SubHandler
 	ConsumerNum  int
 	CTag         string
 }
 
+func (r *RabbitMqSpec) GetRoutingKeys() []string {
+	r.RoutingKeys = make([]string, 0)
+	r.RoutingKeys = append(r.RoutingKeys, r.RoutingKey)
+	for key, _ := range r.RoutingMap {
+		r.RoutingKeys = append(r.RoutingKeys, key)
+	}
+
+	return r.RoutingKeys
+}
+
 type RocketMqTask interface {
 	GetSpec(ctx context.Context) *RocketMqSpec
-	ConsumerHandler
+	Handler
 }
 
 type RocketMqSpec struct {
@@ -57,14 +68,14 @@ type RocketMqSpec struct {
 	Exchange     string
 	ExchangeType string
 	QueueName    string
-	RoutingMap   map[string]ConsumerHandler
+	RoutingMap   map[string]SubHandler
 	ConsumerNum  int
 	CTag         string
 }
 
 type NsqTask interface {
 	GetSpec(ctx context.Context) *NsqSpec
-	ConsumerHandler
+	Handler
 }
 
 type NsqSpec struct {
@@ -73,15 +84,14 @@ type NsqSpec struct {
 	Exchange     string
 	ExchangeType string
 	QueueName    string
-	RoutingMap   map[string]ConsumerHandler
+	RoutingMap   map[string]SubHandler
 	ConsumerNum  int
 	CTag         string
 }
 
-func WrapHandler(handler ConsumerHandler) storage.ConsumerFunc {
+func WrapHandler(handler SubHandler) storage.ConsumerFunc {
 	return storage.ConsumerFunc(
 		func(ctx context.Context, msg storage.Messager) error {
-			glog.Debug(ctx, "handler result:", msg)
 			_, err := handler.Handle(ctx, msg)
 			if err != nil {
 				glog.Error(ctx, "task handler error", err.Error())
@@ -94,10 +104,9 @@ func WrapHandler(handler ConsumerHandler) storage.ConsumerFunc {
 // CallbackFunc 消费结果统一回调
 type CallbackFunc func(context.Context, interface{}) error
 
-func CallbackWrapHandler(handler ConsumerHandler, callback CallbackFunc) storage.ConsumerFunc {
+func CallbackWrapHandler(handler SubHandler, callback CallbackFunc) storage.ConsumerFunc {
 	return storage.ConsumerFunc(
 		func(ctx context.Context, msg storage.Messager) error {
-			glog.Debug(ctx, "handler result:", msg)
 			data, err := handler.Handle(ctx, msg)
 			if err != nil {
 				glog.Error(ctx, "task handler error", err.Error())
@@ -105,7 +114,6 @@ func CallbackWrapHandler(handler ConsumerHandler, callback CallbackFunc) storage
 			err = callback(ctx, data)
 			if err != nil {
 				glog.Error(ctx, "task CallbackFunc error", err.Error())
-				return err
 			}
 			return err
 		},
