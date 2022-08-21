@@ -4,19 +4,13 @@ package storage
 func GetDefaultConsumeOptions() ConsumeOptions {
 	return ConsumeOptions{
 		BindingExchange: &BindingExchangeOptions{
-			Name:       "",
-			Kind:       "direct",
-			Durable:    false,
-			AutoDelete: false,
-			Internal:   false,
-			NoWait:     false,
-			Declare:    true,
+			Name: "",
+			Kind: "direct",
 		},
 		Concurrency:     1,
 		QOSPrefetch:     0,
 		ConsumerName:    "",
 		ConsumerAutoAck: false,
-		ConsumerNoLocal: false,
 	}
 }
 
@@ -28,7 +22,6 @@ type ConsumeOptions struct {
 	QOSPrefetch        int
 	ConsumerName       string
 	ConsumerAutoAck    bool
-	ConsumerNoLocal    bool
 }
 
 // WithConsumeOptionsBindingRoutingKeys returns a function that sets the exchange name the RoutingKeys will be bound to
@@ -42,13 +35,8 @@ func WithConsumeOptionsBindingRoutingKeys(keys []string) func(*ConsumeOptions) {
 func getBindingExchangeOptionsOrSetDefault(options *ConsumeOptions) *BindingExchangeOptions {
 	if options.BindingExchange == nil {
 		options.BindingExchange = &BindingExchangeOptions{
-			Name:       "",
-			Kind:       "direct",
-			Durable:    false,
-			AutoDelete: false,
-			Internal:   false,
-			NoWait:     false,
-			Declare:    true,
+			Name: "",
+			Kind: "direct",
 		}
 	}
 	return options.BindingExchange
@@ -57,13 +45,8 @@ func getBindingExchangeOptionsOrSetDefault(options *ConsumeOptions) *BindingExch
 // BindingExchangeOptions are used when binding to an exchange.
 // it will verify the exchange is created before binding to it.
 type BindingExchangeOptions struct {
-	Name       string
-	Kind       string
-	Durable    bool
-	AutoDelete bool
-	Internal   bool
-	NoWait     bool
-	Declare    bool
+	Name string
+	Kind string
 }
 
 // WithConsumeOptionsBindingExchangeName returns a function that sets the exchange name the queue will be bound to
@@ -73,38 +56,11 @@ func WithConsumeOptionsBindingExchangeName(name string) func(*ConsumeOptions) {
 	}
 }
 
-// WithConsumeOptionsBindingExchangeKind returns a function that sets the binding exchange kind/type
-func WithConsumeOptionsBindingExchangeKind(kind string) func(*ConsumeOptions) {
+// WithConsumeOptionsBindingExchangeType returns a function that sets the binding exchange kind/type
+func WithConsumeOptionsBindingExchangeType(kind string) func(*ConsumeOptions) {
 	return func(options *ConsumeOptions) {
 		getBindingExchangeOptionsOrSetDefault(options).Kind = kind
 	}
-}
-
-// WithConsumeOptionsBindingExchangeDurable returns a function that sets the binding exchange durable flag
-func WithConsumeOptionsBindingExchangeDurable(options *ConsumeOptions) {
-	getBindingExchangeOptionsOrSetDefault(options).Durable = true
-}
-
-// WithConsumeOptionsBindingExchangeAutoDelete returns a function that sets the binding exchange autoDelete flag
-func WithConsumeOptionsBindingExchangeAutoDelete(options *ConsumeOptions) {
-	getBindingExchangeOptionsOrSetDefault(options).AutoDelete = true
-}
-
-// WithConsumeOptionsBindingExchangeInternal returns a function that sets the binding exchange internal flag
-func WithConsumeOptionsBindingExchangeInternal(options *ConsumeOptions) {
-	getBindingExchangeOptionsOrSetDefault(options).Internal = true
-}
-
-// WithConsumeOptionsBindingExchangeNoWait returns a function that sets the binding exchange noWait flag
-func WithConsumeOptionsBindingExchangeNoWait(options *ConsumeOptions) {
-	getBindingExchangeOptionsOrSetDefault(options).NoWait = true
-}
-
-// WithConsumeOptionsBindingExchangeSkipDeclare returns a function that skips the declaration of the
-// binding exchange. Use this setting if the exchange already exists and you don't need to declare
-// it on consumer start.
-func WithConsumeOptionsBindingExchangeSkipDeclare(options *ConsumeOptions) {
-	getBindingExchangeOptionsOrSetDefault(options).Declare = false
 }
 
 // WithConsumeOptionsConcurrency returns a function that sets the concurrency, which means that
