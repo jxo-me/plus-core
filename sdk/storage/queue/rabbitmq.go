@@ -70,13 +70,13 @@ func (r *RabbitMQ) newProducer(ctx context.Context) (*rabbitmq.Publisher, error)
 }
 
 // Publish 消息入生产者
-func (r *RabbitMQ) Publish(ctx context.Context, message storage.Messager, optionFuncs ...func(*PublishOptions)) error {
+func (r *RabbitMQ) Publish(ctx context.Context, message storage.Messager, optionFuncs ...func(*storage.PublishOptions)) error {
 	// exchange exchangeType routingKey
 	rb, err := json.Marshal(message.GetValues())
 	if err != nil {
 		return err
 	}
-	options := &PublishOptions{
+	options := &storage.PublishOptions{
 		ContentType: "application/json",
 		MessageID:   gctx.CtxId(ctx),
 	}
@@ -109,7 +109,7 @@ func (r *RabbitMQ) Publish(ctx context.Context, message storage.Messager, option
 }
 
 // Consumer 监听消费者
-func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.ConsumerFunc, optionFuncs ...func(*ConsumeOptions)) {
+func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.ConsumerFunc, optionFuncs ...func(*storage.ConsumeOptions)) {
 	if r.consumer == nil {
 		// default connection ...
 		consumer, err := r.newConsumer(ctx)
@@ -119,7 +119,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 		}
 		r.consumer = &consumer
 	}
-	options := getDefaultConsumeOptions()
+	options := storage.GetDefaultConsumeOptions()
 	for _, optionFunc := range optionFuncs {
 		optionFunc(&options)
 	}

@@ -1,7 +1,7 @@
-package queue
+package storage
 
-// getDefaultConsumeOptions descibes the options that will be used when a value isn't provided
-func getDefaultConsumeOptions() ConsumeOptions {
+// GetDefaultConsumeOptions descibes the options that will be used when a value isn't provided
+func GetDefaultConsumeOptions() ConsumeOptions {
 	return ConsumeOptions{
 		BindingExchange: nil,
 		Concurrency:     1,

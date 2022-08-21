@@ -1,4 +1,4 @@
-package queue
+package storage
 
 // PublishOptions are used to control how data is published
 type PublishOptions struct {

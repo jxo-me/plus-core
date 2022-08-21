@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"github.com/gogf/gf/v2/container/gvar"
-	"github.com/jxo-me/plus-core/sdk/storage/queue"
 	"time"
 
 	"github.com/jxo-me/redislock"
@@ -27,8 +26,8 @@ type AdapterCache interface {
 
 type AdapterQueue interface {
 	String() string
-	Publish(ctx context.Context, message Messager, optionFuncs ...func(*queue.PublishOptions)) error
-	Consumer(ctx context.Context, name string, f ConsumerFunc, optionFuncs ...func(*queue.ConsumeOptions))
+	Publish(ctx context.Context, message Messager, optionFuncs ...func(*PublishOptions)) error
+	Consumer(ctx context.Context, name string, f ConsumerFunc, optionFuncs ...func(*ConsumeOptions))
 	Run(ctx context.Context)
 	Shutdown(ctx context.Context)
 }
