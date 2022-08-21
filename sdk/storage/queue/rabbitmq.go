@@ -142,7 +142,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 		},
 		queueName,
 		options.BindingRoutingKeys,
-		rabbitmq.WithConsumeOptionsConsumerName(queueName),
+		rabbitmq.WithConsumeOptionsConsumerName(options.ConsumerName),
 		rabbitmq.WithConsumeOptionsBindingExchangeName(options.BindingExchange.Name),
 		rabbitmq.WithConsumeOptionsBindingExchangeKind(options.BindingExchange.Kind),
 		rabbitmq.WithConsumeOptionsConcurrency(options.Concurrency), // goroutine num
