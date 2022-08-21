@@ -3,7 +3,15 @@ package storage
 // GetDefaultConsumeOptions descibes the options that will be used when a value isn't provided
 func GetDefaultConsumeOptions() ConsumeOptions {
 	return ConsumeOptions{
-		BindingExchange: nil,
+		BindingExchange: &BindingExchangeOptions{
+			Name:       "",
+			Kind:       "direct",
+			Durable:    false,
+			AutoDelete: false,
+			Internal:   false,
+			NoWait:     false,
+			Declare:    true,
+		},
 		Concurrency:     1,
 		QOSPrefetch:     0,
 		ConsumerName:    "",
