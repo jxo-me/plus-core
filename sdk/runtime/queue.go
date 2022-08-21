@@ -23,13 +23,13 @@ func (e *Queue) String() string {
 }
 
 // Consumer 注册消费者
-func (e *Queue) Consumer(ctx context.Context, name string, f storage.ConsumerFunc) {
-	e.queue.Consumer(ctx, name, f)
+func (e *Queue) Consumer(ctx context.Context, name string, f storage.ConsumerFunc, optionFuncs ...func(*storage.ConsumeOptions)) {
+	e.queue.Consumer(ctx, name, f, optionFuncs...)
 }
 
 // Publish 数据生产者
-func (e *Queue) Publish(ctx context.Context, message storage.Messager) error {
-	return e.queue.Publish(ctx, message)
+func (e *Queue) Publish(ctx context.Context, message storage.Messager, optionFuncs ...func(*storage.PublishOptions)) error {
+	return e.queue.Publish(ctx, message, optionFuncs...)
 }
 
 // Run 运行
