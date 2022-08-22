@@ -20,7 +20,7 @@ type Task interface {
 	Start(ctx context.Context)
 }
 
-type Services interface {
+type Service interface {
 	Task
 	AddTasks(...Task) Task
 }
