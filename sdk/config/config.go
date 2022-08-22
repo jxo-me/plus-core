@@ -62,3 +62,7 @@ func Bootstrap(ctx context.Context, fs ...Initialize) {
 	}
 	_cfg.Init(ctx)
 }
+
+func GetGlobalSettings() *Settings {
+	return _cfg
+}

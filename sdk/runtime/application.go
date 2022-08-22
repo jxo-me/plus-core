@@ -213,9 +213,7 @@ func (e *Application) GetRabbitQueue(prefix string) storage.AdapterQueue {
 	if q, ok := e.queue[prefix]; ok {
 		return q
 	}
-	q := NewQueue(prefix, e.rabbitQueue)
-	e.queue[prefix] = q
-	return q
+	return nil
 }
 
 func (e *Application) GetRocketQueue(prefix string) storage.AdapterQueue {
@@ -224,9 +222,7 @@ func (e *Application) GetRocketQueue(prefix string) storage.AdapterQueue {
 	if q, ok := e.queue[prefix]; ok {
 		return q
 	}
-	q := NewQueue(prefix, e.rocketQueue)
-	e.queue[prefix] = q
-	return q
+	return nil
 }
 
 // SetQueueAdapter 设置队列适配器
