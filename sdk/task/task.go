@@ -62,6 +62,7 @@ type RabbitMqTask interface {
 
 type RabbitMqSpec struct {
 	TaskName     string
+	Vhost        string
 	RoutingKeys  []string
 	RoutingKey   string
 	Exchange     string
