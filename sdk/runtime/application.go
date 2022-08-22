@@ -33,6 +33,8 @@ type Application struct {
 	rocketQueue     storage.AdapterQueue
 	crontab         cron.Adapter
 	rabbitmqService task.RabbitMqService
+	rocketMqService task.RocketMqService
+	memoryService   task.MemoryService
 	queue           map[string]storage.AdapterQueue
 }
 
@@ -60,6 +62,22 @@ func (e *Application) SetRabbitTask(srv task.RabbitMqService) {
 
 func (e *Application) RabbitTask() task.RabbitMqService {
 	return e.rabbitmqService
+}
+
+func (e *Application) SetRocketMqTask(srv task.RocketMqService) {
+	e.rocketMqService = srv
+}
+
+func (e *Application) RocketMqTask() task.RocketMqService {
+	return e.rocketMqService
+}
+
+func (e *Application) SetMemoryTask(srv task.MemoryService) {
+	e.memoryService = srv
+}
+
+func (e *Application) MemoryTask() task.MemoryService {
+	return e.memoryService
 }
 
 func (e *Application) SetServer(srv *ghttp.Server) {

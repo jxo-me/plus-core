@@ -25,6 +25,21 @@ type RabbitMqService interface {
 	AddTasks(task ...RabbitMqTask) RabbitMqService
 }
 
+type RocketMqService interface {
+	Service
+	AddTasks(task ...RocketMqTask) RocketMqService
+}
+
+type MemoryService interface {
+	Service
+	AddTasks(task ...MemoryTask) MemoryService
+}
+
+type NsqService interface {
+	Service
+	AddTasks(task ...NsqTask) NsqService
+}
+
 type MemoryTask interface {
 	GetSpec() *MemorySpec
 	Handler
