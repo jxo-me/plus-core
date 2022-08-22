@@ -32,7 +32,7 @@ type Application struct {
 	rabbitQueue     storage.AdapterQueue
 	rocketQueue     storage.AdapterQueue
 	crontab         cron.Adapter
-	taskService     task.Service
+	taskService     task.TasksService
 	rabbitmqService task.RabbitMqService
 	rocketMqService task.RocketMqService
 	memoryService   task.MemoryService
@@ -57,11 +57,11 @@ func (e *Application) Cron() cron.Adapter {
 	return e.crontab
 }
 
-func (e *Application) SetTask(srv task.Service) {
+func (e *Application) SetTask(srv task.TasksService) {
 	e.taskService = srv
 }
 
-func (e *Application) Task() task.Service {
+func (e *Application) Task() task.TasksService {
 	return e.taskService
 }
 

@@ -20,6 +20,11 @@ type Service interface {
 	Start(ctx context.Context)
 }
 
+type TasksService interface {
+	Service
+	AddServices(services ...Service) Service
+}
+
 type RabbitMqService interface {
 	Service
 	AddTasks(task ...RabbitMqTask) RabbitMqService
