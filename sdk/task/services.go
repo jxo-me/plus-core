@@ -24,7 +24,7 @@ func (t *tService) String() string {
 	return SrvName
 }
 
-func (t *tService) AddTasks(services ...Service) Service {
+func (t *tService) AddServices(services ...Service) Service {
 	t.Services = services
 	return t
 }
