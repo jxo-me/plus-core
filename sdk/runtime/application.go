@@ -10,6 +10,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/sdk/config"
 	"github.com/jxo-me/plus-core/sdk/cron"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"github.com/jxo-me/plus-core/sdk/storage"
@@ -25,6 +26,7 @@ type Application struct {
 	jwt             map[string]*jwt.GfJWTMiddleware
 	lang            *gi18n.Manager
 	config          *gcfg.Config
+	settings        *config.Settings
 	cache           storage.AdapterCache
 	locker          storage.AdapterLocker
 	websocket       *ws.Instance
@@ -164,6 +166,14 @@ func (e *Application) Config(ctx context.Context, pattern string) *gvar.Var {
 		glog.Error(ctx, "Runtime Get Global Config error:", err)
 	}
 	return c
+}
+
+func (e *Application) SetSettings(c *config.Settings) {
+	e.settings = c
+}
+
+func (e *Application) Settings() *config.Settings {
+	return e.settings
 }
 
 // SetCacheAdapter 设置缓存

@@ -8,6 +8,7 @@ import (
 	"github.com/gogf/gf/v2/i18n/gi18n"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
+	"github.com/jxo-me/plus-core/sdk/config"
 	"github.com/jxo-me/plus-core/sdk/cron"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"github.com/jxo-me/plus-core/sdk/storage"
@@ -35,6 +36,8 @@ type Runtime interface {
 	SetConfig(c *gcfg.Config)
 	GetConfig() *gcfg.Config
 	Config(ctx context.Context, pattern string) *gvar.Var
+	SetSettings(c *config.Settings)
+	Settings() *config.Settings
 	// SetCacheAdapter cache
 	SetCacheAdapter(storage.AdapterCache)
 	GetCacheAdapter() storage.AdapterCache
