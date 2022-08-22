@@ -20,6 +20,11 @@ type Task interface {
 	Start(ctx context.Context)
 }
 
+type Services interface {
+	Task
+	AddTasks(...Task) Task
+}
+
 type MemoryTask interface {
 	GetSpec() *MemorySpec
 	Handler
