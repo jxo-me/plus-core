@@ -18,7 +18,7 @@ type JobSpec struct {
 type Adapter interface {
 	String() string
 	Start(context.Context)
-	AddJobs(...Job)
+	AddJobs(...Job) Adapter
 	GetJobs() []*gcron.Entry
 	StartJob(context.Context, string) bool
 	StopJob(context.Context, string) bool

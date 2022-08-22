@@ -26,8 +26,9 @@ func (t *crontab) String() string {
 	return "CrontabService"
 }
 
-func (t *crontab) AddJobs(jobs ...Job) {
+func (t *crontab) AddJobs(jobs ...Job) Adapter {
 	t.Jobs = jobs
+	return t
 }
 
 func (t *crontab) GetJobs() []*gcron.Entry {
