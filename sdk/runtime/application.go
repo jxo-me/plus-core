@@ -14,24 +14,26 @@ import (
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/storage/queue"
+	"github.com/jxo-me/plus-core/sdk/task"
 	"sync"
 )
 
 type Application struct {
-	server      *ghttp.Server
-	casbins     map[string]*casbin.SyncedEnforcer
-	mux         sync.RWMutex
-	jwt         map[string]*jwt.GfJWTMiddleware
-	lang        *gi18n.Manager
-	config      *gcfg.Config
-	cache       storage.AdapterCache
-	locker      storage.AdapterLocker
-	websocket   *ws.Instance
-	memoryQueue storage.AdapterQueue
-	rabbitQueue storage.AdapterQueue
-	rocketQueue storage.AdapterQueue
-	crontab     cron.Adapter
-	queue       map[string]storage.AdapterQueue
+	server          *ghttp.Server
+	casbins         map[string]*casbin.SyncedEnforcer
+	mux             sync.RWMutex
+	jwt             map[string]*jwt.GfJWTMiddleware
+	lang            *gi18n.Manager
+	config          *gcfg.Config
+	cache           storage.AdapterCache
+	locker          storage.AdapterLocker
+	websocket       *ws.Instance
+	memoryQueue     storage.AdapterQueue
+	rabbitQueue     storage.AdapterQueue
+	rocketQueue     storage.AdapterQueue
+	crontab         cron.Adapter
+	rabbitmqService task.RabbitMqService
+	queue           map[string]storage.AdapterQueue
 }
 
 // NewConfig 默认值
@@ -50,6 +52,14 @@ func (e *Application) SetCron(srv cron.Adapter) {
 
 func (e *Application) Cron() cron.Adapter {
 	return e.crontab
+}
+
+func (e *Application) SetRabbitTask(srv task.RabbitMqService) {
+	e.rabbitmqService = srv
+}
+
+func (e *Application) RabbitTask() task.RabbitMqService {
+	return e.rabbitmqService
 }
 
 func (e *Application) SetServer(srv *ghttp.Server) {

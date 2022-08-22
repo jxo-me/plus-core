@@ -15,14 +15,14 @@ type SubHandler interface {
 	Handle(ctx context.Context, msg storage.Messager) (interface{}, error)
 }
 
-type Task interface {
+type Service interface {
 	String() string
 	Start(ctx context.Context)
 }
 
-type Service interface {
-	Task
-	AddTasks(...Task) Task
+type RabbitMqService interface {
+	Service
+	AddTasks(task ...RabbitMqTask) RabbitMqService
 }
 
 type MemoryTask interface {

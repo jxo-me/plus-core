@@ -11,6 +11,7 @@ import (
 	"github.com/jxo-me/plus-core/sdk/cron"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"github.com/jxo-me/plus-core/sdk/storage"
+	"github.com/jxo-me/plus-core/sdk/task"
 )
 
 type Runtime interface {
@@ -58,4 +59,6 @@ type Runtime interface {
 
 	SetCron(srv cron.Adapter)
 	Cron() cron.Adapter
+	SetRabbitTask(srv task.RabbitMqService)
+	RabbitTask() task.RabbitMqService
 }
