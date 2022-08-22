@@ -22,7 +22,7 @@ type Service interface {
 
 type TasksService interface {
 	Service
-	AddServices(services ...Service) Service
+	AddServices(services ...Service) TasksService
 }
 
 type RabbitMqService interface {
