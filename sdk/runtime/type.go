@@ -59,6 +59,9 @@ type Runtime interface {
 
 	SetCron(srv cron.Adapter)
 	Cron() cron.Adapter
+	
+	SetTask(srv task.Service)
+	Task() task.Service
 	SetRabbitTask(srv task.RabbitMqService)
 	RabbitTask() task.RabbitMqService
 	SetRocketMqTask(srv task.RocketMqService)

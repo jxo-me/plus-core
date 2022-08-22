@@ -32,6 +32,7 @@ type Application struct {
 	rabbitQueue     storage.AdapterQueue
 	rocketQueue     storage.AdapterQueue
 	crontab         cron.Adapter
+	taskService     task.Service
 	rabbitmqService task.RabbitMqService
 	rocketMqService task.RocketMqService
 	memoryService   task.MemoryService
@@ -54,6 +55,14 @@ func (e *Application) SetCron(srv cron.Adapter) {
 
 func (e *Application) Cron() cron.Adapter {
 	return e.crontab
+}
+
+func (e *Application) SetTask(srv task.Service) {
+	e.taskService = srv
+}
+
+func (e *Application) Task() task.Service {
+	return e.taskService
 }
 
 func (e *Application) SetRabbitTask(srv task.RabbitMqService) {
