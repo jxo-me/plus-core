@@ -133,6 +133,9 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 			})
 			m.SetRoutingKey(d.RoutingKey)
 			m.SetId(d.MessageId)
+			if d.Redelivered {
+				m.SetErrorCount(d.DeliveryTag)
+			}
 			err := f(ctx, m)
 			if err != nil {
 				return rabbitmq.NackRequeue

@@ -9,7 +9,7 @@ type Message struct {
 	RoutingKey string
 	Values     map[string]interface{}
 	GroupId    string
-	ErrorCount int
+	ErrorCount uint64
 }
 
 func (m *Message) GetId() string {
@@ -52,10 +52,14 @@ func (m *Message) SetPrefix(prefix string) {
 	m.Values[storage.PrefixKey] = prefix
 }
 
-func (m *Message) SetErrorCount() {
+func (m *Message) SetErrorIncr() {
 	m.ErrorCount = m.ErrorCount + 1
 }
 
-func (m *Message) GetErrorCount() int {
+func (m *Message) SetErrorCount(count uint64) {
+	m.ErrorCount = count
+}
+
+func (m *Message) GetErrorCount() uint64 {
 	return m.ErrorCount
 }

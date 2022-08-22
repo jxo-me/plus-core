@@ -44,7 +44,7 @@ type RabbitMqSpec struct {
 	QueueName    string
 	RoutingMap   map[string]SubHandler
 	ConsumerNum  int
-	CTag         string
+	AutoAck      bool
 }
 
 func (r *RabbitMqSpec) GetRoutingKeys() []string {
@@ -55,6 +55,11 @@ func (r *RabbitMqSpec) GetRoutingKeys() []string {
 	}
 
 	return r.RoutingKeys
+}
+
+func (r *RabbitMqSpec) Route(routingKey string) (handler SubHandler, ifExist bool) {
+	handler, ifExist = r.RoutingMap[routingKey]
+	return
 }
 
 type RocketMqTask interface {
@@ -70,7 +75,7 @@ type RocketMqSpec struct {
 	QueueName    string
 	RoutingMap   map[string]SubHandler
 	ConsumerNum  int
-	CTag         string
+	AutoAck      bool
 }
 
 type NsqTask interface {

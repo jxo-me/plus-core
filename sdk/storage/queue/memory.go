@@ -49,7 +49,7 @@ func (m *Memory) Publish(ctx context.Context, message storage.Messager, optionFu
 	if !ok && memoryMessage.GetErrorCount() < 5 {
 		v = m.makeQueue()
 		m.queue.Store(message.GetRoutingKey(), v)
-		memoryMessage.SetErrorCount()
+		memoryMessage.SetErrorIncr()
 	}
 
 	var q queue

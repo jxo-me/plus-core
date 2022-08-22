@@ -41,8 +41,9 @@ type Messager interface {
 	GetValues() map[string]interface{}
 	GetPrefix() string
 	SetPrefix(string)
-	SetErrorCount()
-	GetErrorCount() int
+	SetErrorIncr()
+	SetErrorCount(uint64)
+	GetErrorCount() uint64
 }
 
 type ConsumerFunc func(ctx context.Context, msg Messager) error
