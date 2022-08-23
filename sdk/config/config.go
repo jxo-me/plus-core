@@ -21,7 +21,7 @@ type Initialize interface {
 // Settings 兼容原先的配置结构
 type Settings struct {
 	Srv       *ghttp.Server
-	Cfg       *gcfg.Config
+	cfg       *gcfg.Config
 	Configs   Config `yaml:"settings"`
 	callbacks []Initialize
 }
@@ -66,9 +66,10 @@ func (e *Settings) Bootstrap(ctx context.Context, fs ...Initialize) {
 }
 
 func (e *Settings) SetConfig(cf *gcfg.Config) *Settings {
-	e.Cfg = cf
+	e.cfg = cf
 	return e
 }
-func (e *Settings) Config() *gcfg.Config {
-	return e.Cfg
+
+func (e *Settings) Cfg() *gcfg.Config {
+	return e.cfg
 }
