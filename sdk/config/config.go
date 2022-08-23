@@ -10,7 +10,7 @@ import (
 
 var (
 	ExtendConfig interface{}
-	_cfg         *Settings
+	insSetting   = Settings{}
 )
 
 type Initialize interface {
@@ -24,6 +24,10 @@ type Settings struct {
 	Config    *gcfg.Config
 	Settings  Config `yaml:"settings"`
 	callbacks []Initialize
+}
+
+func Setting() *Settings {
+	return &insSetting
 }
 
 func (e *Settings) runCallback(ctx context.Context) {
@@ -49,20 +53,14 @@ type Config struct {
 }
 
 // Bootstrap 载入启动配置文件
-func Bootstrap(ctx context.Context, fs ...Initialize) {
-	_cfg = &Settings{
-		Settings: Config{
-			Jwt:    JwtConfig,
-			Cache:  CacheConfig,
-			Queue:  QueueConfig,
-			Extend: ExtendConfig,
-			Locker: LockerConfig,
-		},
-		callbacks: fs,
+func (e *Settings) Bootstrap(ctx context.Context, fs ...Initialize) {
+	e.Settings = Config{
+		Jwt:    JwtConfig,
+		Cache:  CacheConfig,
+		Queue:  QueueConfig,
+		Extend: ExtendConfig,
+		Locker: LockerConfig,
 	}
-	_cfg.Init(ctx)
-}
-
-func GetGlobalSettings() *Settings {
-	return _cfg
+	e.callbacks = fs
+	e.Init(ctx)
 }
