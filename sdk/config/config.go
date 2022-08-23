@@ -20,7 +20,7 @@ type Initialize interface {
 
 // Settings 兼容原先的配置结构
 type Settings struct {
-	Srv       *ghttp.Server
+	srv       *ghttp.Server
 	cfg       *gcfg.Config
 	Config    Config `yaml:"config"`
 	callbacks []Initialize
@@ -72,4 +72,13 @@ func (e *Settings) SetCfg(cf *gcfg.Config) *Settings {
 
 func (e *Settings) Cfg() *gcfg.Config {
 	return e.cfg
+}
+
+func (e *Settings) SetSrv(srv *ghttp.Server) *Settings {
+	e.srv = srv
+	return e
+}
+
+func (e *Settings) Srv() *ghttp.Server {
+	return e.srv
 }
