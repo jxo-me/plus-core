@@ -57,7 +57,7 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 			)
 		} else {
 			glog.Warning(ctx, "RabbitMq is nil ... NewRabbitMQ ...")
-			dsn := sdk.Runtime.Settings().Settings.Queue.Rabbit.Dsn
+			dsn := sdk.Runtime.Settings().Config.Queue.Rabbit.Dsn
 			// get config connection
 			mq, err := queue.NewRabbitMQ(ctx, dsn, &rabbitmq.Config{
 				Vhost: spec.Vhost,
