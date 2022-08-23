@@ -20,9 +20,9 @@ type Initialize interface {
 
 // Settings 兼容原先的配置结构
 type Settings struct {
-	Server    *ghttp.Server
-	Config    *gcfg.Config
-	Settings  Config `yaml:"settings"`
+	Srv       *ghttp.Server
+	Cfg       *gcfg.Config
+	Configs   Config `yaml:"settings"`
 	callbacks []Initialize
 }
 
@@ -54,7 +54,7 @@ type Config struct {
 
 // Bootstrap 载入启动配置文件
 func (e *Settings) Bootstrap(ctx context.Context, fs ...Initialize) {
-	e.Settings = Config{
+	e.Configs = Config{
 		Jwt:    JwtConfig,
 		Cache:  CacheConfig,
 		Queue:  QueueConfig,
@@ -63,4 +63,12 @@ func (e *Settings) Bootstrap(ctx context.Context, fs ...Initialize) {
 	}
 	e.callbacks = fs
 	e.Init(ctx)
+}
+
+func (e *Settings) SetConfig(cf *gcfg.Config) *Settings {
+	e.Cfg = cf
+	return e
+}
+func (e *Settings) Config() *gcfg.Config {
+	return e.Cfg
 }
