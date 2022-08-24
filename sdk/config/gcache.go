@@ -6,27 +6,28 @@ import (
 	"github.com/jxo-me/plus-core/sdk/storage/cache"
 )
 
+var insCache = Cache{}
+
 type Cache struct {
-	Redis  *GredisConnectOptions
+	Redis  *GRedisOptions
 	Memory interface{}
 }
 
 // CacheConfig cache配置
-var CacheConfig = new(Cache)
+func CacheConfig() *Cache {
+	return &insCache
+}
 
 // Setup 构造cache 顺序 redis > 其他 > memory
-func (e Cache) Setup(ctx context.Context) (storage.AdapterCache, error) {
+func (e *Cache) Setup(ctx context.Context) (storage.AdapterCache, error) {
 	if e.Redis != nil {
-		options, err := e.Redis.GetGredisOptions()
+		options, err := e.Redis.GetClientOptions()
 		if err != nil {
 			return nil, err
 		}
-		r, err := cache.NewGredis(GetGredisClient(), options)
+		r, err := cache.NewGredis(GRedis().GetClient(), options)
 		if err != nil {
 			return nil, err
-		}
-		if _redis == nil {
-			_gredis = r.GetClient()
 		}
 		return r, nil
 	}

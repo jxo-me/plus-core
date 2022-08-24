@@ -13,11 +13,6 @@ var (
 	insSetting   = Settings{}
 )
 
-type Initialize interface {
-	String() string
-	Init(ctx context.Context, s *Settings) error
-}
-
 // Settings 兼容原先的配置结构
 type Settings struct {
 	srv       *ghttp.Server
