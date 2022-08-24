@@ -70,6 +70,7 @@ type RabbitMqSpec struct {
 	QueueName    string
 	RoutingMap   map[string]SubHandler
 	ConsumerNum  int
+	CoroutineNum int
 	AutoAck      bool
 }
 
