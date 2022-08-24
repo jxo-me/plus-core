@@ -45,7 +45,7 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 			continue
 		}
 		for i := 0; i < spec.ConsumerNum; i++ {
-			mQueue := sdk.Runtime.GetRabbitQueue(fmt.Sprintf("%s_%02d", spec.Vhost, i)) // get rabbitmq instance
+			mQueue := sdk.Runtime.GetRabbitQueue(spec.Vhost) // get rabbitmq instance
 			if mQueue != nil {
 				// Consumer
 				go mQueue.Consumer(ctx, spec.QueueName, worker.Handle,
@@ -67,7 +67,7 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 				if err != nil {
 					glog.Error(ctx, "NewRabbitMQ error:", err)
 				}
-				sdk.Runtime.SetQueueAdapter(fmt.Sprintf("%s_%d", spec.Vhost, i), mq)
+				sdk.Runtime.SetQueueAdapter(spec.Vhost, mq)
 				// Consumer
 				go mq.Consumer(ctx, spec.QueueName, worker.Handle,
 					storage.WithConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()),
