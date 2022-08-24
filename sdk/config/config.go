@@ -45,17 +45,17 @@ func (e *Settings) Init(ctx context.Context) {
 
 // Config 配置集合
 type Config struct {
-	Jwt    *Jwt        `yaml:"jwt"`
-	Cache  *Cache      `yaml:"cache"`
-	Queue  *Queue      `yaml:"queue"`
-	Locker *Locker     `yaml:"locker"`
-	Extend interface{} `yaml:"extend"`
+	Jwt    map[string]*Jwt `yaml:"jwt"`
+	Cache  *Cache          `yaml:"cache"`
+	Queue  *Queue          `yaml:"queue"`
+	Locker *Locker         `yaml:"locker"`
+	Extend interface{}     `yaml:"extend"`
 }
 
 // Bootstrap 载入启动配置文件
 func (e *Settings) Bootstrap(ctx context.Context, fs ...Initialize) {
 	e.config = Config{
-		Jwt:    JwtConfig,
+		Jwt:    map[string]*Jwt{},
 		Cache:  CacheConfig,
 		Queue:  QueueConfig,
 		Extend: ExtendConfig,
@@ -90,4 +90,16 @@ func (e *Settings) SetSrv(srv *ghttp.Server) *Settings {
 
 func (e *Settings) Srv() *ghttp.Server {
 	return e.srv
+}
+
+func (e *Settings) SetJwt(module string, jwt *Jwt) *Settings {
+	e.Config().Jwt[module] = jwt
+	return e
+}
+
+func (e *Settings) GetJwt(module string) *Jwt {
+	if j, ok := e.Config().Jwt[module]; ok {
+		return j
+	}
+	return nil
 }
