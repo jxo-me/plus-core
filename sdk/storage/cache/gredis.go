@@ -43,7 +43,7 @@ func (r *Gredis) Get(ctx context.Context, key string) (*gvar.Var, error) {
 
 // Set value with key and expire time
 func (r *Gredis) Set(ctx context.Context, key string, val interface{}, expire int) error {
-	_, err := r.client.Do(ctx, "SET", key, val, "EX", time.Duration(expire)*time.Second)
+	_, err := r.client.Do(ctx, "SET", key, val, "EX", expire)
 	return err
 }
 
