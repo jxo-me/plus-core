@@ -40,6 +40,7 @@ type Runtime interface {
 	Settings() *config.Settings
 	// SetCacheAdapter cache
 	SetCacheAdapter(storage.AdapterCache)
+	Cache() storage.AdapterCache
 	GetCacheAdapter() storage.AdapterCache
 	GetCachePrefix(string) storage.AdapterCache
 	// SetWebSocket websocket

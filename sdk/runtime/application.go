@@ -181,6 +181,10 @@ func (e *Application) SetCacheAdapter(c storage.AdapterCache) {
 	e.cache = c
 }
 
+func (e *Application) Cache() storage.AdapterCache {
+	return e.cache
+}
+
 // GetCacheAdapter 获取缓存
 func (e *Application) GetCacheAdapter() storage.AdapterCache {
 	return NewCache("", e.cache, "")
