@@ -51,10 +51,10 @@ type Config struct {
 func (e *Settings) Bootstrap(ctx context.Context, fs ...Initialize) {
 	e.config = Config{
 		Jwt:    map[string]*Jwt{},
-		Cache:  CacheConfig,
-		Queue:  QueueConfig,
+		Cache:  CacheConfig(),
+		Queue:  QueueConfig(),
 		Extend: ExtendConfig,
-		Locker: LockerConfig,
+		Locker: LockerConfig(),
 	}
 	e.callbacks = fs
 	e.Init(ctx)

@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var insQueue = Queue{}
+
 type Queue struct {
 	Redis  *QueueRedis  `json:"redis" yaml:"redis"`
 	Memory *QueueMemory `json:"memory" yaml:"memory"`
@@ -43,15 +45,17 @@ type QueueNSQ struct {
 	ChannelPrefix string
 }
 
-var QueueConfig = new(Queue)
+func QueueConfig() *Queue {
+	return &insQueue
+}
 
 // Empty 空设置
-func (e Queue) Empty() bool {
+func (e *Queue) Empty() bool {
 	return e.Memory == nil && e.Redis == nil && e.NSQ == nil && e.Rabbit == nil && e.Rocket == nil
 }
 
 // Setup 启用顺序 redis > 其他 > memory
-func (e Queue) Setup(ctx context.Context) (storage.AdapterQueue, error) {
+func (e *Queue) Setup(ctx context.Context, s *Settings) (storage.AdapterQueue, error) {
 	if e.Redis != nil {
 		e.Redis.Consumer.ReclaimInterval = e.Redis.Consumer.ReclaimInterval * time.Second
 		e.Redis.Consumer.BlockingTimeout = e.Redis.Consumer.BlockingTimeout * time.Second
