@@ -176,8 +176,8 @@ func (e *Application) Settings() *config.Settings {
 	return e.settings
 }
 
-// SetCacheAdapter 设置缓存
-func (e *Application) SetCacheAdapter(c storage.AdapterCache) {
+// SetCache 设置缓存
+func (e *Application) SetCache(c storage.AdapterCache) {
 	e.cache = c
 }
 

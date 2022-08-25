@@ -38,8 +38,8 @@ type Runtime interface {
 	Config(ctx context.Context, pattern string) *gvar.Var
 	SetSettings(c *config.Settings)
 	Settings() *config.Settings
-	// SetCacheAdapter cache
-	SetCacheAdapter(storage.AdapterCache)
+	// SetCache cache
+	SetCache(storage.AdapterCache)
 	Cache() storage.AdapterCache
 	GetCacheAdapter() storage.AdapterCache
 	GetCachePrefix(string) storage.AdapterCache
