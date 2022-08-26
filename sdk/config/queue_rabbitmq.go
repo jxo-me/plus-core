@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	RabbitmqCfgName = "RabbitMqConfig"
+	RabbitmqQueueName = "rabbitmq"
 )
 
 var insQueueRabbit = cQueueRabbit{
@@ -23,7 +23,7 @@ func QueueRabbit() *cQueueRabbit {
 }
 
 func (c *cQueueRabbit) String() string {
-	return RabbitmqCfgName
+	return RabbitmqQueueName
 }
 
 func (c *cQueueRabbit) Init(ctx context.Context, s *Settings) error {

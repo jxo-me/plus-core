@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	MemoryMqCfgName = "memoryMqConfig"
+	MemoryQueueName = "memory"
 )
 
 var insQueueMemory = cQueueMemory{}
@@ -21,11 +21,11 @@ func QueueMemory() *cQueueMemory {
 }
 
 func (c *cQueueMemory) String() string {
-	return MemoryMqCfgName
+	return MemoryQueueName
 }
 
 func (c *cQueueMemory) Init(ctx context.Context, s *Settings) error {
-	poolSize, err := s.Cfg().Get(ctx, "memoryQueue.poolSize", 10000)
+	poolSize, err := s.Cfg().Get(ctx, "settings.queue.memory.poolSize", 10000)
 	if err != nil {
 		return err
 	}

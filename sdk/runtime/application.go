@@ -30,9 +30,6 @@ type Application struct {
 	cache           storage.AdapterCache
 	locker          storage.AdapterLocker
 	websocket       *ws.Instance
-	memoryQueue     storage.AdapterQueue
-	rabbitQueue     storage.AdapterQueue
-	rocketQueue     storage.AdapterQueue
 	crontab         cron.Adapter
 	taskService     task.TasksService
 	rabbitmqService task.RabbitMqService
@@ -44,10 +41,9 @@ type Application struct {
 // NewConfig 默认值
 func NewConfig() *Application {
 	return &Application{
-		casbins:     make(map[string]*casbin.SyncedEnforcer),
-		jwt:         make(map[string]*jwt.GfJWTMiddleware),
-		queue:       make(map[string]storage.AdapterQueue),
-		memoryQueue: queue.NewMemory(10000),
+		casbins: make(map[string]*casbin.SyncedEnforcer),
+		jwt:     make(map[string]*jwt.GfJWTMiddleware),
+		queue:   make(map[string]storage.AdapterQueue),
 	}
 }
 
@@ -208,13 +204,18 @@ func (e *Application) GetWebSocket() *ws.Instance {
 }
 
 func (e *Application) GetMemoryQueue(prefix string) storage.AdapterQueue {
-	return NewQueue(prefix, e.memoryQueue)
+	e.mux.Lock()
+	defer e.mux.Unlock()
+	if q, ok := e.queue[fmt.Sprintf("%s_%s", prefix, config.MemoryQueueName)]; ok {
+		return q
+	}
+	return nil
 }
 
 func (e *Application) GetRabbitQueue(prefix string) storage.AdapterQueue {
 	e.mux.Lock()
 	defer e.mux.Unlock()
-	if q, ok := e.queue[prefix]; ok {
+	if q, ok := e.queue[fmt.Sprintf("%s_%s", prefix, config.RabbitmqQueueName)]; ok {
 		return q
 	}
 	return nil
@@ -223,7 +224,7 @@ func (e *Application) GetRabbitQueue(prefix string) storage.AdapterQueue {
 func (e *Application) GetRocketQueue(prefix string) storage.AdapterQueue {
 	e.mux.Lock()
 	defer e.mux.Unlock()
-	if q, ok := e.queue[prefix]; ok {
+	if q, ok := e.queue[fmt.Sprintf("%s_%s", prefix, config.RocketQueueName)]; ok {
 		return q
 	}
 	return nil
@@ -233,7 +234,7 @@ func (e *Application) GetRocketQueue(prefix string) storage.AdapterQueue {
 func (e *Application) SetQueueAdapter(key string, c storage.AdapterQueue) {
 	e.mux.Lock()
 	defer e.mux.Unlock()
-	e.queue[key] = c
+	e.queue[fmt.Sprintf("%s_%s", key, c.String())] = NewQueue(key, c)
 }
 
 // GetQueueAdapter 获取队列适配器
@@ -241,7 +242,7 @@ func (e *Application) GetQueueAdapter(key string) storage.AdapterQueue {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 	// 优先返回全局
-	if j, ok := e.queue["*"]; ok {
+	if j, ok := e.queue[fmt.Sprintf("*_%s", key)]; ok {
 		return j
 	}
 	return e.queue[key]

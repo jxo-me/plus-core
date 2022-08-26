@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	NSQMqCfgName = "nsqMqConfig"
+	NsqQueueName = "nsq"
 )
 
 var insQueueNSQ = cQueueNsq{
@@ -26,7 +26,7 @@ func QueueNsq() *cQueueNsq {
 }
 
 func (c *cQueueNsq) String() string {
-	return NSQMqCfgName
+	return NsqQueueName
 }
 
 func (c *cQueueNsq) Init(ctx context.Context, s *Settings) error {

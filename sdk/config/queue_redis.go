@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	RedisMqCfgName = "RedisMqConfig"
+	RedisQueueName = "redis"
 )
 
 var insQueueRedis = cQueueRedis{}
@@ -26,7 +26,7 @@ func QueueRedis() *cQueueRedis {
 }
 
 func (c *cQueueRedis) String() string {
-	return RedisMqCfgName
+	return RedisQueueName
 }
 
 func (c *cQueueRedis) Init(ctx context.Context, s *Settings) error {

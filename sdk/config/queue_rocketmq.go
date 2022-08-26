@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	RocketMqCfgName = "RocketMqConfig"
+	RocketQueueName = "rocketmq"
 )
 
 var insQueueRocket = cQueueRocket{}
@@ -22,7 +22,7 @@ func QueueRocket() *cQueueRocket {
 }
 
 func (c *cQueueRocket) String() string {
-	return RocketMqCfgName
+	return RocketQueueName
 }
 
 func (c *cQueueRocket) Init(ctx context.Context, s *Settings) error {
