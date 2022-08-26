@@ -9,7 +9,6 @@ import (
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/storage/queue"
 	"github.com/jxo-me/plus-core/sdk/task"
-	"github.com/jxo-me/rabbitmq-go"
 )
 
 const (
@@ -60,13 +59,13 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 				)
 			} else {
 				glog.Warning(ctx, "RabbitMq is nil ... NewRabbitMQ ...")
-				dsn := config.QueueRabbit().GetDsn()
+				cfg := config.QueueRabbit().GetCfg()
+				// Use the vhost defined in the task first
+				cfg.Vhost = spec.Vhost
 				// get config connection
-				mq, err := queue.NewRabbitMQ(ctx, dsn, config.QueueRabbit().ReconnectInterval, &rabbitmq.Config{
-					Vhost: spec.Vhost,
-				})
+				mq, err := queue.NewRabbitMQ(ctx, config.QueueRabbit().GetDsn(), config.QueueRabbit().GetReconnectInterval(), cfg)
 				if err != nil {
-					glog.Error(ctx, "NewRabbitMQ error:", err)
+					glog.Error(ctx, "task NewRabbitMQ error:", err)
 				}
 				sdk.Runtime.SetQueueAdapter(spec.Vhost, mq)
 				// Consumer

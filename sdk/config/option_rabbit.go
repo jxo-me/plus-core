@@ -35,6 +35,10 @@ func (e *RabbitOptions) GetReconnectInterval() int {
 	return e.ReconnectInterval
 }
 
+func (e *RabbitOptions) GetCfg() *rabbitmq.Config {
+	return e.Cfg
+}
+
 func (e *RabbitOptions) GetDsn() string {
 	if e.Dsn != "" {
 		return e.Dsn
