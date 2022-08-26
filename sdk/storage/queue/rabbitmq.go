@@ -14,37 +14,31 @@ import (
 func NewRabbitMQ(
 	ctx context.Context,
 	dsn string,
+	reconnectInterval int,
 	cfg *rabbitmq.Config,
 ) (*RabbitMQ, error) {
 	//var err error
 	//var consumer rabbitmq.Consumer
 	r := &RabbitMQ{
-		Url: dsn,
+		Url:               dsn,
+		ReconnectInterval: reconnectInterval,
 	}
 	if cfg != nil {
 		r.Config = *cfg
 	}
-	//consumer, err = r.newConsumer(ctx, r.ConsumerOptions)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//r.consumer = &consumer
-	//r.producer, err = r.newProducer(ctx, r.PublisherOptions)
-	//if err != nil {
-	//	return nil, err
-	//}
 	return r, nil
 }
 
 // RabbitMQ cache implement
 type RabbitMQ struct {
-	Url              string
-	Handler          []rabbitmq.Handler
-	Config           rabbitmq.Config
-	consumer         *rabbitmq.Consumer
-	ConsumerOptions  *rabbitmq.ConsumerOptions
-	producer         *rabbitmq.Publisher
-	PublisherOptions *rabbitmq.PublisherOptions
+	Url               string
+	ReconnectInterval int
+	Handler           []rabbitmq.Handler
+	Config            rabbitmq.Config
+	consumer          *rabbitmq.Consumer
+	ConsumerOptions   *rabbitmq.ConsumerOptions
+	producer          *rabbitmq.Publisher
+	PublisherOptions  *rabbitmq.PublisherOptions
 }
 
 func (RabbitMQ) String() string {
@@ -56,7 +50,7 @@ func (r *RabbitMQ) newConsumer(ctx context.Context) (rabbitmq.Consumer, error) {
 		r.Url,
 		r.Config,
 		rabbitmq.WithConsumerOptionsLogger(g.Log()),
-		rabbitmq.WithConsumerOptionsReconnectInterval(time.Second*5),
+		rabbitmq.WithConsumerOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
 	)
 }
 
@@ -65,7 +59,7 @@ func (r *RabbitMQ) newProducer(ctx context.Context) (*rabbitmq.Publisher, error)
 		r.Url,
 		r.Config,
 		rabbitmq.WithPublisherOptionsLogger(g.Log()),
-		rabbitmq.WithPublisherOptionsReconnectInterval(time.Second*5),
+		rabbitmq.WithPublisherOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
 	)
 }
 

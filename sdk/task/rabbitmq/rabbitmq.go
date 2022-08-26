@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/plus-core/sdk"
+	"github.com/jxo-me/plus-core/sdk/config"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/storage/queue"
 	"github.com/jxo-me/plus-core/sdk/task"
@@ -59,9 +60,9 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 				)
 			} else {
 				glog.Warning(ctx, "RabbitMq is nil ... NewRabbitMQ ...")
-				dsn := sdk.Runtime.Settings().Config().Queue.Rabbit.Dsn
+				dsn := config.QueueRabbit().GetDsn()
 				// get config connection
-				mq, err := queue.NewRabbitMQ(ctx, dsn, &rabbitmq.Config{
+				mq, err := queue.NewRabbitMQ(ctx, dsn, config.QueueRabbit().ReconnectInterval, &rabbitmq.Config{
 					Vhost: spec.Vhost,
 				})
 				if err != nil {

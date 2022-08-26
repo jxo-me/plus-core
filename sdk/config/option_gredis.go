@@ -22,7 +22,7 @@ type GRedisOptions struct {
 	Tls      *Tls   `yaml:"tls" json:"tls"`
 }
 
-// GRedis 获取redis客户端
+// GRedis 获取GRedis客户端
 func GRedis() *cGRedis {
 	return &insGRedis
 }
@@ -44,7 +44,7 @@ func (c *cGRedis) SetClient(ctx context.Context, r *gredis.Redis) *cGRedis {
 	return c
 }
 
-func (e GRedisOptions) GetClientOptions(ctx context.Context, s *Settings) (*gredis.Config, error) {
+func (e *GRedisOptions) GetClientOptions(ctx context.Context, s *Settings) (*gredis.Config, error) {
 	address, err := s.Cfg().Get(ctx, "redis.default.address", "")
 	if err != nil {
 		return nil, err
@@ -57,11 +57,29 @@ func (e GRedisOptions) GetClientOptions(ctx context.Context, s *Settings) (*gred
 	if err != nil {
 		return nil, err
 	}
+	// cert key ca
+	cert, err := s.Cfg().Get(ctx, "redis.default.cert", "")
+	if err != nil {
+		return nil, err
+	}
+	key, err := s.Cfg().Get(ctx, "redis.default.key", "")
+	if err != nil {
+		return nil, err
+	}
+	ca, err := s.Cfg().Get(ctx, "redis.default.ca", "")
+	if err != nil {
+		return nil, err
+	}
+	tls := &Tls{
+		Cert: cert.String(),
+		Ca:   ca.String(),
+		Key:  key.String(),
+	}
 	r := &gredis.Config{
 		Address: address.String(),
 		Pass:    pass.String(),
 		Db:      db.Int(),
 	}
-	r.TLSConfig, err = getTLS(e.Tls)
+	r.TLSConfig, err = getTLS(tls)
 	return r, err
 }

@@ -7,7 +7,7 @@ type RocketOptions struct {
 	RetryTimes        int      `yaml:"retry_times" json:"retry_times"`
 }
 
-func (e RocketOptions) GetRocketOptions() (*RocketOptions, error) {
+func (e *RocketOptions) GetRocketOptions() (*RocketOptions, error) {
 
 	return nil, nil
 }
