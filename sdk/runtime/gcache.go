@@ -9,18 +9,16 @@ import (
 )
 
 // NewCache 创建对应上下文缓存
-func NewCache(prefix string, store storage.AdapterCache, tokenStoreKey string) storage.AdapterCache {
+func NewCache(prefix string, store storage.AdapterCache) storage.AdapterCache {
 	return &Cache{
-		prefix:        prefix,
-		store:         store,
-		tokenStoreKey: tokenStoreKey,
+		prefix: prefix,
+		store:  store,
 	}
 }
 
 type Cache struct {
-	prefix        string
-	store         storage.AdapterCache
-	tokenStoreKey string
+	prefix string
+	store  storage.AdapterCache
 }
 
 // String string输出

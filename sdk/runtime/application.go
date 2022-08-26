@@ -187,12 +187,12 @@ func (e *Application) Cache() storage.AdapterCache {
 
 // GetCacheAdapter 获取缓存
 func (e *Application) GetCacheAdapter() storage.AdapterCache {
-	return NewCache("", e.cache, "")
+	return NewCache("", e.cache)
 }
 
 // GetCachePrefix 获取带租户标记的cache
 func (e *Application) GetCachePrefix(key string) storage.AdapterCache {
-	return NewCache(key, e.cache, "")
+	return NewCache(key, e.cache)
 }
 
 func (e *Application) SetWebSocket(s *ws.Instance) {
