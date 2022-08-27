@@ -21,7 +21,7 @@ type Gredis struct {
 }
 
 func (*Gredis) String() string {
-	return "redis"
+	return "gredis"
 }
 
 // connect connect test
@@ -65,12 +65,12 @@ func (r *Gredis) HashDel(ctx context.Context, hk, key string) error {
 
 // Increase get Increase
 func (r *Gredis) Increase(ctx context.Context, key string) error {
-	_, err := r.client.Do(ctx, "INCRBY", key)
+	_, err := r.client.Do(ctx, "INCR", key)
 	return err
 }
 
 func (r *Gredis) Decrease(ctx context.Context, key string) error {
-	_, err := r.client.Do(ctx, "DECRBY", key)
+	_, err := r.client.Do(ctx, "DECR", key)
 	return err
 }
 
