@@ -16,28 +16,28 @@ import (
 	"time"
 )
 
-// _otpAuth is a one-time-password configuration.  This object will be modified by calls to
+// Auth is a one-time-password configuration.  This object will be modified by calls to
 // Authenticate and should be saved to ensure the codes are in fact only used
 // once. GoogleAuthenticator
-type sOtpAuth struct {
+type Auth struct {
 	UTC       bool // use UTC for the timestamp instead of local time
 	OTPIssuer string
 	Logger    glog.ILogger
 }
 
-func New(issuer string, utc bool, log glog.ILogger) *sOtpAuth {
-	return &sOtpAuth{
+func NewAuth(issuer string, utc bool, log glog.ILogger) *Auth {
+	return &Auth{
 		UTC:       utc,
 		OTPIssuer: issuer,
 		Logger:    log,
 	}
 }
 
-func (s *sOtpAuth) ProvisionURI(user string, secret string) string {
+func (s *Auth) ProvisionURI(user string, secret string) string {
 	return s.ProvisionURIWithIssuer(user, secret, s.OTPIssuer)
 }
 
-func (s *sOtpAuth) ProvisionURIWithIssuer(user string, secret string, issuer string) string {
+func (s *Auth) ProvisionURIWithIssuer(user string, secret string, issuer string) string {
 	auth := "totp/"
 	q := make(url.Values)
 	q.Add("secret", secret)
@@ -51,7 +51,7 @@ func (s *sOtpAuth) ProvisionURIWithIssuer(user string, secret string, issuer str
 
 // GetSecret
 // 获取秘钥
-func (s *sOtpAuth) GetSecret(ctx context.Context) string {
+func (s *Auth) GetSecret(ctx context.Context) string {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.BigEndian, s.un())
 	if err != nil {
@@ -60,15 +60,15 @@ func (s *sOtpAuth) GetSecret(ctx context.Context) string {
 	return strings.ToUpper(s.base32encode(s.hmacSha1(buf.Bytes(), nil)))
 }
 
-func (s *sOtpAuth) base32encode(src []byte) string {
+func (s *Auth) base32encode(src []byte) string {
 	return base32.StdEncoding.EncodeToString(src)
 }
 
-func (s *sOtpAuth) base32decode(str string) ([]byte, error) {
+func (s *Auth) base32decode(str string) ([]byte, error) {
 	return base32.StdEncoding.DecodeString(str)
 }
 
-func (s *sOtpAuth) toBytes(value int64) []byte {
+func (s *Auth) toBytes(value int64) []byte {
 	var result []byte
 	mask := int64(0xFF)
 	shifts := [8]uint16{56, 48, 40, 32, 24, 16, 8, 0}
@@ -78,11 +78,11 @@ func (s *sOtpAuth) toBytes(value int64) []byte {
 	return result
 }
 
-func (s *sOtpAuth) un() int64 {
+func (s *Auth) un() int64 {
 	return time.Now().UnixNano() / 1000 / 30
 }
 
-func (s *sOtpAuth) hmacSha1(key, data []byte) []byte {
+func (s *Auth) hmacSha1(key, data []byte) []byte {
 	h := hmac.New(sha1.New, key)
 	if total := len(data); total > 0 {
 		h.Write(data)
@@ -90,7 +90,7 @@ func (s *sOtpAuth) hmacSha1(key, data []byte) []byte {
 	return h.Sum(nil)
 }
 
-func (s *sOtpAuth) oneTimePassword(key []byte, data []byte) uint32 {
+func (s *Auth) oneTimePassword(key []byte, data []byte) uint32 {
 	hash := s.hmacSha1(key, data)
 	offset := hash[len(hash)-1] & 0x0F
 	hashParts := hash[offset : offset+4]
@@ -99,14 +99,14 @@ func (s *sOtpAuth) oneTimePassword(key []byte, data []byte) uint32 {
 	return number % 1000000
 }
 
-func (s *sOtpAuth) toUint32(bts []byte) uint32 {
+func (s *Auth) toUint32(bts []byte) uint32 {
 	return (uint32(bts[0]) << 24) + (uint32(bts[1]) << 16) +
 		(uint32(bts[2]) << 8) + uint32(bts[3])
 }
 
 // VerifyCode
 // 验证动态码
-func (s *sOtpAuth) VerifyCode(secret, code string) (bool, error) {
+func (s *Auth) VerifyCode(secret, code string) (bool, error) {
 	_code, err := s.GetCode(secret)
 	if err != nil {
 		return false, err
@@ -116,7 +116,7 @@ func (s *sOtpAuth) VerifyCode(secret, code string) (bool, error) {
 
 // GetCode
 // 获取动态码
-func (s *sOtpAuth) GetCode(secret string) (string, error) {
+func (s *Auth) GetCode(secret string) (string, error) {
 	secretUpper := strings.ToUpper(secret)
 	secretKey, err := s.base32decode(secretUpper)
 	if err != nil {
@@ -133,7 +133,7 @@ func (s *sOtpAuth) GetCode(secret string) (string, error) {
 	return fmt.Sprintf("%06d", number), nil
 }
 
-func (s *sOtpAuth) GetQrcode(url string) (string, error) {
+func (s *Auth) GetQrcode(url string) (string, error) {
 	var png []byte
 	png, err := qrcode.Encode(url, qrcode.Medium, 256)
 	if err != nil {
@@ -143,11 +143,11 @@ func (s *sOtpAuth) GetQrcode(url string) (string, error) {
 	return str, nil
 }
 
-func (s *sOtpAuth) imageToBase64(img []byte) string {
+func (s *Auth) imageToBase64(img []byte) string {
 	imgBase64Str := base64.StdEncoding.EncodeToString(img)
 	return s.imgBase64Str(imgBase64Str)
 }
 
-func (s *sOtpAuth) imgBase64Str(base64Str string) string {
+func (s *Auth) imgBase64Str(base64Str string) string {
 	return fmt.Sprintf("data:image/png;base64,%s", base64Str)
 }
