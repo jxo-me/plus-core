@@ -16,6 +16,7 @@ require (
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/robinjoseph08/redisqueue/v2 v2.1.0
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	golang.org/x/text v0.3.8-0.20211105212822-18b340fc7af2
 )
 
