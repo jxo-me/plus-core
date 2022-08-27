@@ -296,15 +296,15 @@ func (conn *Connection) RouterHandle(ins *Instance, r *ghttp.Request, list *map[
 		err     error
 		buf     []byte
 	)
-	//glog.Info(r.Context(), "lang:", r.Get("lang"))
-	//glog.Info(r.Context(), "auth session", r.Get("session"))
-	//glog.Info(r.Context(), "header X-Token", r.GetHeader("X-Token"))
+	//glog.Info(r.GetCtx(), "lang:", r.Get("lang"))
+	//glog.Info(r.GetCtx(), "auth session", r.Get("session"))
+	//glog.Info(r.GetCtx(), "header X-Token", r.GetHeader("X-Token"))
 
 	// 连接加入管理器, 可以推送端查找到
 	ins.ConnMgr().AddConn(conn)
 
 	// 心跳检测线程
-	go conn.heartbeatChecker(r.Context())
+	go conn.heartbeatChecker(r.GetCtx())
 
 	// 请求处理协程
 	for {
@@ -342,7 +342,7 @@ func (conn *Connection) RouterHandle(ins *Instance, r *ghttp.Request, list *map[
 		//case "leave":
 		//	res, err = conn.handleLeave(ins.ConnMgr(), req)
 		default:
-			res, err = conn.dispatcher(r.Context(), req, list)
+			res, err = conn.dispatcher(r.GetCtx(), req, list)
 		}
 		if err != nil {
 			resp = &Response{Code: 500, Message: err.Error(), Body: NullResp{}}
@@ -364,10 +364,10 @@ func (conn *Connection) RouterHandle(ins *Instance, r *ghttp.Request, list *map[
 
 ERR:
 	// 确保连接关闭
-	conn.Close(r.Context())
+	conn.Close(r.GetCtx())
 
 	// 离开所有房间
-	conn.leaveAll(ins.ConnMgr(), r.Context())
+	conn.leaveAll(ins.ConnMgr(), r.GetCtx())
 
 	// 从连接池中移除
 	ins.ConnMgr().DelConn(conn)

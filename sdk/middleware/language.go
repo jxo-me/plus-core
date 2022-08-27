@@ -10,7 +10,7 @@ import (
 func Language(r *ghttp.Request) {
 	var preferred []language.Tag
 	var err error
-	ctx := r.Context()
+	ctx := r.GetCtx()
 	lang := r.Get("lang").String()
 	if lang == "" {
 		lang = r.Get("language").String()
