@@ -8,14 +8,7 @@ import (
 )
 
 // NewGredis redis模式
-func NewGredis(client *gredis.Redis, options *gredis.Config) (*Gredis, error) {
-	var err error
-	if client == nil {
-		client, err = gredis.New(options)
-		if err != nil {
-			return nil, err
-		}
-	}
+func NewGredis(client *gredis.Redis) (*Gredis, error) {
 	r := &Gredis{
 		client: client,
 	}

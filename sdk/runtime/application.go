@@ -178,7 +178,7 @@ func (e *Application) SetCache(c storage.AdapterCache) {
 }
 
 func (e *Application) Cache() storage.AdapterCache {
-	return e.cache
+	return NewCache("", e.cache)
 }
 
 // GetCacheAdapter 获取缓存
@@ -246,17 +246,6 @@ func (e *Application) GetQueueAdapter(key string) storage.AdapterQueue {
 		return j
 	}
 	return e.queue[key]
-}
-
-// GetQueuePrefix 获取带租户标记的queue
-func (e *Application) GetQueuePrefix(key string) storage.AdapterQueue {
-	e.mux.Lock()
-	defer e.mux.Unlock()
-	// 优先返回全局
-	if j, ok := e.queue["*"]; ok {
-		return NewQueue(key, j)
-	}
-	return NewQueue(key, e.queue[key])
 }
 
 // GetQueueMessage 获取队列需要用的message

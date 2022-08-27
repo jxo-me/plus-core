@@ -54,7 +54,6 @@ type Runtime interface {
 
 	SetQueueAdapter(string, storage.AdapterQueue)
 	GetQueueAdapter(key string) storage.AdapterQueue
-	GetQueuePrefix(key string) storage.AdapterQueue
 	GetQueueMessage(id, routingKey string, value map[string]interface{}) (storage.Messager, error)
 
 	SetLockerAdapter(storage.AdapterLocker)

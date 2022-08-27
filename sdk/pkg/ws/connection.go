@@ -44,7 +44,7 @@ func InitConnection(ctx context.Context, connId uint64, wsSocket *ghttp.WebSocke
 	}
 
 	wsSocket.SetCloseHandler(func(code int, text string) error {
-		glog.Debug(ctx, fmt.Sprintf("Connection close code: %d, message: %s", code, text))
+		glog.Debug(ctx, fmt.Sprintf("websocket Connection close code: %d, message: %s", code, text))
 		c.Close(ctx)
 		return nil
 	})

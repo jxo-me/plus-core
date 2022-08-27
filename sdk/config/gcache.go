@@ -26,17 +26,23 @@ func CacheConfig() *Cache {
 func (e *Cache) Setup(ctx context.Context, s *Settings) (storage.AdapterCache, error) {
 	redis := g.Redis(gredis.DefaultGroupName)
 	if redis != nil {
-		r, err := cache.NewGredis(redis, nil)
+		r, err := cache.NewGredis(redis)
 		if err != nil {
 			return nil, err
 		}
+		GRedis().SetClient(ctx, redis)
 		return r, nil
 	}
 	options, err := e.Redis.GetClientOptions(ctx, s)
 	if err != nil {
 		return nil, err
 	}
-	r, err := cache.NewGredis(redis, options)
+	redis, err = gredis.New(options)
+	if err != nil {
+		return nil, err
+	}
+	GRedis().SetClient(ctx, redis)
+	r, err := cache.NewGredis(redis)
 	if err != nil {
 		glog.Warning(ctx, fmt.Sprintf("get redis cache options: %v error: %v", options, err))
 		return cache.NewMemory(), nil

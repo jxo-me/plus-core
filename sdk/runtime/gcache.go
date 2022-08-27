@@ -30,7 +30,10 @@ func (e *Cache) String() string {
 }
 
 func (e *Cache) getPrefixKey(key string) string {
-	return fmt.Sprintf("%s:%s", e.prefix, key)
+	if e.prefix != "" {
+		return fmt.Sprintf("%s:%s", e.prefix, key)
+	}
+	return key
 }
 
 // SetPrefix 设置前缀
