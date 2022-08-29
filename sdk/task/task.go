@@ -96,14 +96,13 @@ type RocketMqTask interface {
 }
 
 type RocketMqSpec struct {
-	TaskName     string
-	RoutingKey   string
-	Exchange     string
-	ExchangeType string
-	QueueName    string
-	RoutingMap   map[string]SubHandler
-	ConsumerNum  int
-	AutoAck      bool
+	TaskName          string
+	GroupName         string
+	TopicName         string
+	TopicMap          map[string]SubHandler
+	ConsumerNum       int
+	MaxReconsumeTimes int32
+	AutoCommit        bool
 }
 
 type NsqTask interface {

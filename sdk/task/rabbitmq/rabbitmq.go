@@ -3,16 +3,16 @@ package rabbitmq
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/plus-core/sdk"
-	"github.com/jxo-me/plus-core/sdk/config"
 	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/storage/queue"
 	"github.com/jxo-me/plus-core/sdk/task"
 )
 
 const (
-	SrvName = "RabbitMqTask"
+	SrvName      = "RabbitMqTask"
+	DefaultQueue = "default"
 )
 
 var insRabbitMq = tRabbitMq{
@@ -43,41 +43,22 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 		if spec == nil {
 			continue
 		}
-		for i := 0; i < spec.ConsumerNum; i++ {
-			mQueue := sdk.Runtime.GetRabbitQueue(spec.Vhost) // get rabbitmq instance
-			if mQueue != nil {
+		mQueue := sdk.Runtime.GetRabbitQueue(DefaultQueue) // get rabbitmq instance
+		if mQueue != nil {
+			for i := 0; i < spec.ConsumerNum; i++ {
 				// Consumer
 				go mQueue.Consumer(ctx, spec.QueueName, worker.Handle,
-					storage.WithConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()),
-					storage.WithConsumeOptionsBindingExchangeName(spec.Exchange),
-					storage.WithConsumeOptionsBindingExchangeType(spec.ExchangeType),
-					storage.WithConsumeOptionsConcurrency(spec.CoroutineNum),
-					storage.WithConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)),
-					storage.WithConsumeOptionsConsumerAutoAck(spec.AutoAck),
-					storage.WithConsumeOptionsQOSPrefetch(spec.Prefetch),
-				)
-			} else {
-				glog.Warning(ctx, "RabbitMq is nil ... NewRabbitMQ ...")
-				cfg := config.QueueRabbit().GetCfg()
-				// Use the vhost defined in the task first
-				cfg.Vhost = spec.Vhost
-				// get config connection
-				mq, err := queue.NewRabbitMQ(ctx, config.QueueRabbit().GetDsn(), config.QueueRabbit().GetReconnectInterval(), cfg)
-				if err != nil {
-					glog.Error(ctx, "task NewRabbitMQ error:", err)
-				}
-				sdk.Runtime.SetQueueAdapter(spec.Vhost, mq)
-				// Consumer
-				go mq.Consumer(ctx, spec.QueueName, worker.Handle,
-					storage.WithConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()),
-					storage.WithConsumeOptionsBindingExchangeName(spec.Exchange),
-					storage.WithConsumeOptionsBindingExchangeType(spec.ExchangeType),
-					storage.WithConsumeOptionsConcurrency(spec.CoroutineNum),
-					storage.WithConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)),
-					storage.WithConsumeOptionsConsumerAutoAck(spec.AutoAck),
-					storage.WithConsumeOptionsQOSPrefetch(spec.Prefetch),
+					storage.WithRabbitMqConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()),
+					storage.WithRabbitMqConsumeOptionsBindingExchangeName(spec.Exchange),
+					storage.WithRabbitMqConsumeOptionsBindingExchangeType(spec.ExchangeType),
+					storage.WithRabbitMqConsumeOptionsConcurrency(spec.CoroutineNum),
+					storage.WithRabbitMqConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)),
+					storage.WithRabbitMqConsumeOptionsConsumerAutoAck(spec.AutoAck),
+					storage.WithRabbitMqConsumeOptionsQOSPrefetch(spec.Prefetch),
 				)
 			}
+		} else {
+			panic(gerror.New("sdk.Runtime.GetRabbitQueue is nil!"))
 		}
 	}
 }

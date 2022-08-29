@@ -15,39 +15,24 @@ import (
 func NewRocketMQ(
 	ctx context.Context,
 	urls []string,
-	consumerOptions *RocketConsumerOptions,
-	producerOptions *RocketProducerOptions,
 	credentials *primitive.Credentials,
 ) (*RocketMQ, error) {
-	var err error
 	r := &RocketMQ{
-		Urls:            urls,
-		ConsumerOptions: consumerOptions,
-		ProducerOptions: producerOptions,
-		Credentials:     *credentials,
+		Urls:        urls,
+		Credentials: credentials,
+		consumers:   map[string]rocketmq.PushConsumer{},
+		producers:   map[string]rocketmq.Producer{},
 	}
-	if credentials != nil {
-		r.Credentials = *credentials
-	}
-	r.consumer, err = r.newConsumer(ctx, r.ConsumerOptions)
-	if err != nil {
-		return nil, err
-	}
-	r.producer, err = r.newProducer(ctx, r.ProducerOptions)
-	if err != nil {
-		return nil, err
-	}
+
 	return r, nil
 }
 
 // RocketMQ cache implement
 type RocketMQ struct {
-	Urls            []string
-	consumer        rocketmq.PushConsumer
-	ConsumerOptions *RocketConsumerOptions
-	producer        rocketmq.Producer
-	ProducerOptions *RocketProducerOptions
-	Credentials     primitive.Credentials
+	Urls        []string
+	consumers   map[string]rocketmq.PushConsumer
+	producers   map[string]rocketmq.Producer
+	Credentials *primitive.Credentials
 }
 
 func (RocketMQ) String() string {
@@ -64,20 +49,17 @@ type RocketProducerOptions struct {
 	RetryTimes int
 }
 
-func (r *RocketMQ) newConsumer(ctx context.Context, options *RocketConsumerOptions) (rocketmq.PushConsumer, error) {
-	if options == nil {
-		r.ConsumerOptions = &RocketConsumerOptions{
-			GroupName:         "DEFAULT_CONSUMER",
-			MaxReconsumeTimes: -1,
-		}
+func (r *RocketMQ) newConsumer(ctx context.Context, opt storage.ConsumeOptions) (rocketmq.PushConsumer, error) {
+	if r.Credentials == nil {
+		r.Credentials = &primitive.Credentials{}
 	}
 	return rocketmq.NewPushConsumer(
-		consumer.WithGroupName(r.ConsumerOptions.GroupName),
+		consumer.WithGroupName(opt.GroupName),
 		consumer.WithNsResolver(primitive.NewPassthroughResolver(r.Urls)),
 		consumer.WithConsumerModel(consumer.Clustering),
-		consumer.WithMaxReconsumeTimes(r.ConsumerOptions.MaxReconsumeTimes),
-		consumer.WithAutoCommit(false),
-		consumer.WithCredentials(r.Credentials),
+		consumer.WithMaxReconsumeTimes(opt.MaxReconsumeTimes),
+		consumer.WithAutoCommit(opt.AutoCommit),
+		//consumer.WithCredentials(*r.Credentials),
 		//consumer.WithCredentials(primitive.Credentials{
 		//	AccessKey: "RocketMQ",
 		//	SecretKey: "12345678",
@@ -85,17 +67,15 @@ func (r *RocketMQ) newConsumer(ctx context.Context, options *RocketConsumerOptio
 	)
 }
 
-func (r *RocketMQ) newProducer(ctx context.Context, options *RocketProducerOptions) (rocketmq.Producer, error) {
-	if options == nil {
-		r.ProducerOptions = &RocketProducerOptions{
-			GroupName:  "DEFAULT_CONSUMER",
-			RetryTimes: 3,
-		}
+func (r *RocketMQ) newProducer(ctx context.Context, opt storage.PublishOptions) (rocketmq.Producer, error) {
+	if r.Credentials == nil {
+		r.Credentials = &primitive.Credentials{}
 	}
+
 	return rocketmq.NewProducer(
 		producer.WithNsResolver(primitive.NewPassthroughResolver(r.Urls)),
-		producer.WithRetry(r.ProducerOptions.RetryTimes),
-		producer.WithCredentials(r.Credentials),
+		producer.WithRetry(opt.RetryTimes),
+		producer.WithCredentials(*r.Credentials),
 		//producer.WithCredentials(primitive.Credentials{
 		//	AccessKey: "RocketMQ",
 		//	SecretKey: "12345678",
@@ -106,12 +86,27 @@ func (r *RocketMQ) newProducer(ctx context.Context, options *RocketProducerOptio
 
 // Publish 消息入生产者
 func (r *RocketMQ) Publish(ctx context.Context, message storage.Messager, optionFuncs ...func(*storage.PublishOptions)) error {
-	//
+	options := storage.PublishOptions{}
+	for _, optionFunc := range optionFuncs {
+		optionFunc(&options)
+	}
+	var p rocketmq.Producer
+	var err error
+	var ok bool
+	if p, ok = r.producers[options.GroupName]; !ok {
+		p, err = r.newProducer(ctx, options)
+		if err != nil {
+			glog.Error(ctx, "RocketMQ newConsumer error:", err)
+			return err
+		}
+		r.producers[options.GroupName] = p
+	}
+	// encode message
 	rb, err := json.Marshal(message.GetValues())
 	if err != nil {
 		return err
 	}
-	_, err = r.producer.SendSync(
+	_, err = p.SendSync(
 		ctx,
 		&primitive.Message{
 			Topic: message.GetRoutingKey(),
@@ -122,7 +117,23 @@ func (r *RocketMQ) Publish(ctx context.Context, message storage.Messager, option
 
 // Consumer 监听消费者
 func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f storage.ConsumerFunc, optionFuncs ...func(*storage.ConsumeOptions)) {
-	err := r.consumer.Subscribe(
+	options := storage.GetDefaultConsumeOptions()
+	for _, optionFunc := range optionFuncs {
+		optionFunc(&options)
+	}
+	var c rocketmq.PushConsumer
+	var err error
+	var ok bool
+	if c, ok = r.consumers[options.GroupName]; !ok {
+		c, err = r.newConsumer(ctx, options)
+		if err != nil {
+			glog.Error(ctx, "RocketMQ newConsumer error:", err)
+			return
+		}
+		r.consumers[options.GroupName] = c
+	}
+
+	err = c.Subscribe(
 		topicName,
 		consumer.MessageSelector{},
 		func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
@@ -131,6 +142,9 @@ func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f storage.Con
 					glog.Debugf(ctx, "rocketmq consumed: %s\n", string(msgs[i].Body))
 					m := new(Message)
 					m.SetValues(gconv.Map(msgs[i].Body))
+					m.SetValues(map[string]interface{}{
+						"body": string(msgs[i].Body),
+					})
 					m.SetRoutingKey(msgs[i].GetTags())
 					m.SetId(msgs[i].MsgId)
 					err := f(ctx, m)
@@ -142,6 +156,7 @@ func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f storage.Con
 			return consumer.ConsumeSuccess, nil
 		},
 	)
+	glog.Warning(ctx, "rocketmq consumer Subscribe error:", err)
 	if err != nil {
 		glog.Errorf(ctx, "rocketmq consumer Subscribe error:%v", err)
 		return
@@ -149,22 +164,25 @@ func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f storage.Con
 }
 
 func (r *RocketMQ) Run(ctx context.Context) {
-	err := r.consumer.Start()
-	if err != nil {
-		glog.Warning(ctx, "rocketmq consumer Start error", err)
+	for _, pushConsumer := range r.consumers {
+		err := pushConsumer.Start()
+		if err != nil {
+			glog.Warning(ctx, "rocketmq consumer Start error", err)
+			continue
+		}
 	}
 	return
 }
 
 func (r *RocketMQ) Shutdown(ctx context.Context) {
-	if r.producer != nil {
-		err := r.producer.Shutdown()
+	for _, pd := range r.producers {
+		err := pd.Shutdown()
 		if err != nil {
 			glog.Warning(ctx, "rocketmq producer Close error", err)
 		}
 	}
-	if r.consumer != nil {
-		err := r.consumer.Shutdown()
+	for _, pushConsumer := range r.consumers {
+		err := pushConsumer.Shutdown()
 		if err != nil {
 			glog.Warning(ctx, "rocketmq consumer Close error", err)
 		}

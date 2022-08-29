@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/storage/queue"
 )
@@ -10,11 +11,12 @@ const (
 	RocketQueueName = "rocketmq"
 )
 
-var insQueueRocket = cQueueRocket{}
+var insQueueRocket = cQueueRocket{
+	RocketOptions: &RocketOptions{},
+}
 
 type cQueueRocket struct {
-	RocketOptions
-	Urls []string
+	*RocketOptions
 }
 
 func QueueRocket() *cQueueRocket {
@@ -26,11 +28,18 @@ func (c *cQueueRocket) String() string {
 }
 
 func (c *cQueueRocket) Init(ctx context.Context, s *Settings) error {
-	_, err := c.GetRocketOptions()
+	var err error
+	c.RocketOptions, err = c.GetRocketOptions(ctx, s)
 	if err != nil {
 		return err
 	}
-	c.Urls = []string{}
+	// primitive.Credentials
+	if c.AccessKey != "" && c.SecretKey != "" {
+		c.Credentials = &primitive.Credentials{
+			AccessKey: c.AccessKey,
+			SecretKey: c.SecretKey,
+		}
+	}
 	return nil
 }
 
@@ -39,8 +48,6 @@ func (c *cQueueRocket) GetQueue(ctx context.Context) (storage.AdapterQueue, erro
 	return queue.NewRocketMQ(
 		ctx,
 		c.Urls,
-		&queue.RocketConsumerOptions{},
-		&queue.RocketProducerOptions{},
-		nil,
+		c.Credentials,
 	)
 }
