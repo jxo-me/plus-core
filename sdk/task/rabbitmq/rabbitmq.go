@@ -12,8 +12,7 @@ import (
 )
 
 const (
-	SrvName     = "RabbitMqTask"
-	QOSPrefetch = 100
+	SrvName = "RabbitMqTask"
 )
 
 var insRabbitMq = tRabbitMq{
@@ -55,7 +54,7 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 					storage.WithConsumeOptionsConcurrency(spec.CoroutineNum),
 					storage.WithConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)),
 					storage.WithConsumeOptionsConsumerAutoAck(spec.AutoAck),
-					storage.WithConsumeOptionsQOSPrefetch(QOSPrefetch),
+					storage.WithConsumeOptionsQOSPrefetch(spec.Prefetch),
 				)
 			} else {
 				glog.Warning(ctx, "RabbitMq is nil ... NewRabbitMQ ...")
@@ -76,7 +75,7 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 					storage.WithConsumeOptionsConcurrency(spec.CoroutineNum),
 					storage.WithConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)),
 					storage.WithConsumeOptionsConsumerAutoAck(spec.AutoAck),
-					storage.WithConsumeOptionsQOSPrefetch(QOSPrefetch),
+					storage.WithConsumeOptionsQOSPrefetch(spec.Prefetch),
 				)
 			}
 		}

@@ -71,6 +71,7 @@ type RabbitMqSpec struct {
 	RoutingMap   map[string]SubHandler
 	ConsumerNum  int
 	CoroutineNum int
+	Prefetch     int
 	AutoAck      bool
 }
 
