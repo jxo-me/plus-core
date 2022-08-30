@@ -142,6 +142,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 			}
 			err = f(ctx, m)
 			if err != nil {
+				glog.Warning(ctx, "RabbitMQ Requeue msg:", m)
 				return rabbitmq.NackRequeue
 			}
 			// rabbitmq.Ack, rabbitmq.NackDiscard, rabbitmq.NackRequeue

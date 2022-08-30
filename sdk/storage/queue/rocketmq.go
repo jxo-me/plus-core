@@ -165,7 +165,7 @@ func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f storage.Con
 		func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 			for i := range msgs {
 				if len(msgs[i].Body) > 0 {
-					glog.Debugf(ctx, "rocketmq consumed: %s\n", string(msgs[i].Body))
+					glog.Debugf(ctx, "rocketmq consumed: %v\n", msgs[i])
 					m := new(Message)
 					m.SetValues(gconv.Map(msgs[i].Body))
 					m.SetValues(map[string]interface{}{
@@ -173,8 +173,10 @@ func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f storage.Con
 					})
 					m.SetRoutingKey(msgs[i].GetTags())
 					m.SetId(msgs[i].MsgId)
-					err := f(ctx, m)
+					m.SetErrorCount(uint64(msgs[i].ReconsumeTimes))
+					err = f(ctx, m)
 					if err != nil {
+						glog.Warning(ctx, "RocketMQ Rollback msg:", m)
 						return consumer.Rollback, err
 					}
 				}
