@@ -109,6 +109,11 @@ type RocketMqSpec struct {
 	AutoCommit        bool
 }
 
+func (r *RocketMqSpec) Route(routingKey string) (handler SubHandler, ifExist bool) {
+	handler, ifExist = r.TopicMap[routingKey]
+	return
+}
+
 type NsqTask interface {
 	GetSpec(ctx context.Context) *NsqSpec
 	Handler
