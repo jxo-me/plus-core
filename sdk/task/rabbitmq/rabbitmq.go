@@ -37,13 +37,14 @@ func (t *tRabbitMq) AddTasks(tasks ...task.RabbitMqTask) task.RabbitMqService {
 
 func (t *tRabbitMq) Start(ctx context.Context) {
 	glog.Info(ctx, "RabbitMq task start ...")
-	for _, worker := range t.Routers {
-		spec := worker.GetSpec(ctx)
-		if spec == nil {
-			continue
-		}
-		mQueue := sdk.Runtime.GetRabbitQueue(task.DefaultQueue) // get rabbitmq instance
-		if mQueue != nil {
+	mQueue := sdk.Runtime.GetRabbitQueue(task.DefaultQueue) // get rabbitmq instance
+	if mQueue != nil {
+		for _, worker := range t.Routers {
+			spec := worker.GetSpec(ctx)
+			if spec == nil {
+				glog.Warning(ctx, "get tRabbitMq spec is nil ignore...")
+				continue
+			}
 			for i := 0; i < spec.ConsumerNum; i++ {
 				// Consumer
 				go mQueue.Consumer(ctx, spec.QueueName, worker.Handle,
@@ -56,8 +57,8 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 					storage.WithRabbitMqConsumeOptionsQOSPrefetch(spec.Prefetch),
 				)
 			}
-		} else {
-			panic(gerror.New("sdk.Runtime.GetRabbitQueue is nil!"))
 		}
+	} else {
+		panic(gerror.New("sdk.Runtime.GetRabbitQueue is nil!"))
 	}
 }

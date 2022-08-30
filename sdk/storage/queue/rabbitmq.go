@@ -8,6 +8,7 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/rabbitmq-go"
+	"sync"
 	"time"
 )
 
@@ -37,13 +38,14 @@ type RabbitMQ struct {
 	ReconnectInterval int
 	Handler           []rabbitmq.Handler
 	Config            rabbitmq.Config
+	mux               sync.RWMutex
 	consumers         map[string]rabbitmq.Consumer
 	ConsumerOptions   *rabbitmq.ConsumerOptions
 	producers         map[string]*rabbitmq.Publisher
 	PublisherOptions  *rabbitmq.PublisherOptions
 }
 
-func (RabbitMQ) String() string {
+func (r *RabbitMQ) String() string {
 	return "rabbitmq"
 }
 
@@ -115,6 +117,8 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 	var c rabbitmq.Consumer
 	var err error
 	var ok bool
+	r.mux.Lock()
+	defer r.mux.Unlock()
 	if c, ok = r.consumers[options.BindingExchange.Name]; !ok {
 		c, err = r.newConsumer(ctx)
 		if err != nil {

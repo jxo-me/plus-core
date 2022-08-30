@@ -11,6 +11,7 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/jxo-me/plus-core/sdk/storage"
+	"sync"
 )
 
 func NewRocketMQ(
@@ -35,10 +36,11 @@ type RocketMQ struct {
 	Urls        []string
 	consumers   map[string]rocketmq.PushConsumer
 	producers   map[string]rocketmq.Producer
+	mux         sync.RWMutex
 	Credentials *primitive.Credentials
 }
 
-func (RocketMQ) String() string {
+func (r *RocketMQ) String() string {
 	return "rocketmq"
 }
 
@@ -147,6 +149,8 @@ func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f storage.Con
 	var c rocketmq.PushConsumer
 	var err error
 	var ok bool
+	r.mux.Lock()
+	defer r.mux.Unlock()
 	if c, ok = r.consumers[options.GroupName]; !ok {
 		c, err = r.newConsumer(ctx, options)
 		if err != nil {

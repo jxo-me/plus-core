@@ -41,9 +41,9 @@ func (t *tRocketMq) Start(ctx context.Context) {
 		for _, worker := range t.Routers {
 			spec := worker.GetSpec(ctx)
 			if spec == nil {
+				glog.Warning(ctx, "get tRocketMq spec is nil ignore...")
 				continue
 			}
-			glog.Warning(ctx, "tRocketMq spec:", spec)
 			for i := 0; i < spec.ConsumerNum; i++ {
 				// Consumer
 				mQueue.Consumer(ctx, spec.TopicName, worker.Handle,
