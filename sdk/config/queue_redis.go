@@ -13,7 +13,10 @@ const (
 	RedisQueueName = "redis"
 )
 
-var insQueueRedis = cQueueRedis{}
+var insQueueRedis = cQueueRedis{
+	Producer: &redisqueue.ProducerOptions{},
+	Consumer: &redisqueue.ConsumerOptions{},
+}
 
 type cQueueRedis struct {
 	RedisConnectOptions
@@ -30,9 +33,6 @@ func (c *cQueueRedis) String() string {
 }
 
 func (c *cQueueRedis) Init(ctx context.Context, s *Settings) error {
-	c.Consumer.ReclaimInterval = c.Consumer.ReclaimInterval * time.Second
-	c.Consumer.BlockingTimeout = c.Consumer.BlockingTimeout * time.Second
-	c.Consumer.VisibilityTimeout = c.Consumer.VisibilityTimeout * time.Second
 	client := Redis().GetClient()
 	if client == nil {
 		options, err := c.RedisConnectOptions.GetRedisOptions(ctx, s)
@@ -44,6 +44,9 @@ func (c *cQueueRedis) Init(ctx context.Context, s *Settings) error {
 	}
 	c.Producer.RedisClient = client
 	c.Consumer.RedisClient = client
+	c.Consumer.ReclaimInterval = c.Consumer.ReclaimInterval * time.Second
+	c.Consumer.BlockingTimeout = c.Consumer.BlockingTimeout * time.Second
+	c.Consumer.VisibilityTimeout = c.Consumer.VisibilityTimeout * time.Second
 	return nil
 }
 
