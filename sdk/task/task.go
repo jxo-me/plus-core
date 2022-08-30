@@ -6,6 +6,10 @@ import (
 	"github.com/jxo-me/plus-core/sdk/storage"
 )
 
+const (
+	DefaultQueue = "default"
+)
+
 // Handler 任务MQ路由的回调接口/**/
 type Handler interface {
 	Handle(ctx context.Context, msg storage.Messager) error

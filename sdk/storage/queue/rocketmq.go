@@ -53,8 +53,19 @@ type RocketProducerOptions struct {
 }
 
 func (r *RocketMQ) newConsumer(ctx context.Context, opt storage.ConsumeOptions) (rocketmq.PushConsumer, error) {
-	if r.Credentials == nil {
-		r.Credentials = &primitive.Credentials{}
+	if r.Credentials != nil {
+		return rocketmq.NewPushConsumer(
+			consumer.WithGroupName(opt.GroupName),
+			consumer.WithNsResolver(primitive.NewPassthroughResolver(r.Urls)),
+			consumer.WithConsumerModel(consumer.Clustering),
+			consumer.WithMaxReconsumeTimes(opt.MaxReconsumeTimes),
+			consumer.WithAutoCommit(opt.AutoCommit),
+			consumer.WithCredentials(*r.Credentials),
+			//consumer.WithCredentials(primitive.Credentials{
+			//	AccessKey: "RocketMQ",
+			//	SecretKey: "12345678",
+			//}),
+		)
 	}
 	return rocketmq.NewPushConsumer(
 		consumer.WithGroupName(opt.GroupName),
@@ -71,14 +82,23 @@ func (r *RocketMQ) newConsumer(ctx context.Context, opt storage.ConsumeOptions) 
 }
 
 func (r *RocketMQ) newProducer(ctx context.Context, opt storage.PublishOptions) (rocketmq.Producer, error) {
-	if r.Credentials == nil {
-		r.Credentials = &primitive.Credentials{}
+	if r.Credentials != nil {
+		return rocketmq.NewProducer(
+			producer.WithNsResolver(primitive.NewPassthroughResolver(r.Urls)),
+			producer.WithRetry(opt.RetryTimes),
+			producer.WithCredentials(*r.Credentials),
+			//producer.WithCredentials(primitive.Credentials{
+			//	AccessKey: "RocketMQ",
+			//	SecretKey: "12345678",
+			//}),
+			//producer.WithNamespace("namespace"),
+		)
 	}
 
 	return rocketmq.NewProducer(
 		producer.WithNsResolver(primitive.NewPassthroughResolver(r.Urls)),
 		producer.WithRetry(opt.RetryTimes),
-		producer.WithCredentials(*r.Credentials),
+		//producer.WithCredentials(*r.Credentials),
 		//producer.WithCredentials(primitive.Credentials{
 		//	AccessKey: "RocketMQ",
 		//	SecretKey: "12345678",
@@ -158,7 +178,6 @@ func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f storage.Con
 			return consumer.ConsumeSuccess, nil
 		},
 	)
-	glog.Warning(ctx, "rocketmq consumer Subscribe error:", err)
 	if err != nil {
 		glog.Errorf(ctx, "rocketmq consumer Subscribe error:%v", err)
 		return

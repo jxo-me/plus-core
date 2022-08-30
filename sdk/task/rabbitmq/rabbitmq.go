@@ -11,8 +11,7 @@ import (
 )
 
 const (
-	SrvName      = "RabbitMqTask"
-	DefaultQueue = "default"
+	SrvName = "RabbitMqTask"
 )
 
 var insRabbitMq = tRabbitMq{
@@ -43,7 +42,7 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 		if spec == nil {
 			continue
 		}
-		mQueue := sdk.Runtime.GetRabbitQueue(DefaultQueue) // get rabbitmq instance
+		mQueue := sdk.Runtime.GetRabbitQueue(task.DefaultQueue) // get rabbitmq instance
 		if mQueue != nil {
 			for i := 0; i < spec.ConsumerNum; i++ {
 				// Consumer
