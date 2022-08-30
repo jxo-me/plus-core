@@ -15,7 +15,8 @@ type Handler interface {
 	Handle(ctx context.Context, msg storage.Messager) error
 }
 
-type SubHandler interface {
+type SubTask interface {
+	RoutingKey() string
 	Handle(ctx context.Context, msg storage.Messager) (interface{}, error)
 }
 
@@ -72,7 +73,7 @@ type RabbitMqSpec struct {
 	Exchange     string
 	ExchangeType string
 	QueueName    string
-	RoutingMap   map[string]SubHandler
+	SubTasks     []SubTask
 	ConsumerNum  int
 	CoroutineNum int
 	Prefetch     int
@@ -82,16 +83,20 @@ type RabbitMqSpec struct {
 func (r *RabbitMqSpec) GetRoutingKeys() []string {
 	r.RoutingKeys = make([]string, 0)
 	r.RoutingKeys = append(r.RoutingKeys, r.RoutingKey)
-	for key, _ := range r.RoutingMap {
-		r.RoutingKeys = append(r.RoutingKeys, key)
+	for _, subHandler := range r.SubTasks {
+		r.RoutingKeys = append(r.RoutingKeys, subHandler.RoutingKey())
 	}
 
 	return r.RoutingKeys
 }
 
-func (r *RabbitMqSpec) Route(routingKey string) (handler SubHandler, ifExist bool) {
-	handler, ifExist = r.RoutingMap[routingKey]
-	return
+func (r *RabbitMqSpec) Route(routingKey string) (handler SubTask, ifExist bool) {
+	for _, subHandler := range r.SubTasks {
+		if subHandler.RoutingKey() == routingKey {
+			return subHandler, true
+		}
+	}
+	return nil, false
 }
 
 type RocketMqTask interface {
@@ -103,15 +108,19 @@ type RocketMqSpec struct {
 	TaskName          string
 	GroupName         string
 	TopicName         string
-	TopicMap          map[string]SubHandler
+	SubTasks          []SubTask
 	ConsumerNum       int
 	MaxReconsumeTimes int32
 	AutoCommit        bool
 }
 
-func (r *RocketMqSpec) Route(routingKey string) (handler SubHandler, ifExist bool) {
-	handler, ifExist = r.TopicMap[routingKey]
-	return
+func (r *RocketMqSpec) Route(routingKey string) (handler SubTask, ifExist bool) {
+	for _, subHandler := range r.SubTasks {
+		if subHandler.RoutingKey() == routingKey {
+			return subHandler, true
+		}
+	}
+	return nil, false
 }
 
 type NsqTask interface {
@@ -125,12 +134,12 @@ type NsqSpec struct {
 	Exchange     string
 	ExchangeType string
 	QueueName    string
-	RoutingMap   map[string]SubHandler
+	RoutingMap   map[string]SubTask
 	ConsumerNum  int
 	CTag         string
 }
 
-func WrapHandler(handler SubHandler) storage.ConsumerFunc {
+func WrapHandler(handler SubTask) storage.ConsumerFunc {
 	return storage.ConsumerFunc(
 		func(ctx context.Context, msg storage.Messager) error {
 			_, err := handler.Handle(ctx, msg)
@@ -145,7 +154,7 @@ func WrapHandler(handler SubHandler) storage.ConsumerFunc {
 // CallbackFunc 消费结果统一回调
 type CallbackFunc func(context.Context, interface{}) error
 
-func CallbackWrapHandler(handler SubHandler, callback CallbackFunc) storage.ConsumerFunc {
+func CallbackWrapHandler(handler SubTask, callback CallbackFunc) storage.ConsumerFunc {
 	return storage.ConsumerFunc(
 		func(ctx context.Context, msg storage.Messager) error {
 			data, err := handler.Handle(ctx, msg)
