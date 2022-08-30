@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/storage/queue"
 )
@@ -49,5 +50,6 @@ func (c *cQueueRocket) GetQueue(ctx context.Context) (storage.AdapterQueue, erro
 		ctx,
 		c.Urls,
 		c.Credentials,
+		g.Log(),
 	)
 }

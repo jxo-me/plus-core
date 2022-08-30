@@ -7,6 +7,7 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/apache/rocketmq-client-go/v2/producer"
+	"github.com/apache/rocketmq-client-go/v2/rlog"
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/jxo-me/plus-core/sdk/storage"
@@ -16,6 +17,7 @@ func NewRocketMQ(
 	ctx context.Context,
 	urls []string,
 	credentials *primitive.Credentials,
+	logger *glog.Logger,
 ) (*RocketMQ, error) {
 	r := &RocketMQ{
 		Urls:        urls,
@@ -24,6 +26,7 @@ func NewRocketMQ(
 		producers:   map[string]rocketmq.Producer{},
 	}
 
+	rlog.SetLogger(&QLoger{Logger: logger})
 	return r, nil
 }
 
@@ -132,7 +135,6 @@ func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f storage.Con
 		}
 		r.consumers[options.GroupName] = c
 	}
-
 	err = c.Subscribe(
 		topicName,
 		consumer.MessageSelector{},

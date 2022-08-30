@@ -54,7 +54,7 @@ func (t *tRocketMq) Start(ctx context.Context) {
 				)
 			}
 		}
-		//go mQueue.Run(ctx)
+		go mQueue.Run(ctx)
 	} else {
 		panic(gerror.New("sdk.Runtime.GetRocketQueue is nil!"))
 	}
