@@ -13,7 +13,10 @@ const (
 	RedisQueueName = "redis"
 )
 
-var insQueueRedis = cQueueRedis{}
+var insQueueRedis = cQueueRedis{
+	Producer: &redisqueue.ProducerOptions{},
+	Consumer: &redisqueue.ConsumerOptions{},
+}
 
 type cQueueRedis struct {
 	RedisConnectOptions
