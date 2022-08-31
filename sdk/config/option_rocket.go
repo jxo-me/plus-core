@@ -7,14 +7,12 @@ import (
 )
 
 type RocketOptions struct {
-	Urls              []string `yaml:"urls" json:"urls"`
-	GroupName         string   `yaml:"groupName" json:"group_name"`
-	MaxReconsumeTimes int32    `yaml:"maxReconsumeTimes" json:"max_reconsume_times"`
-	RetryTimes        int      `yaml:"retryTimes" json:"retry_times"`
-	AccessKey         string   `yaml:"accessKey" json:"access_key"`
-	SecretKey         string   `yaml:"secretKey" json:"secret_key"`
-	Credentials       *primitive.Credentials
-	AutoCommit        bool `yaml:"autoCommit" json:"auto_commit"`
+	Urls []string `yaml:"urls" json:"urls"`
+	*primitive.Credentials
+	LogPath   string `yaml:"logPath" json:"log_path"`
+	LogFile   string `yaml:"logFile" json:"log_file"`
+	LogLevel  string `yaml:"logLevel" json:"log_level"`
+	LogStdout bool   `yaml:"logStdout" json:"log_stdout"`
 }
 
 func (e *RocketOptions) GetRocketOptions(ctx context.Context, s *Settings) (*RocketOptions, error) {
