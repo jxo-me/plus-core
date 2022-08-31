@@ -2,6 +2,8 @@ package config
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/storage/queue"
 )
@@ -37,7 +39,21 @@ func (c *cQueueRabbit) Init(ctx context.Context, s *Settings) error {
 
 // GetQueue get Rabbit queue
 func (c *cQueueRabbit) GetQueue(ctx context.Context) (storage.AdapterQueue, error) {
+	logger := glog.New()
+	err := logger.SetConfigWithMap(g.Map{
+		"path":   c.LogPath,
+		"file":   c.LogFile,
+		"level":  c.LogLevel,
+		"stdout": c.LogStdout,
+	})
+	if err != nil {
+		return nil, err
+	}
 	return queue.NewRabbitMQ(
-		ctx, c.RabbitOptions.Dsn, c.RabbitOptions.ReconnectInterval, c.RabbitOptions.Cfg,
+		ctx,
+		c.RabbitOptions.Dsn,
+		c.RabbitOptions.ReconnectInterval,
+		c.RabbitOptions.Cfg,
+		logger,
 	)
 }

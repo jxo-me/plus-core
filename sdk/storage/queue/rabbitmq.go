@@ -17,6 +17,7 @@ func NewRabbitMQ(
 	dsn string,
 	reconnectInterval int,
 	cfg *rabbitmq.Config,
+	logger rabbitmq.Logger,
 ) (*RabbitMQ, error) {
 	//var err error
 	//var consumer rabbitmq.Consumer
@@ -25,6 +26,7 @@ func NewRabbitMQ(
 		ReconnectInterval: reconnectInterval,
 		producers:         map[string]*rabbitmq.Publisher{},
 		consumers:         map[string]rabbitmq.Consumer{},
+		Logger:            logger,
 	}
 	if cfg != nil {
 		r.Config = *cfg
@@ -43,6 +45,7 @@ type RabbitMQ struct {
 	ConsumerOptions   *rabbitmq.ConsumerOptions
 	producers         map[string]*rabbitmq.Publisher
 	PublisherOptions  *rabbitmq.PublisherOptions
+	Logger            rabbitmq.Logger
 }
 
 func (r *RabbitMQ) String() string {
@@ -55,6 +58,7 @@ func (r *RabbitMQ) newConsumer(ctx context.Context) (rabbitmq.Consumer, error) {
 		r.Config,
 		rabbitmq.WithConsumerOptionsLogger(g.Log()),
 		rabbitmq.WithConsumerOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
+		rabbitmq.WithConsumerOptionsLogger(r.Logger),
 	)
 }
 
@@ -64,6 +68,7 @@ func (r *RabbitMQ) newProducer(ctx context.Context) (*rabbitmq.Publisher, error)
 		r.Config,
 		rabbitmq.WithPublisherOptionsLogger(g.Log()),
 		rabbitmq.WithPublisherOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
+		rabbitmq.WithPublisherOptionsLogger(r.Logger),
 	)
 }
 
