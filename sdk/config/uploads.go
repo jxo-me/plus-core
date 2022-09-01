@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/plus-core/sdk/pkg/tus"
 	"github.com/jxo-me/plus-core/sdk/pkg/tus/filestore"
 )
@@ -50,7 +51,18 @@ func (q *Upload) Init(ctx context.Context, s *Settings) error {
 	composer := tus.NewStoreComposer()
 	store.UseIn(composer)
 	cf.StoreComposer = composer
-	cf.Logger = g.Log()
+
+	logger := glog.New()
+	err = logger.SetConfigWithMap(g.Map{
+		"path":   cf.LogPath,
+		"file":   cf.LogFile,
+		"level":  cf.LogLevel,
+		"stdout": cf.LogStdout,
+	})
+	if err != nil {
+		return err
+	}
+	cf.Logger = logger
 	s.Config().Tus = cf
 	return nil
 }
