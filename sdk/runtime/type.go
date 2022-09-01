@@ -10,6 +10,7 @@ import (
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/jxo-me/plus-core/sdk/config"
 	"github.com/jxo-me/plus-core/sdk/cron"
+	"github.com/jxo-me/plus-core/sdk/pkg/tus"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/task"
@@ -71,4 +72,7 @@ type Runtime interface {
 	RocketMqTask() task.RocketMqService
 	SetMemoryTask(srv task.MemoryService)
 	MemoryTask() task.MemoryService
+
+	SetTus(c *tus.Uploader)
+	Tus() *tus.Uploader
 }

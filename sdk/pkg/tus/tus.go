@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func NewTus(config Config) (*sTus, error) {
+func NewTus(config Config) (*Uploader, error) {
 	if err := config.validate(); err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func NewTus(config Config) (*sTus, error) {
 		extensions += ",creation-defer-length"
 	}
 
-	t := &sTus{
+	t := &Uploader{
 		config:            config,
 		composer:          config.StoreComposer,
 		basePath:          config.BasePath,
@@ -37,19 +37,19 @@ func NewTus(config Config) (*sTus, error) {
 		TerminatedUploads: make(chan HookEvent),
 		UploadProgress:    make(chan HookEvent),
 		CreatedUploads:    make(chan HookEvent),
-		logger:            config.Logger,
+		Logger:            config.Logger,
 		extensions:        extensions,
 		Metrics:           newMetrics(),
 	}
 	return t, nil
 }
 
-type sTus struct {
+type Uploader struct {
 	config        Config
 	composer      *StoreComposer
 	isBasePathAbs bool
 	basePath      string
-	logger        *glog.Logger
+	Logger        *glog.Logger
 	extensions    string
 
 	// CompleteUploads is used to send notifications whenever an upload is
@@ -121,7 +121,7 @@ func newHookEvent(info FileInfo, r *http.Request) HookEvent {
 // writeChunk reads the body from the requests r and appends it to the upload
 // with the corresponding id. Afterwards, it will set the necessary response
 // headers but will not send the response.
-func (h *sTus) writeChunk(ctx context.Context, upload Upload, info FileInfo, w http.ResponseWriter, r *http.Request) error {
+func (h *Uploader) writeChunk(ctx context.Context, upload Upload, info FileInfo, w http.ResponseWriter, r *http.Request) error {
 	// Get Content-Length if possible
 	length := r.ContentLength
 	offset := info.Offset
@@ -224,7 +224,7 @@ func (h *sTus) writeChunk(ctx context.Context, upload Upload, info FileInfo, w h
 // finishUploadIfComplete checks whether an upload is completed (i.e. upload offset
 // matches upload size) and if so, it will call the data store's FinishUpload
 // function and send the necessary message on the CompleteUpload channel.
-func (h *sTus) finishUploadIfComplete(ctx context.Context, upload Upload, info FileInfo, r *http.Request) error {
+func (h *Uploader) finishUploadIfComplete(ctx context.Context, upload Upload, info FileInfo, r *http.Request) error {
 	// If the upload is completed, ...
 	if !info.SizeIsDeferred && info.Offset == info.Size {
 		// ... allow the data storage to finish and cleanup the upload
@@ -254,7 +254,7 @@ func (h *sTus) finishUploadIfComplete(ctx context.Context, upload Upload, info F
 // every second, indicating how much data has been transfered to the server.
 // It will stop sending these instances once the returned channel has been
 // closed.
-func (h *sTus) sendProgressMessages(hook HookEvent, reader *bodyReader) chan<- struct{} {
+func (h *Uploader) sendProgressMessages(hook HookEvent, reader *bodyReader) chan<- struct{} {
 	previousOffset := int64(0)
 	originalOffset := hook.Upload.Offset
 	stop := make(chan struct{}, 1)
@@ -287,7 +287,7 @@ func (h *sTus) sendProgressMessages(hook HookEvent, reader *bodyReader) chan<- s
 // and updates the statistics.
 // Note the the info argument is only needed if the terminated uploads
 // notifications are enabled.
-func (h *sTus) terminateUpload(ctx context.Context, upload Upload, info FileInfo, r *http.Request) error {
+func (h *Uploader) terminateUpload(ctx context.Context, upload Upload, info FileInfo, r *http.Request) error {
 	terminatableUpload := h.composer.Terminater.AsTerminatableUpload(upload)
 
 	err := terminatableUpload.Terminate(ctx)
@@ -307,7 +307,7 @@ func (h *sTus) terminateUpload(ctx context.Context, upload Upload, info FileInfo
 // The get sum of all sizes for a list of upload ids while checking whether
 // all of these uploads are finished yet. This is used to calculate the size
 // of a final resource.
-func (h *sTus) sizeOfUploads(ctx context.Context, ids []string) (partialUploads []Upload, size int64, err error) {
+func (h *Uploader) sizeOfUploads(ctx context.Context, ids []string) (partialUploads []Upload, size int64, err error) {
 	partialUploads = make([]Upload, len(ids))
 
 	for i, id := range ids {
@@ -335,7 +335,7 @@ func (h *sTus) sizeOfUploads(ctx context.Context, ids []string) (partialUploads 
 
 // Verify that the Upload-Length and Upload-Defer-Length headers are acceptable for creating a
 // new upload
-func (h *sTus) validateNewUploadLengthHeaders(uploadLengthHeader string, uploadDeferLengthHeader string) (uploadLength int64, uploadLengthDeferred bool, err error) {
+func (h *Uploader) validateNewUploadLengthHeaders(uploadLengthHeader string, uploadDeferLengthHeader string) (uploadLength int64, uploadLengthDeferred bool, err error) {
 	haveBothLengthHeaders := uploadLengthHeader != "" && uploadDeferLengthHeader != ""
 	haveInvalidDeferHeader := uploadDeferLengthHeader != "" && uploadDeferLengthHeader != UploadLengthDeferred
 	lengthIsDeferred := uploadDeferLengthHeader == UploadLengthDeferred
@@ -360,7 +360,7 @@ func (h *sTus) validateNewUploadLengthHeaders(uploadLengthHeader string, uploadD
 
 // lockUpload creates a new lock for the given upload ID and attempts to lock it.
 // The created lock is returned if it was aquired successfully.
-func (h *sTus) lockUpload(id string) (Lock, error) {
+func (h *Uploader) lockUpload(id string) (Lock, error) {
 	lock, err := h.composer.Locker.NewLock(id)
 	if err != nil {
 		return nil, err
@@ -375,7 +375,7 @@ func (h *sTus) lockUpload(id string) (Lock, error) {
 
 // Send the error in the response body. The status code will be looked up in
 // ErrStatusCodes. If none is found 500 Internal Error will be used.
-func (h *sTus) sendError(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) {
+func (h *Uploader) sendError(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) {
 	// Errors for read timeouts contain too much information which is not
 	// necessary for us and makes grouping for the metrics harder. The error
 	// message looks like: read tcp 127.0.0.1:1080->127.0.0.1:53673: i/o timeout
@@ -431,14 +431,14 @@ func (h *sTus) sendError(ctx context.Context, w http.ResponseWriter, r *http.Req
 }
 
 // sendResp writes the header to w with the specified status code.
-func (h *sTus) sendResp(ctx context.Context, w http.ResponseWriter, r *http.Request, status int) {
+func (h *Uploader) sendResp(ctx context.Context, w http.ResponseWriter, r *http.Request, status int) {
 	w.WriteHeader(status)
 	h.log(ctx, "ResponseOutgoing", "status", strconv.Itoa(status), "method", r.Method, "path", r.URL.Path, "requestId", getRequestId(r))
 }
 
 // Make an absolute URLs to the given upload id. If the base path is absolute
 // it will be prepended else the host and protocol from the request is used.
-func (h *sTus) absFileURL(r *http.Request, id string) string {
+func (h *Uploader) absFileURL(r *http.Request, id string) string {
 	if h.isBasePathAbs {
 		return h.basePath + id
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/sdk/pkg/tus"
 )
 
 var (
@@ -45,6 +46,7 @@ type Config struct {
 	Queue  *Queue          `yaml:"queue"`
 	Locker *Locker         `yaml:"locker"`
 	Extend interface{}     `yaml:"extend"`
+	Tus    tus.Config      `yaml:"tus"`
 }
 
 // Bootstrap 载入启动配置文件
@@ -97,4 +99,8 @@ func (e *Settings) GetJwt(module string) *Jwt {
 		return j
 	}
 	return nil
+}
+
+func (e *Settings) GetTus() tus.Config {
+	return e.Config().Tus
 }

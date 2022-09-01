@@ -2,6 +2,7 @@ package tus
 
 import (
 	"errors"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
 	"net/url"
 )
@@ -39,7 +40,7 @@ type Config struct {
 	// NotifyCreatedUploads indicates whether sending notifications about
 	// the upload having been created using the CreatedUploads channel should be enabled.
 	NotifyCreatedUploads bool `yaml:"notifyCreatedUploads" json:"notify_created_uploads"`
-	// Logger is the logger to use internally, mostly for printing requests.
+	// Logger is the Logger to use internally, mostly for printing requests.
 	Logger *glog.Logger `yaml:"-" json:"-"`
 	// Respect the X-Forwarded-Host, X-Forwarded-Proto and Forwarded headers
 	// potentially set by proxies when generating an absolute URL in the
@@ -58,7 +59,7 @@ type Config struct {
 
 func (config *Config) validate() error {
 	if config.Logger == nil {
-		config.Logger = glog.New()
+		config.Logger = g.Log()
 	}
 
 	base := config.BasePath

@@ -5,8 +5,8 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 )
 
-func (h *sTus) log(ctx context.Context, eventName string, details ...string) {
-	LogEvent(ctx, h.logger, eventName, details...)
+func (h *Uploader) log(ctx context.Context, eventName string, details ...string) {
+	LogEvent(ctx, h.Logger, eventName, details...)
 }
 
 func LogEvent(ctx context.Context, logger *glog.Logger, eventName string, details ...string) {

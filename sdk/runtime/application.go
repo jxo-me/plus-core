@@ -12,6 +12,7 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/plus-core/sdk/config"
 	"github.com/jxo-me/plus-core/sdk/cron"
+	"github.com/jxo-me/plus-core/sdk/pkg/tus"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/storage/queue"
@@ -36,6 +37,7 @@ type Application struct {
 	rocketMqService task.RocketMqService
 	memoryService   task.MemoryService
 	queue           map[string]storage.AdapterQueue
+	tus             *tus.Uploader
 }
 
 // NewConfig 默认值
@@ -61,6 +63,14 @@ func (e *Application) SetTask(srv task.TasksService) {
 
 func (e *Application) Task() task.TasksService {
 	return e.taskService
+}
+
+func (e *Application) SetTus(t *tus.Uploader) {
+	e.tus = t
+}
+
+func (e *Application) Tus() *tus.Uploader {
+	return e.tus
 }
 
 func (e *Application) SetRabbitTask(srv task.RabbitMqService) {

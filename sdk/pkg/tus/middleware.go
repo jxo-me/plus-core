@@ -6,8 +6,7 @@ import (
 	"strconv"
 )
 
-func Middleware(req *ghttp.Request) {
-	h := sTus{} // Todo ...
+func (h *Uploader) Middleware(req *ghttp.Request) {
 	w := req.Response.RawWriter()
 	r := req.Request
 	ctx := req.GetCtx()
