@@ -55,6 +55,8 @@ type Config struct {
 	// a response is returned to the client. Error responses from the callback will be passed
 	// back to the client. This can be used to implement post-processing validation.
 	PreFinishResponseCallback func(hook HookEvent) error `yaml:"-" json:"-"`
+
+	Path string `yaml:"path" json:"path"`
 	// log
 	LogPath   string `yaml:"logPath" json:"log_path"`
 	LogFile   string `yaml:"logFile" json:"log_file"`

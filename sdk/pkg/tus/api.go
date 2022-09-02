@@ -1,7 +1,7 @@
 package tus
 
 import (
-	"context"
+	"github.com/gogf/gf/v2/net/ghttp"
 	"io"
 	"net/http"
 	"strconv"
@@ -9,7 +9,8 @@ import (
 
 // PostFile creates a new file upload using the datastore after validating the
 // length and parsing the metadata.
-func (h *Uploader) PostFile(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+func (h *Uploader) PostFile(r *ghttp.Request) {
+	ctx := r.GetCtx()
 	// Check for presence of application/offset+octet-stream. If another content
 	// type is defined, it will be ignored and treated as none was set because
 	// some HTTP clients may enforce a default value for this header.
@@ -25,7 +26,7 @@ func (h *Uploader) PostFile(ctx context.Context, w http.ResponseWriter, r *http.
 	// Parse Upload-Concat header
 	isPartial, isFinal, partialUploadIDs, err := parseConcat(concatHeader)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
@@ -38,13 +39,13 @@ func (h *Uploader) PostFile(ctx context.Context, w http.ResponseWriter, r *http.
 	if isFinal {
 		// A final upload must not contain a chunk within the creation request
 		if containsChunk {
-			h.sendError(ctx, w, r, ErrModifyFinal)
+			h.sendError(r, ErrModifyFinal)
 			return
 		}
 
 		partialUploads, size, err = h.sizeOfUploads(ctx, partialUploadIDs)
 		if err != nil {
-			h.sendError(ctx, w, r, err)
+			h.sendError(r, err)
 			return
 		}
 	} else {
@@ -52,14 +53,14 @@ func (h *Uploader) PostFile(ctx context.Context, w http.ResponseWriter, r *http.
 		uploadDeferLengthHeader := r.Header.Get("Upload-Defer-Length")
 		size, sizeIsDeferred, err = h.validateNewUploadLengthHeaders(uploadLengthHeader, uploadDeferLengthHeader)
 		if err != nil {
-			h.sendError(ctx, w, r, err)
+			h.sendError(r, err)
 			return
 		}
 	}
 
 	// Test whether the size is still allowed
 	if h.config.MaxSize > 0 && size > h.config.MaxSize {
-		h.sendError(ctx, w, r, ErrMaxSizeExceeded)
+		h.sendError(r, ErrMaxSizeExceeded)
 		return
 	}
 
@@ -77,20 +78,20 @@ func (h *Uploader) PostFile(ctx context.Context, w http.ResponseWriter, r *http.
 
 	if h.config.PreUploadCreateCallback != nil {
 		if err := h.config.PreUploadCreateCallback(newHookEvent(info, r)); err != nil {
-			h.sendError(ctx, w, r, err)
+			h.sendError(r, err)
 			return
 		}
 	}
 
 	upload, err := h.composer.Core.NewUpload(ctx, info)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
 	info, err = upload.GetInfo(ctx)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
@@ -99,7 +100,7 @@ func (h *Uploader) PostFile(ctx context.Context, w http.ResponseWriter, r *http.
 	// Add the Location header directly after creating the new resource to even
 	// include it in cases of failure when an error is returned
 	url := h.absFileURL(r, id)
-	w.Header().Set("Location", url)
+	r.Response.Header().Set("Location", url)
 
 	h.Metrics.incUploadsCreated()
 	h.log(ctx, "UploadCreated", "id", id, "size", i64toa(size), "url", url)
@@ -111,7 +112,7 @@ func (h *Uploader) PostFile(ctx context.Context, w http.ResponseWriter, r *http.
 	if isFinal {
 		concatableUpload := h.composer.Concater.AsConcatableUpload(upload)
 		if err := concatableUpload.ConcatUploads(ctx, partialUploads); err != nil {
-			h.sendError(ctx, w, r, err)
+			h.sendError(r, err)
 			return
 		}
 		info.Offset = size
@@ -125,7 +126,7 @@ func (h *Uploader) PostFile(ctx context.Context, w http.ResponseWriter, r *http.
 		if h.composer.UsesLocker {
 			lock, err := h.lockUpload(id)
 			if err != nil {
-				h.sendError(ctx, w, r, err)
+				h.sendError(r, err)
 				return
 			}
 
@@ -134,8 +135,8 @@ func (h *Uploader) PostFile(ctx context.Context, w http.ResponseWriter, r *http.
 			}(lock)
 		}
 
-		if err := h.writeChunk(ctx, upload, info, w, r); err != nil {
-			h.sendError(ctx, w, r, err)
+		if err := h.writeChunk(upload, info, r); err != nil {
+			h.sendError(r, err)
 			return
 		}
 	} else if !sizeIsDeferred && size == 0 {
@@ -143,26 +144,27 @@ func (h *Uploader) PostFile(ctx context.Context, w http.ResponseWriter, r *http.
 		// This statement is in an else-if block to avoid causing duplicate calls
 		// to finishUploadIfComplete if an upload is empty and contains a chunk.
 		if err := h.finishUploadIfComplete(ctx, upload, info, r); err != nil {
-			h.sendError(ctx, w, r, err)
+			h.sendError(r, err)
 			return
 		}
 	}
 
-	h.sendResp(ctx, w, r, http.StatusCreated)
+	h.sendResp(r, http.StatusCreated)
 }
 
 // HeadFile returns the length and offset for the HEAD request
-func (h *Uploader) HeadFile(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+func (h *Uploader) HeadFile(r *ghttp.Request) {
+	ctx := r.GetCtx()
 	id, err := extractIDFromPath(r.URL.Path)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
 	if h.composer.UsesLocker {
 		lock, err := h.lockUpload(id)
 		if err != nil {
-			h.sendError(ctx, w, r, err)
+			h.sendError(r, err)
 			return
 		}
 
@@ -173,19 +175,19 @@ func (h *Uploader) HeadFile(ctx context.Context, w http.ResponseWriter, r *http.
 
 	upload, err := h.composer.Core.GetUpload(ctx, id)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
 	info, err := upload.GetInfo(ctx)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
 	// Add Upload-Concat header if possible
 	if info.IsPartial {
-		w.Header().Set("Upload-Concat", "partial")
+		r.Response.Header().Set("Upload-Concat", "partial")
 	}
 
 	if info.IsFinal {
@@ -196,51 +198,52 @@ func (h *Uploader) HeadFile(ctx context.Context, w http.ResponseWriter, r *http.
 		// Remove trailing space
 		v = v[:len(v)-1]
 
-		w.Header().Set("Upload-Concat", v)
+		r.Response.Header().Set("Upload-Concat", v)
 	}
 
 	if len(info.MetaData) != 0 {
-		w.Header().Set("Upload-Metadata", SerializeMetadataHeader(info.MetaData))
+		r.Response.Header().Set("Upload-Metadata", SerializeMetadataHeader(info.MetaData))
 	}
 
 	if info.SizeIsDeferred {
-		w.Header().Set("Upload-Defer-Length", UploadLengthDeferred)
+		r.Response.Header().Set("Upload-Defer-Length", UploadLengthDeferred)
 	} else {
-		w.Header().Set("Upload-Length", strconv.FormatInt(info.Size, 10))
-		w.Header().Set("Content-Length", strconv.FormatInt(info.Size, 10))
+		r.Response.Header().Set("Upload-Length", strconv.FormatInt(info.Size, 10))
+		r.Response.Header().Set("Content-Length", strconv.FormatInt(info.Size, 10))
 	}
 
-	w.Header().Set("Cache-Control", "no-store")
-	w.Header().Set("Upload-Offset", strconv.FormatInt(info.Offset, 10))
-	h.sendResp(ctx, w, r, http.StatusOK)
+	r.Response.Header().Set("Cache-Control", "no-store")
+	r.Response.Header().Set("Upload-Offset", strconv.FormatInt(info.Offset, 10))
+	h.sendResp(r, http.StatusOK)
 }
 
 // PatchFile adds a chunk to an upload. This operation is only allowed
 // if enough space in the upload is left.
-func (h *Uploader) PatchFile(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+func (h *Uploader) PatchFile(r *ghttp.Request) {
+	ctx := r.GetCtx()
 	// Check for presence of application/offset+octet-stream
 	if r.Header.Get("Content-Type") != "application/offset+octet-stream" {
-		h.sendError(ctx, w, r, ErrInvalidContentType)
+		h.sendError(r, ErrInvalidContentType)
 		return
 	}
 
 	// Check for presence of a valid Upload-Offset Header
 	offset, err := strconv.ParseInt(r.Header.Get("Upload-Offset"), 10, 64)
 	if err != nil || offset < 0 {
-		h.sendError(ctx, w, r, ErrInvalidOffset)
+		h.sendError(r, ErrInvalidOffset)
 		return
 	}
 
 	id, err := extractIDFromPath(r.URL.Path)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
 	if h.composer.UsesLocker {
 		lock, err := h.lockUpload(id)
 		if err != nil {
-			h.sendError(ctx, w, r, err)
+			h.sendError(r, err)
 			return
 		}
 
@@ -251,52 +254,52 @@ func (h *Uploader) PatchFile(ctx context.Context, w http.ResponseWriter, r *http
 
 	upload, err := h.composer.Core.GetUpload(ctx, id)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
 	info, err := upload.GetInfo(ctx)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
 	// Modifying a final upload is not allowed
 	if info.IsFinal {
-		h.sendError(ctx, w, r, ErrModifyFinal)
+		h.sendError(r, ErrModifyFinal)
 		return
 	}
 
 	if offset != info.Offset {
-		h.sendError(ctx, w, r, ErrMismatchOffset)
+		h.sendError(r, ErrMismatchOffset)
 		return
 	}
 
 	// Do not proxy the call to the data store if the upload is already completed
 	if !info.SizeIsDeferred && info.Offset == info.Size {
-		w.Header().Set("Upload-Offset", strconv.FormatInt(offset, 10))
-		h.sendResp(ctx, w, r, http.StatusNoContent)
+		r.Response.Header().Set("Upload-Offset", strconv.FormatInt(offset, 10))
+		h.sendResp(r, http.StatusNoContent)
 		return
 	}
 
 	if r.Header.Get("Upload-Length") != "" {
 		if !h.composer.UsesLengthDeferrer {
-			h.sendError(ctx, w, r, ErrNotImplemented)
+			h.sendError(r, ErrNotImplemented)
 			return
 		}
 		if !info.SizeIsDeferred {
-			h.sendError(ctx, w, r, ErrInvalidUploadLength)
+			h.sendError(r, ErrInvalidUploadLength)
 			return
 		}
 		uploadLength, err := strconv.ParseInt(r.Header.Get("Upload-Length"), 10, 64)
 		if err != nil || uploadLength < 0 || uploadLength < info.Offset || (h.config.MaxSize > 0 && uploadLength > h.config.MaxSize) {
-			h.sendError(ctx, w, r, ErrInvalidUploadLength)
+			h.sendError(r, ErrInvalidUploadLength)
 			return
 		}
 
 		lengthDeclarableUpload := h.composer.LengthDeferrer.AsLengthDeclarableUpload(upload)
 		if err := lengthDeclarableUpload.DeclareLength(ctx, uploadLength); err != nil {
-			h.sendError(ctx, w, r, err)
+			h.sendError(r, err)
 			return
 		}
 
@@ -305,27 +308,28 @@ func (h *Uploader) PatchFile(ctx context.Context, w http.ResponseWriter, r *http
 
 	}
 
-	if err := h.writeChunk(ctx, upload, info, w, r); err != nil {
-		h.sendError(ctx, w, r, err)
+	if err := h.writeChunk(upload, info, r); err != nil {
+		h.sendError(r, err)
 		return
 	}
 
-	h.sendResp(ctx, w, r, http.StatusNoContent)
+	h.sendResp(r, http.StatusNoContent)
 }
 
 // GetFile handles requests to download a file using a GET request. This is not
 // part of the specification.
-func (h *Uploader) GetFile(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+func (h *Uploader) GetFile(r *ghttp.Request) {
+	ctx := r.GetCtx()
 	id, err := extractIDFromPath(r.URL.Path)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
 	if h.composer.UsesLocker {
 		lock, err := h.lockUpload(id)
 		if err != nil {
-			h.sendError(ctx, w, r, err)
+			h.sendError(r, err)
 			return
 		}
 
@@ -336,37 +340,37 @@ func (h *Uploader) GetFile(ctx context.Context, w http.ResponseWriter, r *http.R
 
 	upload, err := h.composer.Core.GetUpload(ctx, id)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
 	info, err := upload.GetInfo(ctx)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
 	// Set headers before sending responses
-	w.Header().Set("Content-Length", strconv.FormatInt(info.Offset, 10))
+	r.Response.Header().Set("Content-Length", strconv.FormatInt(info.Offset, 10))
 
 	contentType, contentDisposition := filterContentType(info)
-	w.Header().Set("Content-Type", contentType)
-	w.Header().Set("Content-Disposition", contentDisposition)
+	r.Response.Header().Set("Content-Type", contentType)
+	r.Response.Header().Set("Content-Disposition", contentDisposition)
 
 	// If no data has been uploaded yet, respond with an empty "204 No Content" status.
 	if info.Offset == 0 {
-		h.sendResp(ctx, w, r, http.StatusNoContent)
+		h.sendResp(r, http.StatusNoContent)
 		return
 	}
 
 	src, err := upload.GetReader(ctx)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
-	h.sendResp(ctx, w, r, http.StatusOK)
-	_, _ = io.Copy(w, src)
+	h.sendResp(r, http.StatusOK)
+	_, _ = io.Copy(r.Response.RawWriter(), src)
 
 	// Try to close the reader if the io.Closer interface is implemented
 	if closer, ok := src.(io.Closer); ok {
@@ -375,23 +379,24 @@ func (h *Uploader) GetFile(ctx context.Context, w http.ResponseWriter, r *http.R
 }
 
 // DelFile terminates an upload permanently.
-func (h *Uploader) DelFile(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+func (h *Uploader) DelFile(r *ghttp.Request) {
+	ctx := r.GetCtx()
 	// Abort the request handling if the required interface is not implemented
 	if !h.composer.UsesTerminater {
-		h.sendError(ctx, w, r, ErrNotImplemented)
+		h.sendError(r, ErrNotImplemented)
 		return
 	}
 
 	id, err := extractIDFromPath(r.URL.Path)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
 	if h.composer.UsesLocker {
 		lock, err := h.lockUpload(id)
 		if err != nil {
-			h.sendError(ctx, w, r, err)
+			h.sendError(r, err)
 			return
 		}
 
@@ -402,7 +407,7 @@ func (h *Uploader) DelFile(ctx context.Context, w http.ResponseWriter, r *http.R
 
 	upload, err := h.composer.Core.GetUpload(ctx, id)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
@@ -410,16 +415,16 @@ func (h *Uploader) DelFile(ctx context.Context, w http.ResponseWriter, r *http.R
 	if h.config.NotifyTerminatedUploads {
 		info, err = upload.GetInfo(ctx)
 		if err != nil {
-			h.sendError(ctx, w, r, err)
+			h.sendError(r, err)
 			return
 		}
 	}
 
 	err = h.terminateUpload(ctx, upload, info, r)
 	if err != nil {
-		h.sendError(ctx, w, r, err)
+		h.sendError(r, err)
 		return
 	}
 
-	h.sendResp(ctx, w, r, http.StatusNoContent)
+	h.sendResp(r, http.StatusNoContent)
 }

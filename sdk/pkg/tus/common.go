@@ -2,7 +2,7 @@ package tus
 
 import (
 	"encoding/base64"
-	"net/http"
+	"github.com/gogf/gf/v2/net/ghttp"
 	"regexp"
 	"strconv"
 	"strings"
@@ -157,7 +157,7 @@ func i64toa(num int64) string {
 
 // getRequestId returns the value of the X-Request-ID header, if available,
 // and also takes care of truncating the input.
-func getRequestId(r *http.Request) string {
+func getRequestId(r *ghttp.Request) string {
 	reqId := r.Header.Get("X-Request-ID")
 	if reqId == "" {
 		return ""
@@ -176,7 +176,7 @@ func getRequestId(r *http.Request) string {
 // from the given request. If `allowForwarded` is set, the X-Forwarded-Host,
 // X-Forwarded-Proto and Forwarded headers will also be checked to
 // support proxies.
-func getHostAndProtocol(r *http.Request, allowForwarded bool) (host, proto string) {
+func getHostAndProtocol(r *ghttp.Request, allowForwarded bool) (host, proto string) {
 	if r.TLS != nil {
 		proto = "https"
 	} else {

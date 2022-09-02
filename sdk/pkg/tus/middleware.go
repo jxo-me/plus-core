@@ -6,10 +6,8 @@ import (
 	"strconv"
 )
 
-func (h *Uploader) Middleware(req *ghttp.Request) {
-	w := req.Response.RawWriter()
-	r := req.Request
-	ctx := req.GetCtx()
+func (h *Uploader) Middleware(r *ghttp.Request) {
+	ctx := r.GetCtx()
 	// Allow overriding the HTTP method. The reason for this is
 	// that some libraries/environments to not support PATCH and
 	// DELETE requests, e.g. Flash in a browser and parts of Java
@@ -21,7 +19,7 @@ func (h *Uploader) Middleware(req *ghttp.Request) {
 
 	h.Metrics.incRequestsTotal(r.Method)
 
-	header := w.Header()
+	header := r.Response.Header()
 
 	if origin := r.Header.Get("Origin"); origin != "" {
 		header.Set("Access-Control-Allow-Origin", origin)
@@ -70,7 +68,7 @@ func (h *Uploader) Middleware(req *ghttp.Request) {
 		// will be ignored or interpreted as a rejection.
 		// For example, the Presto engine, which is used in older versions of
 		// Opera, Opera Mobile and Opera Mini, handles CORS this way.
-		h.sendResp(ctx, w, r, http.StatusOK)
+		h.sendResp(r, http.StatusOK)
 		return
 	}
 
@@ -78,7 +76,7 @@ func (h *Uploader) Middleware(req *ghttp.Request) {
 	// GET and HEAD methods are not checked since a browser may visit this URL and does
 	// not include this header. GET requests are not part of the specification.
 	if r.Method != "GET" && r.Method != "HEAD" && r.Header.Get("Tus-Resumable") != "1.0.0" {
-		h.sendError(ctx, w, r, ErrUnsupportedVersion)
+		h.sendError(r, ErrUnsupportedVersion)
 		return
 	}
 }

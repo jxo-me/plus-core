@@ -41,7 +41,7 @@ func (q *Upload) Init(ctx context.Context, s *Settings) error {
 	// a remote FTP server, you can implement your own storage backend
 	// by implementing the tusd.DataStore interface.
 	store := filestore.FileStore{
-		Path: "./uploads",
+		Path: cf.Path,
 	}
 
 	// A storage backend for tusd may consist of multiple different parts which
