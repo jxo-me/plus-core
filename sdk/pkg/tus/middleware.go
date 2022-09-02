@@ -79,4 +79,5 @@ func (h *Uploader) Middleware(r *ghttp.Request) {
 		h.sendError(r, ErrUnsupportedVersion)
 		return
 	}
+	r.Middleware.Next()
 }

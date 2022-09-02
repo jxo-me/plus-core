@@ -2,6 +2,7 @@ package tus
 
 import (
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/glog"
 	"net"
 	"net/http"
 	"strconv"
@@ -59,12 +60,12 @@ func (h *Uploader) sendError(r *ghttp.Request, err error) {
 	r.Response.WriteStatus(statusErr.StatusCode(), reason)
 
 	h.log(r.GetCtx(), "ResponseOutgoing", "status", strconv.Itoa(statusErr.StatusCode()), "method", r.Method, "path", r.URL.Path, "error", err.Error(), "requestId", getRequestId(r))
-
+	glog.Warning(r.GetCtx(), "sendError:", reason)
 	h.Metrics.incErrorsTotal(statusErr)
 }
 
 // sendResp writes the header to w with the specified status code.
-func (h *Uploader) sendResp(r *ghttp.Request, status int) {
-	r.Response.WriteStatus(status)
+func (h *Uploader) sendResp(r *ghttp.Request, status int, content ...interface{}) {
+	r.Response.WriteStatus(status, content)
 	h.log(r.GetCtx(), "ResponseOutgoing", "status", strconv.Itoa(status), "method", r.Method, "path", r.URL.Path, "requestId", getRequestId(r))
 }
