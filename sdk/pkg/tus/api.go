@@ -368,12 +368,10 @@ func (h *Uploader) GetFile(r *ghttp.Request) {
 		h.sendError(r, err)
 		return
 	}
-	defer func() {
-		// Try to close the reader if the io.Closer interface is implemented
-		if closer, ok := src.(io.Closer); ok {
-			_ = closer.Close()
-		}
-	}()
+	defer func(src io.ReadCloser) {
+		_ = src.Close()
+	}(src)
+
 	h.sendResp(r, http.StatusOK)
 	_, _ = io.Copy(r.Response.ResponseWriter, src)
 }

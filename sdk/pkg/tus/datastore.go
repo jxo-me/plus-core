@@ -67,7 +67,7 @@ type Upload interface {
 	// Close() method will be invoked once everything has been read.
 	// If the given upload could not be found, the error tus.ErrNotFound should
 	// be returned.
-	GetReader(ctx context.Context) (io.Reader, error)
+	GetReader(ctx context.Context) (io.ReadCloser, error)
 	// FinishUpload FinisherDataStore is the interface which can be implemented by DataStores
 	// which need to do additional operations once an entire upload has been
 	// completed. These tasks may include but are not limited to freeing unused

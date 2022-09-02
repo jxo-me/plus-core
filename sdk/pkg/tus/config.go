@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
 	"net/url"
+	"time"
 )
 
 // Config provides a way to configure the Handler depending on your needs.
@@ -40,6 +41,10 @@ type Config struct {
 	// NotifyCreatedUploads indicates whether sending notifications about
 	// the upload having been created using the CreatedUploads channel should be enabled.
 	NotifyCreatedUploads bool `yaml:"notifyCreatedUploads" json:"notify_created_uploads"`
+	// UploadProgressInterval specifies the interval at which the upload progress
+	// notifications are sent to the UploadProgress channel, if enabled.
+	// Defaults to 1s.
+	UploadProgressInterval time.Duration
 	// Logger is the Logger to use internally, mostly for printing requests.
 	Logger *glog.Logger `yaml:"-" json:"-"`
 	// Respect the X-Forwarded-Host, X-Forwarded-Proto and Forwarded headers
@@ -93,6 +98,9 @@ func (config *Config) validate() error {
 
 	if config.StoreComposer.Core == nil {
 		return errors.New("tus: StoreComposer in Config needs to contain a non-nil core")
+	}
+	if config.UploadProgressInterval <= 0 {
+		config.UploadProgressInterval = 1 * time.Second
 	}
 
 	return nil

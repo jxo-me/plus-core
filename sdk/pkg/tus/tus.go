@@ -4,9 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/glog"
-	"io"
 	"math"
-	"net/http"
 	"strconv"
 	"time"
 )
@@ -83,40 +81,6 @@ type Uploader struct {
 	Metrics Metrics
 }
 
-// HTTPRequest contains basic details of an incoming HTTP request.
-type HTTPRequest struct {
-	// Method is the HTTP method, e.g. POST or PATCH
-	Method string
-	// URI is the full HTTP request URI, e.g. /files/fooo
-	URI string
-	// RemoteAddr contains the network address that sent the request
-	RemoteAddr string
-	// Header contains all HTTP headers as present in the HTTP request.
-	Header http.Header
-}
-
-// HookEvent represents an event from tus which can be handled by the application.
-type HookEvent struct {
-	// Upload contains information about the upload that caused this hook
-	// to be fired.
-	Upload FileInfo
-	// HTTPRequest contains details about the HTTP request that reached
-	// tus.
-	HTTPRequest HTTPRequest
-}
-
-func newHookEvent(info FileInfo, r *ghttp.Request) HookEvent {
-	return HookEvent{
-		Upload: info,
-		HTTPRequest: HTTPRequest{
-			Method:     r.Method,
-			URI:        r.RequestURI,
-			RemoteAddr: r.RemoteAddr,
-			Header:     r.Header,
-		},
-	}
-}
-
 // writeChunk reads the body from the requests r and appends it to the upload
 // with the corresponding id. Afterwards, it will set the necessary response
 // headers but will not send the response.
@@ -157,7 +121,7 @@ func (h *Uploader) writeChunk(upload Upload, info FileInfo, r *ghttp.Request) er
 	// available in the case of a malicious request.
 	if r.Body != nil && maxSize > 0 {
 		// Limit the data read from the request's body to the allowed maximum
-		reader := newBodyReader(io.LimitReader(r.Body, maxSize))
+		reader := newBodyReader(r.Body, maxSize)
 
 		// We use a context object to allow the hook system to cancel an upload
 		uploadCtx, stopUpload := context.WithCancel(context.Background())
