@@ -308,7 +308,7 @@ func (h *Uploader) PatchFile(r *ghttp.Request) {
 
 	}
 
-	if err := h.writeChunk(upload, info, r); err != nil {
+	if err = h.writeChunk(upload, info, r); err != nil {
 		h.sendError(r, err)
 		return
 	}
