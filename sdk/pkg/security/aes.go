@@ -14,7 +14,7 @@ const (
 	DefaultAesNBits = 256
 )
 
-type aesCipher struct {
+type AesCipher struct {
 	key   string
 	nBits int
 	sBox  []int
@@ -27,7 +27,7 @@ func (k AesKeySizeError) Error() string {
 	return "aes: invalid key size " + strconv.Itoa(int(k)) + ", standard allows 128/192/256 bit keys"
 }
 
-func NewAesCipher(key string, nBits int) (*aesCipher, error) {
+func NewAesCipher(key string, nBits int) (*AesCipher, error) {
 	switch nBits {
 	default:
 		return nil, AesKeySizeError(nBits)
@@ -69,12 +69,12 @@ func NewAesCipher(key string, nBits int) (*aesCipher, error) {
 		{0x1b, 0x00, 0x00, 0x00},
 		{0x36, 0x00, 0x00, 0x00},
 	}
-	return &aesCipher{key: key, nBits: nBits, sBox: sBox, rCon: rCon}, nil
+	return &AesCipher{key: key, nBits: nBits, sBox: sBox, rCon: rCon}, nil
 }
 
-func (a *aesCipher) BlockSize() int { return BlockSize }
+func (a *AesCipher) BlockSize() int { return BlockSize }
 
-func (a *aesCipher) Encrypt(plaintext string) (string, error) {
+func (a *AesCipher) Encrypt(plaintext string) (string, error) {
 	var i int
 	plainBytes := []byte(plaintext)
 	// use AES itself to encrypt password to get cipher key (using plain password as source for key
@@ -146,7 +146,7 @@ func (a *aesCipher) Encrypt(plaintext string) (string, error) {
 	ciphertext := base64.StdEncoding.EncodeToString(append(ctrTxt, cipherBytes...))
 	return ciphertext, nil
 }
-func (a *aesCipher) Decrypt(cipherText string) ([]byte, error) {
+func (a *AesCipher) Decrypt(cipherText string) ([]byte, error) {
 	var b int
 	var i int
 	cipherBytes, err := base64.StdEncoding.DecodeString(cipherText)
@@ -211,7 +211,7 @@ func (a *aesCipher) Decrypt(cipherText string) ([]byte, error) {
 	return plainBytes, nil
 }
 
-func (a *aesCipher) cipher(input []int, w [][]int) []int {
+func (a *AesCipher) cipher(input []int, w [][]int) []int {
 	var i int
 	Nb := 4                                                                    // block size (in words): no of columns in state (fixed at 4 for AES)
 	Nr := len(w)/Nb - 1                                                        // no of rounds: 10/12/14 for 128/192/256-bit keys
@@ -237,7 +237,7 @@ func (a *aesCipher) cipher(input []int, w [][]int) []int {
 	return output
 }
 
-func (a *aesCipher) mixColumns(s *[4][4]int) *[4][4]int {
+func (a *AesCipher) mixColumns(s *[4][4]int) *[4][4]int {
 	for c := 0; c < 4; c++ {
 		a := make([]int, 4) // 'a' is a copy of the current column from 's'
 		b := make([]int, 4) // 'b' is a•{02} in GF(2^8)
@@ -258,7 +258,7 @@ func (a *aesCipher) mixColumns(s *[4][4]int) *[4][4]int {
 	return s
 }
 
-func (a *aesCipher) shiftRows(s *[4][4]int, Nb int) *[4][4]int {
+func (a *AesCipher) shiftRows(s *[4][4]int, Nb int) *[4][4]int {
 	t := make([]int, 4)
 	for r := 1; r < 4; r++ {
 		var c int
@@ -272,7 +272,7 @@ func (a *aesCipher) shiftRows(s *[4][4]int, Nb int) *[4][4]int {
 	return s // see asmaes.sourceforge.net/rijndael/rijndaelImplementation.pdf
 }
 
-func (a *aesCipher) subBytes(s *[4][4]int, Nb int) *[4][4]int {
+func (a *AesCipher) subBytes(s *[4][4]int, Nb int) *[4][4]int {
 	var sBox = []int{
 		0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe,
 		0xd7, 0xab, 0x76, 0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4,
@@ -303,7 +303,7 @@ func (a *aesCipher) subBytes(s *[4][4]int, Nb int) *[4][4]int {
 	return s
 }
 
-func (a *aesCipher) addRoundKey(state *[4][4]int, w [][]int, rnd int, Nb int) *[4][4]int {
+func (a *AesCipher) addRoundKey(state *[4][4]int, w [][]int, rnd int, Nb int) *[4][4]int {
 	for r := 0; r < 4; r++ {
 		for c := 0; c < Nb; c++ {
 			state[r][c] ^= w[rnd*4+c][r]
@@ -312,7 +312,7 @@ func (a *aesCipher) addRoundKey(state *[4][4]int, w [][]int, rnd int, Nb int) *[
 	return state
 }
 
-func (a *aesCipher) keyExpansion(key []int) [][]int {
+func (a *AesCipher) keyExpansion(key []int) [][]int {
 	var i int
 	Nb := 4            // block size (in words): no of columns in state (fixed at 4 for AES)
 	Nk := len(key) / 4 // key length (in words): 4/6/8 for 128/192/256-bit keys
@@ -352,7 +352,7 @@ func (a *aesCipher) keyExpansion(key []int) [][]int {
 	return w
 }
 
-func (a *aesCipher) rotWord(w []int) []int {
+func (a *AesCipher) rotWord(w []int) []int {
 	tmp := w[0]
 	for i := 0; i < 3; i++ {
 		w[i] = w[i+1]
@@ -361,14 +361,14 @@ func (a *aesCipher) rotWord(w []int) []int {
 	return w
 }
 
-func (a *aesCipher) subWord(w []int) []int {
+func (a *AesCipher) subWord(w []int) []int {
 	for i := 0; i < 4; i++ {
 		w[i] = a.sBox[w[i]]
 	}
 	return w
 }
 
-func (a *aesCipher) charCodeAt(s string, n int) rune {
+func (a *AesCipher) charCodeAt(s string, n int) rune {
 	i := 0
 	for _, r := range s {
 		if i == n {
