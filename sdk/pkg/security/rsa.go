@@ -1,5 +1,3 @@
-// Package utils
-// @Description: Operation with rsa encryption
 package security
 
 import (
@@ -16,6 +14,19 @@ import (
 	"strings"
 )
 
+type RsaCipher struct {
+	PubKey string
+	PriKey string
+}
+
+func NewRsaCipher(pubKey, priKey string) (*RsaCipher, error) {
+	c := &RsaCipher{
+		PubKey: pubKey,
+		PriKey: priKey,
+	}
+	return c, nil
+}
+
 func split(buf []byte, lim int) [][]byte {
 	//glog.Debug(context.Background(), "长度:", len(buf))
 	var chunk []byte
@@ -30,8 +41,8 @@ func split(buf []byte, lim int) [][]byte {
 	return chunks
 }
 
-func RsaEncrypt(plainText, pubKey string) (cryptText string, err error) {
-	block, _ := pem.Decode([]byte(pubKey))
+func (a *RsaCipher) Encrypt(plainText string) (cryptText string, err error) {
+	block, _ := pem.Decode([]byte(a.PubKey))
 	defer func() {
 		if err := recover(); err != nil {
 			switch err.(type) {
@@ -49,7 +60,7 @@ func RsaEncrypt(plainText, pubKey string) (cryptText string, err error) {
 	publicKey := publicKeyInterface.(*rsa.PublicKey)
 	//maxEncryptBlockLen := publicKey.N.BitLen()/8 - 11
 	maxEncryptBlockLen := ((publicKey.N.BitLen() + 7) >> 3) - 11
-	chunks := split([]byte(EncodeURIComponent(plainText)), maxEncryptBlockLen)
+	chunks := split([]byte(a.EncodeURIComponent(plainText)), maxEncryptBlockLen)
 	buffer := bytes.NewBufferString("")
 	for _, chunk := range chunks {
 		byteCode, err := rsa.EncryptPKCS1v15(rand.Reader, publicKey, chunk)
@@ -62,8 +73,8 @@ func RsaEncrypt(plainText, pubKey string) (cryptText string, err error) {
 	return base64.StdEncoding.EncodeToString(buffer.Bytes()), nil
 }
 
-func RsaDecrypt(cryptText, priKey string) (plainText []byte, err error) {
-	block, _ := pem.Decode([]byte(priKey))
+func (a *RsaCipher) Decrypt(cryptText string) (plainText []byte, err error) {
+	block, _ := pem.Decode([]byte(a.PriKey))
 	defer func() {
 		if err := recover(); err != nil {
 			switch err.(type) {
@@ -100,13 +111,13 @@ func RsaDecrypt(cryptText, priKey string) (plainText []byte, err error) {
 	return buffer.Bytes(), err
 }
 
-func EncodeURIComponent(str string) string {
+func (a *RsaCipher) EncodeURIComponent(str string) string {
 	r := url.QueryEscape(str)
 	r = strings.Replace(r, "+", "%20", -1)
 	return r
 }
 
-func DecodeURIComponent(str string) string {
+func (a *RsaCipher) DecodeURIComponent(str string) string {
 	r, err := url.QueryUnescape(str)
 	if err != nil {
 		return str

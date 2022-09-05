@@ -30,16 +30,20 @@ Y6JATT3+fwHdfIQ/ZLOtUJnDW0Y0Z/ScroYAwuBK20TF
 
 func BenchmarkRsaEncryptAndDecrypt(b *testing.B) {
 	plaintext := "这是测试aes-ctr加密内容256.#$5.*x,time:1653634619"
+	c, err := NewRsaCipher(ServerRsaPublicKey, ServerRsaPrivateKey)
+	if err != nil {
+		b.Error("RSA NewRsaCipher err", err)
+	}
 	for i := 0; i < b.N; i++ {
-		ciphertext, err := RsaEncrypt(plaintext, ServerRsaPublicKey)
+		ciphertext, err := c.Encrypt(plaintext)
 		if err != nil {
 			b.Error("RSA Encrypt err", err)
 		}
-		decrypt, err := RsaDecrypt(ciphertext, ServerRsaPrivateKey)
+		decrypt, err := c.Decrypt(ciphertext)
 		if err != nil {
 			b.Error("RSA Decrypt err", err)
 		}
-		if DecodeURIComponent(string(decrypt)) != plaintext {
+		if c.DecodeURIComponent(string(decrypt)) != plaintext {
 			b.Error(`RSA Decrypt fail`)
 		}
 	}
