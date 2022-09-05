@@ -12,41 +12,49 @@ import (
 const salt uint8 = 67
 const subLen int = 76
 
-func Rc4Encrypt(plaintext string, key string) (string, error) {
-	c, err := rc4.NewCipher([]byte(key))
+type Rc4Cipher struct {
+	Key string
+}
+
+func NewRc4Cipher(key string) *Rc4Cipher {
+	return &Rc4Cipher{Key: key}
+}
+
+func (r *Rc4Cipher) Encrypt(plaintext string) (string, error) {
+	c, err := rc4.NewCipher([]byte(r.Key))
 	if err != nil {
 		return "", err
 	}
 	src := []byte(plaintext)
 	dst := make([]byte, len(src))
 	c.XORKeyStream(dst, src)
-
 	return hex.EncodeToString(dst), nil
 }
 
-func Rc4Decrypt(ciphertext string, key string) (string, error) {
+func (r *Rc4Cipher) Decrypt(ciphertext string) ([]byte, error) {
 	src, err := hex.DecodeString(ciphertext)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	c, err := rc4.NewCipher([]byte(key))
+	c, err := rc4.NewCipher([]byte(r.Key))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	dst := make([]byte, len(src))
 	c.XORKeyStream(dst, src)
 
-	return string(dst), nil
+	//return string(dst), nil
+	return dst, nil
 }
 
 // Rc4ClientEncrypt Client RC4 Config file Encrypt
-func Rc4ClientEncrypt(plaintext string) (string, error) {
+func (r *Rc4Cipher) Rc4ClientEncrypt(plaintext string) (string, error) {
 	bw := make([]byte, 0)
 	pad := []uint8{2, 0, 0, 0}
 	bw = append(bw, pad...)
 	key := make([]uint8, 16)
 	for i := 0; i < 16; i++ {
-		c := uint8(RandInt(1, 256))
+		c := uint8(r.RandInt(1, 256))
 		s := (c ^ salt) % c
 		bw = append(bw, c)
 		key[i] = s
@@ -63,7 +71,7 @@ func Rc4ClientEncrypt(plaintext string) (string, error) {
 }
 
 // Rc4ClientDecrypt Client RC4 Config file Decrypt
-func Rc4ClientDecrypt(ciphertext string) (string, error) {
+func (r *Rc4Cipher) Rc4ClientDecrypt(ciphertext string) (string, error) {
 	src, err := base64.StdEncoding.DecodeString(ciphertext)
 	if err != nil {
 		return "", err
@@ -84,7 +92,7 @@ func Rc4ClientDecrypt(ciphertext string) (string, error) {
 }
 
 // CiphertextFormat Client encrypt content format
-func CiphertextFormat(ciphertext string) string {
+func (r *Rc4Cipher) CiphertextFormat(ciphertext string) string {
 	str := ""
 	l := int(math.Ceil(float64(len(ciphertext)) / float64(subLen)))
 	for i := 0; i < l; i++ {
@@ -98,11 +106,11 @@ func CiphertextFormat(ciphertext string) string {
 	return str
 }
 
-func CiphertextReplace(ciphertext string) string {
+func (r *Rc4Cipher) CiphertextReplace(ciphertext string) string {
 	return strings.Replace(ciphertext, "\n", "", -1)
 }
 
-func RandInt(min, max int) int {
+func (r *Rc4Cipher) RandInt(min, max int) int {
 	if min >= max || min == 0 || max == 0 {
 		return max
 	}

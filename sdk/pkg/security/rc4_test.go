@@ -1,6 +1,7 @@
 package security
 
 import (
+	"bytes"
 	"io/ioutil"
 	"testing"
 )
@@ -9,7 +10,8 @@ func TestRc4Decrypt(t *testing.T) {
 	plaintext := `{"nickname":"","loginIp":469982874,"loginMacCode":"c4f174bd56e5c497254c390fd9223e0549d6ed5f","loginDevice":1,"loginSrc":4,"LoginAddress":"美国 加利福尼亚 洛杉矶 0","sex":"","timestamp":1653051576,"channelId":"800001","head":""}`
 	keyStr := "sBymrOdodHQ4mLcnQsehtKWolnMaR0aLmtmFlCZNZsHwVHb2ZASCYW2kdiN7OLX1"
 	encrypt := "9BB9F1C0E9267EA7E1B950F865262E67102D46F088F6678F801A9AFE00A346EE9FE7991ACA3D3AF1E60EF8CE5779AC1F39DE7E7286BB9F2174AB94182CB9705A4A64EB39FFE09CD81BC22791D63E0961DDA1AE4EDBA24F05FE3DFD8F4D66A2F7D593C513FD52DB24F62863365CC72EE3EDD98C7991A4FCD5895B9995F6BA0FBE5ED498DC355AA9196A12BFD1FBB16E1F0BD7E27E6454D81227CACC0B8405C13B3A0BD07FC88BBCFC4C3D810EF9233D069227D57844BC973A891EB6A8E7F5F24BF7E97DC1060977687BF18F774999C3F7CB4B1F314DDE9C0FBD19FF2CF922445FE26745360F5264968DA8D07956"
-	decrypt, err := Rc4Decrypt(encrypt, keyStr)
+	c := NewRc4Cipher(keyStr)
+	decrypt, err := c.Decrypt(encrypt)
 	if err != nil {
 		t.Error("RC4 Decrypt err", err)
 	}
@@ -17,7 +19,7 @@ func TestRc4Decrypt(t *testing.T) {
 	//if err != nil {
 	//	panic(err)
 	//}
-	if decrypt != plaintext {
+	if bytes.Compare(decrypt, []byte(plaintext)) != 0 {
 		t.Error(`Decrypt fail`)
 	}
 	//fmt.Println(decrypt)
@@ -26,15 +28,16 @@ func TestRc4Decrypt(t *testing.T) {
 func TestRc4EncryptAndDecrypt(t *testing.T) {
 	keyStr := "sBymrOdodHQ4mLcnQsehtKWolnMaR0aLmtmFlCZNZsHwVHb2ZASCYW2kdiN7OLX1"
 	plaintext := "{\"UserName\":\"d1a3a79eb27920febcec43\",\"Password\":\"aa123456\",\"loginIp\":\"1275925876\",\"loginMacCode\":\"a598e745b7d9666ef5a550d8aef79cd2\",\"SMSCode\":\"12344\",\"loginDevice\":\"1\",\"RegDevice\":\"1\"}"
-	encrypt, err := Rc4Encrypt(plaintext, keyStr)
+	c := NewRc4Cipher(keyStr)
+	encrypt, err := c.Encrypt(plaintext)
 	if err != nil {
 		t.Error("RC4 Encrypt err", err)
 	}
-	decrypt, err := Rc4Decrypt(encrypt, keyStr)
+	decrypt, err := c.Decrypt(encrypt)
 	if err != nil {
 		t.Error("Rc4Decrypt error:", err)
 	}
-	if decrypt != plaintext {
+	if bytes.Compare(decrypt, []byte(plaintext)) != 0 {
 		t.Error(`Decrypt fail`)
 	}
 }
@@ -42,16 +45,17 @@ func TestRc4EncryptAndDecrypt(t *testing.T) {
 func BenchmarkRc4EncryptAndDecrypt(b *testing.B) {
 	keyStr := "sBymrOdodHQ4mLcnQsehtKWolnMaR0aLmtmFlCZNZsHwVHb2ZASCYW2kdiN7OLX1"
 	plaintext := "{\"UserName\":\"d1a3a79eb27920febcec43\",\"Password\":\"aa123456\",\"loginIp\":\"1275925876\",\"loginMacCode\":\"a598e745b7d9666ef5a550d8aef79cd2\",\"SMSCode\":\"12344\",\"loginDevice\":\"1\",\"RegDevice\":\"1\"}"
+	c := NewRc4Cipher(keyStr)
 	for i := 0; i < b.N; i++ {
-		encrypt, err := Rc4Encrypt(plaintext, keyStr)
+		encrypt, err := c.Encrypt(plaintext)
 		if err != nil {
 			b.Error("RC4 Encrypt err", err)
 		}
-		decrypt, err := Rc4Decrypt(encrypt, keyStr)
+		decrypt, err := c.Decrypt(encrypt)
 		if err != nil {
 			b.Error("RC4 Decrypt err", err)
 		}
-		if decrypt != plaintext {
+		if bytes.Compare(decrypt, []byte(plaintext)) != 0 {
 			b.Error(`Decrypt fail`)
 		}
 	}
@@ -90,11 +94,12 @@ func TestRc4ClientEncryptAndDecrypt(t *testing.T) {
 	"getip":"http://api.ip138.com/ipv4/?token=22593ac90f78a4001d7350148bf1350d",
 	"debugMacCodes":"2d8fa5bf61e18ee38e170cfc031c63c4,"
 }`
-	encrypt, err := Rc4ClientEncrypt(plaintext)
+	c := NewRc4Cipher("")
+	encrypt, err := c.Rc4ClientEncrypt(plaintext)
 	if err != nil {
 		t.Error("RC4 Client Encrypt err", err)
 	}
-	decrypt, err := Rc4ClientDecrypt(CiphertextReplace(CiphertextFormat(encrypt)))
+	decrypt, err := c.Rc4ClientDecrypt(c.CiphertextReplace(c.CiphertextFormat(encrypt)))
 	if err != nil {
 		t.Error("RC4 Client Decrypt err", err)
 	}
@@ -176,7 +181,8 @@ kU+uLae4PWZtUcYMW3kZOpF3ZWeOQYs3KvQzk5PfQ4KP7OKLB/Us8BAH02IFWfATGVyeSnptH6Tv
 nX0LhIUu5hxw2dIafzOCkMJOraxkf+ja2/cL4UstesX4QiUVGTw4vhSS5mvFp1vG9BQTZZIxoQR6
 RFeUIM/buOQXvr8piwDgy6WRG+u/iAXlUgJWgcnTShgq/Q3ztD8BOJjCetlrQdkzI/uSlRv2ZMiy
 7l5ogVMK8IywtL3Ks5tAs1LCOMVUseFnZOJ+jg==`
-	decrypt, err := Rc4ClientDecrypt(CiphertextReplace(ciphertext))
+	c := NewRc4Cipher("")
+	decrypt, err := c.Rc4ClientDecrypt(c.CiphertextReplace(ciphertext))
 	if err != nil {
 		t.Error("RC4 Client Decrypt err", err)
 	}
