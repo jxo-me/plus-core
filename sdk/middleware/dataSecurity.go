@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/glog"
@@ -12,28 +11,19 @@ import (
 	"io"
 )
 
-var insAesCrypto = AesCrypto{
-	Key:   security.DefaultAesKey,
-	NBits: security.DefaultAesNBits,
+var insCrypto = crypto{}
+
+type crypto struct {
+	Cipher security.Crypto
 }
 
-type AesCrypto struct {
-	Cipher *security.AesCipher
-	Key    string
-	NBits  int
+func Crypto(cipher security.Crypto) *crypto {
+	insCrypto.Cipher = cipher
+	return &insCrypto
 }
 
-func Crypto(ctx context.Context) *AesCrypto {
-	aes, err := security.NewAesCipher(insAesCrypto.Key, insAesCrypto.NBits)
-	if err != nil {
-		glog.Error(ctx, "NewCipher err", err)
-	}
-	insAesCrypto.Cipher = aes
-	return &insAesCrypto
-}
-
-// DecryptRequest Aes解密请求数据
-func (a *AesCrypto) DecryptRequest(r *ghttp.Request) {
+// DecryptRequest 解密请求数据
+func (c *crypto) DecryptRequest(r *ghttp.Request) {
 	ctx := r.GetCtx()
 	var (
 		err error
@@ -44,7 +34,7 @@ func (a *AesCrypto) DecryptRequest(r *ghttp.Request) {
 	}
 	ciphertext := string(buf)
 	glog.Debug(ctx, "raw request:", ciphertext)
-	decrypt, err := a.Cipher.Decrypt(ciphertext)
+	decrypt, err := c.Cipher.Decrypt(ciphertext)
 	if err != nil {
 		glog.Errorf(ctx, "RsaDecrypt error:%v", err)
 	} else {
@@ -54,8 +44,8 @@ func (a *AesCrypto) DecryptRequest(r *ghttp.Request) {
 	}
 }
 
-// EncryptResponse Aes加密返回数据
-func (a *AesCrypto) EncryptResponse(r *ghttp.Request) {
+// EncryptResponse 加密响应数据
+func (c *crypto) EncryptResponse(r *ghttp.Request) {
 	ctx := r.GetCtx()
 	bf := r.Response.Buffer()
 	glog.Debug(ctx, "raw Response body:", bf)
@@ -66,7 +56,7 @@ func (a *AesCrypto) EncryptResponse(r *ghttp.Request) {
 		glog.Errorf(ctx, `json Unmarshal error: %+v`, err)
 	}
 	str := gconv.String(res.Data)
-	encryptData, err := a.Cipher.Encrypt(str)
+	encryptData, err := c.Cipher.Encrypt(str)
 	if err != nil {
 		glog.Warningf(ctx, `RsaEncrypt error: %+v`, err)
 	} else {
