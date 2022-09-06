@@ -40,9 +40,6 @@ func Language(r *ghttp.Request) {
 	base, _ := code.Base()
 	lang = base.String()
 	ctx = gi18n.WithLanguage(ctx, lang)
-
-	//设置公共信息
-
 	r.SetCtx(ctx)
 	r.Middleware.Next()
 }
