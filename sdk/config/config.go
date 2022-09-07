@@ -7,6 +7,7 @@ import (
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/plus-core/sdk/pkg/tus"
+	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 )
 
 var (
@@ -47,6 +48,7 @@ type Config struct {
 	Locker *Locker         `yaml:"locker"`
 	Extend interface{}     `yaml:"extend"`
 	Tus    tus.Config      `yaml:"tus"`
+	Ws     *ws.Config      `yaml:"ws"`
 }
 
 // Bootstrap 载入启动配置文件
@@ -57,6 +59,7 @@ func (e *Settings) Bootstrap(ctx context.Context, fs ...Initialize) {
 		Queue:  QueueConfig(),
 		Extend: ExtendConfig,
 		Locker: LockerConfig(),
+		Ws:     &ws.Config{},
 	}
 	e.callbacks = fs
 	e.Init(ctx)
