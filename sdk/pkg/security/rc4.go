@@ -25,13 +25,38 @@ func (r *Rc4Cipher) Encrypt(plaintext string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	src := []byte(base64.StdEncoding.EncodeToString([]byte(plaintext)))
+	dst := make([]byte, len(src))
+	c.XORKeyStream(dst, src)
+	return base64.StdEncoding.EncodeToString(dst), nil
+}
+
+func (r *Rc4Cipher) Decrypt(ciphertext string) ([]byte, error) {
+	src, err := base64.StdEncoding.DecodeString(ciphertext)
+	if err != nil {
+		return nil, err
+	}
+	c, err := rc4.NewCipher([]byte(r.Key))
+	if err != nil {
+		return nil, err
+	}
+	dst := make([]byte, len(src))
+	c.XORKeyStream(dst, src)
+	return base64.StdEncoding.DecodeString(string(dst))
+}
+
+func (r *Rc4Cipher) encrypt(plaintext string) (string, error) {
+	c, err := rc4.NewCipher([]byte(r.Key))
+	if err != nil {
+		return "", err
+	}
 	src := []byte(plaintext)
 	dst := make([]byte, len(src))
 	c.XORKeyStream(dst, src)
 	return hex.EncodeToString(dst), nil
 }
 
-func (r *Rc4Cipher) Decrypt(ciphertext string) ([]byte, error) {
+func (r *Rc4Cipher) decrypt(ciphertext string) ([]byte, error) {
 	src, err := hex.DecodeString(ciphertext)
 	if err != nil {
 		return nil, err

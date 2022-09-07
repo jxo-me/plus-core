@@ -2,16 +2,43 @@ package security
 
 import (
 	"bytes"
-	"io/ioutil"
+	"fmt"
+	"os"
 	"testing"
+	"time"
 )
 
+func TestRc4EncryptDecrypt(t *testing.T) {
+	nonce := time.Now().Unix()
+	var tests = []struct {
+		key       string
+		plaintext string
+	}{
+		{"159054a86e3bfb85b5f1991cdb07645e", fmt.Sprintf("这是测试rc4加密内容.#$5.*x,time:%d", nonce)},
+		{"159054a86e3bfb85b5f1991cdb07645e", fmt.Sprintf("这是测试rc4加密内容.#$5.*x,time:%d", nonce)},
+		{"159054a86e3bfb85b5f1991cdb07645e", fmt.Sprintf("这是测试rc4加密内容.#$5.*x,time:%d", nonce)},
+	}
+	for _, test := range tests {
+		rc4 := NewRc4Cipher(test.key)
+		encrypt, err := rc4.Encrypt(test.plaintext)
+		if err != nil {
+			t.Error("RC4 Encrypt err", err)
+		}
+		decrypt, err := rc4.Decrypt(encrypt)
+		if err != nil {
+			t.Error("RC4 Decrypt err", err)
+		}
+		if string(decrypt) != test.plaintext {
+			t.Error(`RC4 Decrypt fail`)
+		}
+	}
+}
 func TestRc4Decrypt(t *testing.T) {
 	plaintext := `{"nickname":"","loginIp":469982874,"loginMacCode":"c4f174bd56e5c497254c390fd9223e0549d6ed5f","loginDevice":1,"loginSrc":4,"LoginAddress":"美国 加利福尼亚 洛杉矶 0","sex":"","timestamp":1653051576,"channelId":"800001","head":""}`
 	keyStr := "sBymrOdodHQ4mLcnQsehtKWolnMaR0aLmtmFlCZNZsHwVHb2ZASCYW2kdiN7OLX1"
 	encrypt := "9BB9F1C0E9267EA7E1B950F865262E67102D46F088F6678F801A9AFE00A346EE9FE7991ACA3D3AF1E60EF8CE5779AC1F39DE7E7286BB9F2174AB94182CB9705A4A64EB39FFE09CD81BC22791D63E0961DDA1AE4EDBA24F05FE3DFD8F4D66A2F7D593C513FD52DB24F62863365CC72EE3EDD98C7991A4FCD5895B9995F6BA0FBE5ED498DC355AA9196A12BFD1FBB16E1F0BD7E27E6454D81227CACC0B8405C13B3A0BD07FC88BBCFC4C3D810EF9233D069227D57844BC973A891EB6A8E7F5F24BF7E97DC1060977687BF18F774999C3F7CB4B1F314DDE9C0FBD19FF2CF922445FE26745360F5264968DA8D07956"
 	c := NewRc4Cipher(keyStr)
-	decrypt, err := c.Decrypt(encrypt)
+	decrypt, err := c.decrypt(encrypt)
 	if err != nil {
 		t.Error("RC4 Decrypt err", err)
 	}
@@ -29,11 +56,11 @@ func TestRc4EncryptAndDecrypt(t *testing.T) {
 	keyStr := "sBymrOdodHQ4mLcnQsehtKWolnMaR0aLmtmFlCZNZsHwVHb2ZASCYW2kdiN7OLX1"
 	plaintext := "{\"UserName\":\"d1a3a79eb27920febcec43\",\"Password\":\"aa123456\",\"loginIp\":\"1275925876\",\"loginMacCode\":\"a598e745b7d9666ef5a550d8aef79cd2\",\"SMSCode\":\"12344\",\"loginDevice\":\"1\",\"RegDevice\":\"1\"}"
 	c := NewRc4Cipher(keyStr)
-	encrypt, err := c.Encrypt(plaintext)
+	encrypt, err := c.encrypt(plaintext)
 	if err != nil {
 		t.Error("RC4 Encrypt err", err)
 	}
-	decrypt, err := c.Decrypt(encrypt)
+	decrypt, err := c.decrypt(encrypt)
 	if err != nil {
 		t.Error("Rc4Decrypt error:", err)
 	}
@@ -47,11 +74,11 @@ func BenchmarkRc4EncryptAndDecrypt(b *testing.B) {
 	plaintext := "{\"UserName\":\"d1a3a79eb27920febcec43\",\"Password\":\"aa123456\",\"loginIp\":\"1275925876\",\"loginMacCode\":\"a598e745b7d9666ef5a550d8aef79cd2\",\"SMSCode\":\"12344\",\"loginDevice\":\"1\",\"RegDevice\":\"1\"}"
 	c := NewRc4Cipher(keyStr)
 	for i := 0; i < b.N; i++ {
-		encrypt, err := c.Encrypt(plaintext)
+		encrypt, err := c.encrypt(plaintext)
 		if err != nil {
 			b.Error("RC4 Encrypt err", err)
 		}
-		decrypt, err := c.Decrypt(encrypt)
+		decrypt, err := c.decrypt(encrypt)
 		if err != nil {
 			b.Error("RC4 Decrypt err", err)
 		}
@@ -186,7 +213,7 @@ RFeUIM/buOQXvr8piwDgy6WRG+u/iAXlUgJWgcnTShgq/Q3ztD8BOJjCetlrQdkzI/uSlRv2ZMiy
 	if err != nil {
 		t.Error("RC4 Client Decrypt err", err)
 	}
-	err = ioutil.WriteFile("test.json", []byte(decrypt), 0644)
+	err = os.WriteFile("test.json", []byte(decrypt), 0644)
 	if err != nil {
 		panic(err)
 	}
