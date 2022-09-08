@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"math"
 	"math/rand"
+	"net/url"
 	"strings"
 )
 
@@ -27,7 +28,7 @@ func (r *Rc4Cipher) Encrypt(plaintext string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	src := []byte(base64.StdEncoding.EncodeToString([]byte(plaintext)))
+	src := []byte(base64.StdEncoding.EncodeToString([]byte(r.EncodeURIComponent(plaintext))))
 	dst := make([]byte, len(src))
 	c.XORKeyStream(dst, src)
 	return base64.StdEncoding.EncodeToString(dst), nil
@@ -44,7 +45,28 @@ func (r *Rc4Cipher) Decrypt(ciphertext string) ([]byte, error) {
 	}
 	dst := make([]byte, len(src))
 	c.XORKeyStream(dst, src)
-	return base64.StdEncoding.DecodeString(string(dst))
+	str, err := base64.StdEncoding.DecodeString(string(dst))
+	if err != nil {
+		return nil, err
+	}
+	code := r.DecodeURIComponent(string(str))
+
+	return []byte(code), nil
+}
+
+func (r *Rc4Cipher) EncodeURIComponent(str string) string {
+	q := url.QueryEscape(str)
+	//q = strings.Replace(q, "+", "%20", -1)
+	return q
+}
+
+func (r *Rc4Cipher) DecodeURIComponent(str string) string {
+	//str = strings.Replace(str, "%20", "+", -1)
+	q, err := url.QueryUnescape(str)
+	if err != nil {
+		return str
+	}
+	return q
 }
 
 func (r *Rc4Cipher) encrypt(plaintext string) (string, error) {
