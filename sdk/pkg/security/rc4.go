@@ -55,13 +55,10 @@ func (r *Rc4Cipher) Decrypt(ciphertext string) ([]byte, error) {
 }
 
 func (r *Rc4Cipher) EncodeURIComponent(str string) string {
-	q := url.QueryEscape(str)
-	//q = strings.Replace(q, "+", "%20", -1)
-	return q
+	return url.QueryEscape(str)
 }
 
 func (r *Rc4Cipher) DecodeURIComponent(str string) string {
-	//str = strings.Replace(str, "%20", "+", -1)
 	q, err := url.QueryUnescape(str)
 	if err != nil {
 		return str

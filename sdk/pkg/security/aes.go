@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"math"
 	"math/rand"
+	"net/url"
 	"strconv"
 	"time"
 )
@@ -76,7 +77,7 @@ func (a *AesCipher) BlockSize() int { return BlockSize }
 
 func (a *AesCipher) Encrypt(plaintext string) (string, error) {
 	var i int
-	plainBytes := []byte(plaintext)
+	plainBytes := []byte(a.EncodeURIComponent(plaintext))
 	// use AES itself to encrypt password to get cipher key (using plain password as source for key
 	// expansion) - gives us well encrypted key (though hashed key might be preferred for prod'n use)
 	var nBytes = a.nBits / 8 // no bytes in key (16/24/32)
@@ -207,8 +208,19 @@ func (a *AesCipher) Decrypt(cipherText string) ([]byte, error) {
 			plainBytes = append(plainBytes, byte(plaintextByte[i]))
 		}
 	}
+	return []byte(a.DecodeURIComponent(string(plainBytes))), nil
+}
 
-	return plainBytes, nil
+func (a *AesCipher) EncodeURIComponent(str string) string {
+	return url.QueryEscape(str)
+}
+
+func (a *AesCipher) DecodeURIComponent(str string) string {
+	q, err := url.QueryUnescape(str)
+	if err != nil {
+		return str
+	}
+	return q
 }
 
 func (a *AesCipher) cipher(input []int, w [][]int) []int {

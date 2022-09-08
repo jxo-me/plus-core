@@ -38,7 +38,7 @@ func (c *crypto) DecryptRequest(r *ghttp.Request) {
 	if err != nil {
 		glog.Errorf(ctx, "RsaDecrypt error:%v", err)
 	} else {
-		//glog.Debug(ctx, "decrypt:", decrypt)
+		glog.Debug(ctx, "request Decrypt:", decrypt)
 		r.Request.Body = io.NopCloser(bytes.NewReader(decrypt))
 		r.Request.ContentLength = int64(len(decrypt))
 	}
