@@ -12,6 +12,8 @@ import (
 const salt uint8 = 67
 const subLen int = 76
 
+const DefaultRC4Key = "159054a86e3bfb85b5f1991cdb07645e"
+
 type Rc4Cipher struct {
 	Key string
 }

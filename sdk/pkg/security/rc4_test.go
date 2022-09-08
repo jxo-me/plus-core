@@ -8,6 +8,30 @@ import (
 	"time"
 )
 
+func BenchmarkRc4Cipher_EncryptAndDecrypt(b *testing.B) {
+	nonce := time.Now().Unix()
+	var tests = []struct {
+		key       string
+		plaintext string
+	}{
+		{"159054a86e3bfb85b5f1991cdb07645e", fmt.Sprintf("这是测试rc4加密内容.#$5.*x,time:%d", nonce)},
+	}
+	for i := 0; i < b.N; i++ {
+		rc4 := NewRc4Cipher(tests[0].key)
+		encrypt, err := rc4.Encrypt(tests[0].plaintext)
+		if err != nil {
+			b.Error("RC4 Encrypt err", err)
+		}
+		decrypt, err := rc4.Decrypt(encrypt)
+		if err != nil {
+			b.Error("RC4 Decrypt err", err)
+		}
+		if string(decrypt) != tests[0].plaintext {
+			b.Error(`RC4 Decrypt fail`)
+		}
+	}
+}
+
 func TestRc4EncryptDecrypt(t *testing.T) {
 	nonce := time.Now().Unix()
 	var tests = []struct {
