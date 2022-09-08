@@ -10,10 +10,12 @@ import (
 	"strings"
 )
 
-const salt uint8 = 67
-const subLen int = 76
-
-const DefaultRC4Key = "159054a86e3bfb85b5f1991cdb07645e"
+const (
+	DefaultRC4Key        = "159054a86e3bfb85b5f1991cdb07645e"
+	salt          uint8  = 67
+	subLen        int    = 76
+	CryptoRC4Name string = "rc4"
+)
 
 type Rc4Cipher struct {
 	Key string
@@ -21,6 +23,10 @@ type Rc4Cipher struct {
 
 func NewRc4Cipher(key string) *Rc4Cipher {
 	return &Rc4Cipher{Key: key}
+}
+
+func (r *Rc4Cipher) String() string {
+	return CryptoRC4Name
 }
 
 func (r *Rc4Cipher) Encrypt(plaintext string) (string, error) {

@@ -13,6 +13,7 @@ const (
 	DefaultAesKey   = `159054a86e3bfb85b5f1991cdb07645e`
 	BlockSize       = 16 // block size fixed at 16 bytes / 128 bits (Nb=4) for AES
 	DefaultAesNBits = 256
+	CryptoAesName   = "aes"
 )
 
 type AesCipher struct {
@@ -73,7 +74,9 @@ func NewAesCipher(key string, nBits int) (*AesCipher, error) {
 	return &AesCipher{key: key, nBits: nBits, sBox: sBox, rCon: rCon}, nil
 }
 
-func (a *AesCipher) BlockSize() int { return BlockSize }
+func (a *AesCipher) String() string {
+	return CryptoAesName
+}
 
 func (a *AesCipher) Encrypt(plaintext string) (string, error) {
 	var i int
@@ -210,6 +213,8 @@ func (a *AesCipher) Decrypt(cipherText string) ([]byte, error) {
 	}
 	return []byte(a.DecodeURIComponent(string(plainBytes))), nil
 }
+
+func (a *AesCipher) BlockSize() int { return BlockSize }
 
 func (a *AesCipher) EncodeURIComponent(str string) string {
 	return url.QueryEscape(str)
