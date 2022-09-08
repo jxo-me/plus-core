@@ -51,8 +51,42 @@ pPAbMC3Gv/yAKYjgI6dZ6g3x9Y8UGd1eUxZgRlmfVVI=
 -----END RSA PRIVATE KEY-----`
 )
 
+func TestRsaEncryptAndDecrypts(t *testing.T) {
+	c, err := NewRsaCiphers(
+		ClientRsaPublicKey, ServerRsaPrivateKey,
+		ServerRsaPublicKey, ClientRsaPrivateKey,
+	)
+	if err != nil {
+		t.Error("NewRsaCiphers err", err)
+	}
+	nonce := time.Now().Unix()
+	var tests = []struct {
+		plaintext string
+	}{
+		{fmt.Sprintf("这是测试RSA加密内容.#$5.*x,time:%d", nonce)},
+	}
+	for _, test := range tests {
+		// client Encrypt
+		encrypt, err := c.Encrypt(test.plaintext)
+		if err != nil {
+			t.Error("RSA RsaCiphers Encrypt err", err)
+		}
+		// server Decrypt
+		decrypt, err := c.Decrypt(encrypt)
+		if err != nil {
+			t.Error("RSA RsaCiphers Decrypt err", err)
+		}
+		if string(decrypt) != test.plaintext {
+			t.Error(`RSA RsaCiphers Decrypt fail`)
+		}
+	}
+}
+
 func TestRsaEncryptAndDecrypt(t *testing.T) {
-	c, err := NewRsaCiphers(ServerRsaPublicKey, ServerRsaPrivateKey, ClientRsaPublicKey, ClientRsaPrivateKey)
+	c, err := NewRsaCiphers(
+		ServerRsaPublicKey, ServerRsaPrivateKey,
+		ClientRsaPublicKey, ClientRsaPrivateKey,
+	)
 	if err != nil {
 		t.Error("NewRsaCiphers err", err)
 	}
