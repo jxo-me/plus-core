@@ -129,8 +129,8 @@ func (a *RsaCipher) Decrypt(cryptText string) (plainText []byte, err error) {
 		}
 		buffer.Write(decrypted)
 	}
-	str := a.DecodeURIComponent(string(buffer.Bytes()))
-	return []byte(str), err
+	//str := a.DecodeURIComponent(string(buffer.Bytes()))
+	return buffer.Bytes(), err
 }
 
 func (a *RsaCipher) EncodeURIComponent(str string) string {
