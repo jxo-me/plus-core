@@ -33,12 +33,12 @@ func (c *crypto) DecryptRequest(r *ghttp.Request) {
 		glog.Error(ctx, "Crypto io.ReadAll Request.Body err", err)
 	}
 	ciphertext := string(buf)
-	glog.Debug(ctx, "raw request:", ciphertext)
+	//glog.Debug(ctx, "raw request:", ciphertext)
 	decrypt, err := c.Cipher.Decrypt(ciphertext)
 	if err != nil {
 		glog.Errorf(ctx, "RsaDecrypt error:%v", err)
 	} else {
-		glog.Debug(ctx, "request Decrypt:", decrypt)
+		//glog.Debug(ctx, "request Decrypt:", decrypt)
 		r.Request.Body = io.NopCloser(bytes.NewReader(decrypt))
 		r.Request.ContentLength = int64(len(decrypt))
 	}
@@ -48,7 +48,7 @@ func (c *crypto) DecryptRequest(r *ghttp.Request) {
 func (c *crypto) EncryptResponse(r *ghttp.Request) {
 	ctx := r.GetCtx()
 	bf := r.Response.Buffer()
-	glog.Debug(ctx, "raw Response body:", bf)
+	//glog.Debug(ctx, "raw Response body:", bf)
 	// decode json response
 	res := response.JsonRes{}
 	err := json.Unmarshal(bf, &res)
@@ -61,7 +61,7 @@ func (c *crypto) EncryptResponse(r *ghttp.Request) {
 		glog.Warningf(ctx, `RsaEncrypt error: %+v`, err)
 	} else {
 		res.Data = encryptData
-		glog.Debug(ctx, "aes.Encrypt Response body:", encryptData)
+		//glog.Debug(ctx, "aes.Encrypt Response body:", encryptData)
 	}
 	// Override response body
 	r.Response.SetBuffer([]byte(gconv.String(res)))
