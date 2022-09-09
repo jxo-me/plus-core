@@ -29,7 +29,11 @@ type Connection struct {
 	outChannelSize    int
 }
 
-func InitConnection(ctx context.Context, connId uint64, wsSocket *ghttp.WebSocket, heartbeat, inChannelSize, outChannelSize int) (c *Connection) {
+func InitConnection(
+	ctx context.Context, connId uint64,
+	wsSocket *ghttp.WebSocket,
+	heartbeat, inChannelSize, outChannelSize int,
+) (c *Connection) {
 	c = &Connection{
 		wsSocket:          wsSocket,
 		connId:            connId,
@@ -287,7 +291,7 @@ func (conn *Connection) leaveAll(connMgr *ConnManager, ctx context.Context) {
 }
 
 // RouterHandle 处理websocket请求
-func (conn *Connection) RouterHandle(ins *Instance, r *ghttp.Request, list *map[string]Service) {
+func (conn *Connection) RouterHandle(ctx context.Context, ins *Instance, list *map[string]Service) {
 	var (
 		message *Message
 		req     *MessageReq
@@ -296,15 +300,9 @@ func (conn *Connection) RouterHandle(ins *Instance, r *ghttp.Request, list *map[
 		err     error
 		buf     []byte
 	)
-	//glog.Info(r.GetCtx(), "lang:", r.Get("lang"))
-	//glog.Info(r.GetCtx(), "auth session", r.Get("session"))
-	//glog.Info(r.GetCtx(), "header X-Token", r.GetHeader("X-Token"))
-
-	// 连接加入管理器, 可以推送端查找到
-	ins.ConnMgr().AddConn(conn)
 
 	// 心跳检测线程
-	go conn.heartbeatChecker(r.GetCtx())
+	go conn.heartbeatChecker(ctx)
 
 	// 请求处理协程
 	for {
@@ -342,7 +340,7 @@ func (conn *Connection) RouterHandle(ins *Instance, r *ghttp.Request, list *map[
 		//case "leave":
 		//	res, err = conn.handleLeave(ins.ConnMgr(), req)
 		default:
-			res, err = conn.dispatcher(r.GetCtx(), req, list)
+			res, err = conn.dispatcher(ctx, req, list)
 		}
 		if err != nil {
 			resp = &Response{Code: 500, Message: err.Error(), Body: NullResp{}}
@@ -364,10 +362,10 @@ func (conn *Connection) RouterHandle(ins *Instance, r *ghttp.Request, list *map[
 
 ERR:
 	// 确保连接关闭
-	conn.Close(r.GetCtx())
+	conn.Close(ctx)
 
 	// 离开所有房间
-	conn.leaveAll(ins.ConnMgr(), r.GetCtx())
+	conn.leaveAll(ins.ConnMgr(), ctx)
 
 	// 从连接池中移除
 	ins.ConnMgr().DelConn(conn)

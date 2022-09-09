@@ -2,15 +2,15 @@ package ws
 
 type Config struct {
 	// websocket HTTP握手读超时 单位毫秒
-	WsReadTimeout int `json:"wsReadTimeout" yaml:"wsReadTimeout"`
+	ReadTimeout int `json:"readTimeout" yaml:"readTimeout"`
 	// websocket HTTP握手写超时 单位毫秒
-	WsWriteTimeout int `json:"wsWriteTimeout" yaml:"wsWriteTimeout"`
+	WriteTimeout int `json:"writeTimeout" yaml:"writeTimeout"`
 	// websocket读队列长度 一般不需要修改
-	WsInChannelSize int `json:"wsInChannelSize" yaml:"wsInChannelSize"`
+	InChannelSize int `json:"inChannelSize" yaml:"inChannelSize"`
 	// WebSocket写队列长度 一般不需要修改
-	WsOutChannelSize int `json:"wsOutChannelSize" yaml:"wsOutChannelSize"`
+	OutChannelSize int `json:"outChannelSize" yaml:"outChannelSize"`
 	// WebSocket心跳检查间隔 单位秒, 超过时间没有收到心跳, 服务端将主动断开链接
-	WsHeartbeatInterval int `json:"wsHeartbeatInterval" yaml:"wsHeartbeatInterval"`
+	HeartbeatInterval int `json:"heartbeatInterval" yaml:"heartbeatInterval"`
 	// 连接分桶的数量 桶越多, 推送的锁粒度越小, 推送并发度越高
 	BucketCount int `json:"bucketCount" yaml:"bucketCount"`
 	// 每个桶的处理协程数量 影响同一时刻可以有多少个不同消息被分发出去

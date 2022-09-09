@@ -1,5 +1,13 @@
 package ws
 
+import (
+	"context"
+	"github.com/gogf/gf/v2/net/ghttp"
+	"sync/atomic"
+)
+
+var insInstance = Instance{}
+
 type Instance struct {
 	ServerId    *uint64      `json:"serverId"`
 	ConnManager *ConnManager `json:"connMgr"`
@@ -8,11 +16,34 @@ type Instance struct {
 	Stat        *Statistics  `json:"stats"`
 }
 
-func New() *Instance {
-	return &Instance{}
+func Socket(id *uint64, cfg *Config) *Instance {
+	// InitStats
+	insInstance.Stat = Stats()
+	// InitConnMgr
+	insInstance.ConnManager = InitConnMgr(cfg)
+	// InitMerger
+	insInstance.Merge = InitMerger(cfg)
+	// serverId
+	insInstance.ServerId = id
+	// config
+	insInstance.Cfg = cfg
+
+	return &insInstance
 }
 
 func (i *Instance) GetInstance() *Instance {
+	return i
+}
+
+func (i *Instance) Connection(ctx context.Context, wsSocket *ghttp.WebSocket, list *map[string]Service) *Instance {
+	conn := InitConnection(ctx, atomic.AddUint64(i.Sid(), 1),
+		wsSocket, i.Config().HeartbeatInterval,
+		i.Config().InChannelSize,
+		i.Config().OutChannelSize,
+	)
+	// 连接加入管理器, 可以推送端查找到
+	i.ConnMgr().AddConn(conn)
+	conn.RouterHandle(ctx, i, list)
 	return i
 }
 
