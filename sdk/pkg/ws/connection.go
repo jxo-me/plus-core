@@ -10,6 +10,7 @@ import (
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/gorilla/websocket"
+	"net/http"
 	"sync"
 	"time"
 )
@@ -111,13 +112,13 @@ func (conn *Connection) SendMessage(message *Message) (err error) {
 	select {
 	case conn.outChan <- message:
 		// 统计计数
-		Stats().SendMessageTotalIncr()
+		GetStats().SendMessageTotalIncr()
 	case <-conn.closeChan:
 		err = ErrConnectionLoss
 	default: // 写操作不会阻塞, 因为channel已经预留给websocket一定的缓冲空间
 		err = ErrSendMessageFull
 		// 统计计数
-		Stats().SendMessageFailIncr()
+		GetStats().SendMessageFailIncr()
 	}
 	return
 }
@@ -343,7 +344,7 @@ func (conn *Connection) RouterHandle(ctx context.Context, ins *Instance, routers
 			res, err = conn.dispatcher(ctx, req, routers)
 		}
 		if err != nil {
-			resp = &Response{Code: 500, Message: err.Error(), Body: NullResp{}}
+			resp = &Response{Code: http.StatusInternalServerError, Message: err.Error(), Body: NullResp{}}
 		} else {
 			resp = &Response{Code: 0, Message: "ok", Body: res}
 		}
@@ -365,18 +366,18 @@ ERR:
 	conn.Close(ctx)
 
 	// 离开所有房间
-	conn.leaveAll(ins.ConnMgr(), ctx)
+	conn.leaveAll(ins.ConnManager, ctx)
 
 	// 从连接池中移除
-	ins.ConnMgr().DelConn(conn)
+	ins.ConnManager.DelConn(conn)
 	return
 }
 
-func (conn *Connection) dispatcher(ctx context.Context, msg *MessageReq, list *map[string]Service) (*MessageRes, error) {
+func (conn *Connection) dispatcher(ctx context.Context, msg *MessageReq, routers *map[string]Service) (*MessageRes, error) {
 	var res = &MessageRes{}
 	var err error
 	// action = join or leave ?
-	if s, y := (*list)[msg.Service]; y {
+	if s, y := (*routers)[msg.Service]; y {
 		// validation
 		// before hook
 		if h, ok := s.(SrvBefore); ok {

@@ -34,7 +34,7 @@ func (bucket *Bucket) JoinRoom(roomId string, wsConn *Connection) (err error) {
 	if room, existed = bucket.rooms[roomId]; !existed {
 		room = InitRoom(roomId)
 		bucket.rooms[roomId] = room
-		Stats().RoomCountIncr()
+		GetStats().RoomCountIncr()
 	}
 	// 加入房间
 	err = room.Join(wsConn)
@@ -60,7 +60,7 @@ func (bucket *Bucket) LeaveRoom(roomId string, wsConn *Connection) (err error) {
 	// 房间为空, 则删除
 	if room.Count() == 0 {
 		delete(bucket.rooms, roomId)
-		Stats().RoomCountDesc()
+		GetStats().RoomCountDesc()
 	}
 	return
 }

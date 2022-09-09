@@ -93,7 +93,7 @@ func (worker *MergeWorker) mergeWorkerMain(config *Config) {
 	for {
 		select {
 		case context = <-worker.contextChan:
-			Stats().MergerPendingDesc()
+			GetStats().MergerPendingDesc()
 
 			isCreated = false
 			// 按房间合并
@@ -135,9 +135,9 @@ func (worker *MergeWorker) mergeWorkerMain(config *Config) {
 
 		// 打点统计
 		if worker.mergeType == PushTypeAll {
-			Stats().MergerAllTotalIncr(int64(len(batch.items)))
+			GetStats().MergerAllTotalIncr(int64(len(batch.items)))
 			if err != nil {
-				Stats().MergerAllFailIncr(int64(len(batch.items)))
+				GetStats().MergerAllFailIncr(int64(len(batch.items)))
 			}
 		}
 	}
@@ -163,7 +163,7 @@ func (worker *MergeWorker) pushAll(msg *json.RawMessage) (err error) {
 	}
 	select {
 	case worker.contextChan <- context:
-		Stats().MergerPendingIncr()
+		GetStats().MergerPendingIncr()
 	default:
 		err = ErrMergeChannelFull
 	}

@@ -88,7 +88,7 @@ func (connMgr *ConnManager) dispatchWorkerMain() {
 	for {
 		select {
 		case pushJob = <-connMgr.dispatchChan:
-			Stats().DispatchPendingDesc()
+			GetStats().DispatchPendingDesc()
 
 			// 序列化
 			if pushJob.wsMsg, err = EncodeWsMessage(pushJob.Msg); err != nil {
@@ -96,7 +96,7 @@ func (connMgr *ConnManager) dispatchWorkerMain() {
 			}
 			// 分发给所有Bucket, 若Bucket拥塞则等待
 			for bucketIdx = range connMgr.buckets {
-				Stats().PushJobPendingIncr()
+				GetStats().PushJobPendingIncr()
 				connMgr.jobChan[bucketIdx] <- pushJob
 			}
 		}
@@ -113,7 +113,7 @@ func (connMgr *ConnManager) jobWorkerMain(bucketIdx int) {
 	for {
 		select {
 		case pushJob = <-connMgr.jobChan[bucketIdx]: // 从Bucket的job queue取出一个任务
-			Stats().PushJobPendingDesc()
+			GetStats().PushJobPendingDesc()
 			if pushJob.pushType == PushTypeAll {
 				bucket.PushAll(pushJob.wsMsg)
 			}
@@ -139,7 +139,7 @@ func (connMgr *ConnManager) AddConn(wsConnection *Connection) {
 	bucket = connMgr.GetBucket(wsConnection)
 	bucket.AddConn(wsConnection)
 
-	Stats().OnlineConnectionsIncr()
+	GetStats().OnlineConnectionsIncr()
 }
 
 func (connMgr *ConnManager) DelConn(wsConnection *Connection) {
@@ -150,7 +150,7 @@ func (connMgr *ConnManager) DelConn(wsConnection *Connection) {
 	bucket = connMgr.GetBucket(wsConnection)
 	bucket.DelConn(wsConnection)
 
-	Stats().OnlineConnectionsDesc()
+	GetStats().OnlineConnectionsDesc()
 }
 
 func (connMgr *ConnManager) DelConnByCID(ctx context.Context, connId uint64) {
@@ -174,10 +174,10 @@ func (connMgr *ConnManager) PushAll(msg *MessageReq) (err error) {
 
 	select {
 	case connMgr.dispatchChan <- pushJob:
-		Stats().DispatchPendingIncr()
+		GetStats().DispatchPendingIncr()
 	default:
 		err = ErrDispatchChannelFull
-		Stats().DispatchFailIncr()
+		GetStats().DispatchFailIncr()
 	}
 	return
 }
@@ -194,9 +194,9 @@ func (connMgr *ConnManager) PushRoom(roomId string, items *MessageReq) (err erro
 
 	select {
 	case connMgr.dispatchChan <- pushJob:
-		Stats().DispatchTotalIncr(1)
+		GetStats().DispatchTotalIncr(1)
 	default:
-		Stats().DispatchFailNumIncr(1)
+		GetStats().DispatchFailNumIncr(1)
 		err = ErrDispatchChannelFull
 	}
 	return

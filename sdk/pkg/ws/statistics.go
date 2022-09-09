@@ -37,7 +37,7 @@ type Statistics struct {
 	MergerAllFail   int64 `json:"merger_all_fail"`
 }
 
-func Stats() *Statistics {
+func GetStats() *Statistics {
 	return &insStats
 }
 
