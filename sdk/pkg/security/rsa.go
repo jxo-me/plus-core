@@ -83,6 +83,10 @@ func NewRsaCipher(pubKey, priKey string) (*RsaCipher, error) {
 	return c, nil
 }
 
+func (a *RsaCipher) String() string {
+	return CryptoRSAName
+}
+
 func split(buf []byte, lim int) [][]byte {
 	//glog.Debug(context.Background(), "长度:", len(buf))
 	var chunk []byte
@@ -129,8 +133,8 @@ func (a *RsaCipher) Decrypt(cryptText string) (plainText []byte, err error) {
 		}
 		buffer.Write(decrypted)
 	}
-	//str := a.DecodeURIComponent(string(buffer.Bytes()))
-	return buffer.Bytes(), err
+	str := a.DecodeURIComponent(string(buffer.Bytes()))
+	return []byte(str), err
 }
 
 func (a *RsaCipher) EncodeURIComponent(str string) string {
