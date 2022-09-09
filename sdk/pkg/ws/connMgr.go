@@ -30,7 +30,7 @@ func ConnMgr() *ConnManager {
 	return &insConnManager
 }
 
-func InitConnMgr(config *Config) *ConnManager {
+func NewConnMgr(config *Config) *ConnManager {
 	var (
 		bucketIdx         int
 		jobWorkerIdx      int

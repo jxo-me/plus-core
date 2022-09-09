@@ -41,7 +41,7 @@ type Merger struct {
 	broadcastWorker *MergeWorker   // 广播合并
 }
 
-func InitMerger(config *Config) *Merger {
+func NewMerger(config *Config) *Merger {
 	insMerger := Merger{
 		roomWorkers: make([]*MergeWorker, config.MergerWorkerCount),
 	}

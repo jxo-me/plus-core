@@ -29,7 +29,7 @@ type Connection struct {
 	outChannelSize    int
 }
 
-func InitConnection(
+func NewConnection(
 	ctx context.Context, connId uint64,
 	wsSocket *ghttp.WebSocket,
 	heartbeat, inChannelSize, outChannelSize int,
@@ -291,7 +291,7 @@ func (conn *Connection) leaveAll(connMgr *ConnManager, ctx context.Context) {
 }
 
 // RouterHandle 处理websocket请求
-func (conn *Connection) RouterHandle(ctx context.Context, ins *Instance, list *map[string]Service) {
+func (conn *Connection) RouterHandle(ctx context.Context, ins *Instance, routers *map[string]Service) {
 	var (
 		message *Message
 		req     *MessageReq
@@ -340,7 +340,7 @@ func (conn *Connection) RouterHandle(ctx context.Context, ins *Instance, list *m
 		//case "leave":
 		//	res, err = conn.handleLeave(ins.ConnMgr(), req)
 		default:
-			res, err = conn.dispatcher(ctx, req, list)
+			res, err = conn.dispatcher(ctx, req, routers)
 		}
 		if err != nil {
 			resp = &Response{Code: 500, Message: err.Error(), Body: NullResp{}}

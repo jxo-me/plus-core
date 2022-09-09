@@ -16,13 +16,13 @@ type Instance struct {
 	Stat        *Statistics  `json:"stats"`
 }
 
-func Socket(id *uint64, cfg *Config) *Instance {
+func NewSocket(id *uint64, cfg *Config) *Instance {
 	// InitStats
 	insInstance.Stat = Stats()
 	// InitConnMgr
-	insInstance.ConnManager = InitConnMgr(cfg)
+	insInstance.ConnManager = NewConnMgr(cfg)
 	// InitMerger
-	insInstance.Merge = InitMerger(cfg)
+	insInstance.Merge = NewMerger(cfg)
 	// serverId
 	insInstance.ServerId = id
 	// config
@@ -35,15 +35,15 @@ func (i *Instance) GetInstance() *Instance {
 	return i
 }
 
-func (i *Instance) Connection(ctx context.Context, wsSocket *ghttp.WebSocket, list *map[string]Service) *Instance {
-	conn := InitConnection(ctx, atomic.AddUint64(i.Sid(), 1),
+func (i *Instance) Connection(ctx context.Context, wsSocket *ghttp.WebSocket, routers *map[string]Service) *Instance {
+	conn := NewConnection(ctx, atomic.AddUint64(i.Sid(), 1),
 		wsSocket, i.Config().HeartbeatInterval,
 		i.Config().InChannelSize,
 		i.Config().OutChannelSize,
 	)
 	// 连接加入管理器, 可以推送端查找到
 	i.ConnMgr().AddConn(conn)
-	conn.RouterHandle(ctx, i, list)
+	conn.RouterHandle(ctx, i, routers)
 	return i
 }
 
