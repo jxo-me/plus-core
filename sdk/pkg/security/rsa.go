@@ -33,6 +33,11 @@ type RsaCipherConfig struct {
 	PrivateKey string `yaml:"privateKey" json:"privateKey"`
 }
 
+type RsaCiphersConfig struct {
+	Client RsaCipherConfig `yaml:"client" json:"client"`
+	Server RsaCipherConfig `yaml:"server" json:"server"`
+}
+
 func NewRsaCipher(pubKey, priKey string) (*RsaCipher, error) {
 	c := &RsaCipher{
 		PubKey: fmt.Sprintf(RsaPublicKeyTpl, pubKey),
