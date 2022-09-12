@@ -7,53 +7,19 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"fmt"
 	"net/url"
 )
 
 const (
-	CryptoRSAName = "rsa"
+	CryptoRSAName   = "rsa"
+	RsaPublicKeyTpl = `-----BEGIN PUBLIC KEY-----
+%s
+-----END PUBLIC KEY-----`
+	RsaPrivateKeyTpl = `-----BEGIN RSA PRIVATE KEY-----
+%s
+-----END RSA PRIVATE KEY-----`
 )
-
-type RsaCiphers struct {
-	ClientCipher     *RsaCipher
-	ServerCipher     *RsaCipher
-	ClientPublicKey  string
-	ClientPrivateKey string
-	ServerPublicKey  string
-	ServerPrivateKey string
-}
-
-func NewRsaCiphers(serverPublicKey, serverPrivateKey, clientPublicKey, clientPrivateKey string) (*RsaCiphers, error) {
-	var err error
-	c := &RsaCiphers{
-		ServerPublicKey:  serverPublicKey,
-		ServerPrivateKey: serverPrivateKey,
-		ClientPublicKey:  clientPublicKey,
-		ClientPrivateKey: clientPrivateKey,
-	}
-	c.ClientCipher, err = NewRsaCipher(c.ClientPublicKey, c.ClientPrivateKey)
-	if err != nil {
-		return nil, err
-	}
-	c.ServerCipher, err = NewRsaCipher(c.ServerPublicKey, c.ServerPrivateKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return c, nil
-}
-
-func (a *RsaCiphers) String() string {
-	return CryptoRSAName
-}
-
-func (a *RsaCiphers) Encrypt(plainText string) (cryptText string, err error) {
-	return a.ServerCipher.Encrypt(plainText)
-}
-
-func (a *RsaCiphers) Decrypt(cryptText string) (plainText []byte, err error) {
-	return a.ClientCipher.Decrypt(cryptText)
-}
 
 type RsaCipher struct {
 	PubKey     string
@@ -62,10 +28,15 @@ type RsaCipher struct {
 	PrivateKey *rsa.PrivateKey
 }
 
+type RsaCipherConfig struct {
+	PublicKey  string `yaml:"publicKey" json:"publicKey"`
+	PrivateKey string `yaml:"privateKey" json:"privateKey"`
+}
+
 func NewRsaCipher(pubKey, priKey string) (*RsaCipher, error) {
 	c := &RsaCipher{
-		PubKey: pubKey,
-		PriKey: priKey,
+		PubKey: fmt.Sprintf(RsaPublicKeyTpl, pubKey),
+		PriKey: fmt.Sprintf(RsaPrivateKeyTpl, priKey),
 	}
 	// PublicKey
 	block, _ := pem.Decode([]byte(c.PubKey))

@@ -23,6 +23,11 @@ type AesCipher struct {
 	rCon  [][]int
 }
 
+type AesCipherConfig struct {
+	Key  string `json:"key" yaml:"key"`
+	Bits int    `json:"bits" yaml:"bits"`
+}
+
 type AesKeySizeError int
 
 func (k AesKeySizeError) Error() string {

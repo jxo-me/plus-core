@@ -18,8 +18,10 @@ const (
 )
 
 type Rc4Cipher struct {
-	Key string
+	Key string `json:"key" yaml:"key"`
 }
+
+type Rc4CipherConfig Rc4Cipher
 
 func NewRc4Cipher(key string) *Rc4Cipher {
 	return &Rc4Cipher{Key: key}
