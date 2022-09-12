@@ -4,7 +4,6 @@ import (
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/plus-core/sdk/pkg/response"
 	"net/http"
 )
@@ -12,8 +11,7 @@ import (
 // Response is the default middleware handling handler response object and its error.
 func Response(r *ghttp.Request) {
 	r.Middleware.Next()
-	ctx := r.GetCtx()
-	glog.Warning(ctx, "Response start ......")
+	//glog.Warning(r.GetCtx(), "Response start ......")
 	// There's custom buffer content, it then exits current handler.
 	if r.Response.BufferLength() > 0 {
 		return
@@ -44,6 +42,6 @@ func Response(r *ghttp.Request) {
 		code = gcode.CodeOK
 		msg = "ok"
 	}
-	glog.Warning(r.GetCtx(), "Response end ......")
+	//glog.Warning(r.GetCtx(), "Response end ......")
 	response.JsonExit(r, code.Code(), msg, res)
 }
