@@ -42,13 +42,14 @@ func (e *Settings) Init(ctx context.Context) {
 
 // Config 配置集合
 type Config struct {
-	Jwt    map[string]*Jwt `yaml:"jwt"`
-	Cache  *Cache          `yaml:"cache"`
-	Queue  *Queue          `yaml:"queue"`
-	Locker *Locker         `yaml:"locker"`
-	Extend interface{}     `yaml:"extend"`
-	Tus    tus.Config      `yaml:"tus"`
-	Ws     *ws.Config      `yaml:"ws"`
+	Jwt     map[string]*Jwt `yaml:"jwt"`
+	Cache   *Cache          `yaml:"cache"`
+	Queue   *Queue          `yaml:"queue"`
+	Locker  *Locker         `yaml:"locker"`
+	Extend  interface{}     `yaml:"extend"`
+	Tus     tus.Config      `yaml:"tus"`
+	Ws      *ws.Config      `yaml:"ws"`
+	Metrics *Metrics        `yaml:"metrics"`
 }
 
 // Bootstrap 载入启动配置文件

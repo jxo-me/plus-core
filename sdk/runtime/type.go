@@ -8,6 +8,7 @@ import (
 	"github.com/gogf/gf/v2/i18n/gi18n"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
+	metrics "github.com/jxo-me/gf-metrics"
 	"github.com/jxo-me/plus-core/sdk/config"
 	"github.com/jxo-me/plus-core/sdk/cron"
 	"github.com/jxo-me/plus-core/sdk/pkg/tus"
@@ -75,4 +76,6 @@ type Runtime interface {
 
 	SetTus(c *tus.Uploader)
 	Tus() *tus.Uploader
+	SetMetrics(m *metrics.Monitor)
+	Monitor() *metrics.Monitor
 }

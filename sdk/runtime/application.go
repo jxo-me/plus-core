@@ -10,6 +10,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/gf-metrics"
 	"github.com/jxo-me/plus-core/sdk/config"
 	"github.com/jxo-me/plus-core/sdk/cron"
 	"github.com/jxo-me/plus-core/sdk/pkg/tus"
@@ -38,6 +39,7 @@ type Application struct {
 	memoryService   task.MemoryService
 	queue           map[string]storage.AdapterQueue
 	tus             *tus.Uploader
+	monitor         *metrics.Monitor
 }
 
 // NewConfig 默认值
@@ -279,4 +281,12 @@ func (e *Application) GetLockerAdapter() storage.AdapterLocker {
 
 func (e *Application) GetLockerPrefix(key string) storage.AdapterLocker {
 	return NewLocker(key, e.locker)
+}
+
+func (e *Application) SetMetrics(m *metrics.Monitor) {
+	e.monitor = m
+}
+
+func (e *Application) Monitor() *metrics.Monitor {
+	return e.monitor
 }
