@@ -4,14 +4,14 @@ go 1.18
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
-	github.com/casbin/casbin/v2 v2.55.0
+	github.com/casbin/casbin/v2 v2.55.1
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/gogf/gf-jwt/v2 v2.0.1
 	github.com/gogf/gf/v2 v2.1.4
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/json-iterator/go v1.1.12
-	github.com/jxo-me/gf-metrics v0.1.1
+	github.com/jxo-me/gf-metrics v0.1.2
 	github.com/jxo-me/rabbitmq-go v1.0.1
 	github.com/jxo-me/redislock v1.0.0
 	github.com/mojocn/base64Captcha v1.3.5
