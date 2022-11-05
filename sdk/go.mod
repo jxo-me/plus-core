@@ -7,7 +7,7 @@ require (
 	github.com/casbin/casbin/v2 v2.56.0
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/gogf/gf-jwt/v2 v2.0.1
-	github.com/gogf/gf/v2 v2.2.1
+	github.com/gogf/gf/v2 v2.2.2
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/json-iterator/go v1.1.12
