@@ -11,6 +11,7 @@ import (
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/gf-metrics"
+	"github.com/jxo-me/gfbot"
 	"github.com/jxo-me/plus-core/sdk/config"
 	"github.com/jxo-me/plus-core/sdk/cron"
 	"github.com/jxo-me/plus-core/sdk/pkg/tus"
@@ -18,7 +19,6 @@ import (
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/storage/queue"
 	"github.com/jxo-me/plus-core/sdk/task"
-	"gopkg.in/telebot.v3"
 	"sync"
 )
 

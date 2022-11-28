@@ -9,13 +9,13 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	metrics "github.com/jxo-me/gf-metrics"
+	"github.com/jxo-me/gfbot"
 	"github.com/jxo-me/plus-core/sdk/config"
 	"github.com/jxo-me/plus-core/sdk/cron"
 	"github.com/jxo-me/plus-core/sdk/pkg/tus"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/task"
-	telebot "gopkg.in/telebot.v3"
 )
 
 type Runtime interface {
