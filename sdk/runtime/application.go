@@ -42,6 +42,7 @@ type Application struct {
 	tus             *tus.Uploader
 	monitor         *metrics.Monitor
 	bot             *telebot.Bot
+	botHook         *telebot.Hook
 }
 
 // NewConfig 默认值
@@ -299,4 +300,12 @@ func (e *Application) SetBot(b *telebot.Bot) {
 
 func (e *Application) Bot() *telebot.Bot {
 	return e.bot
+}
+
+func (e *Application) SetBotHook(b *telebot.Hook) {
+	e.botHook = b
+}
+
+func (e *Application) BotHook() *telebot.Hook {
+	return e.botHook
 }

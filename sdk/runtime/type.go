@@ -80,6 +80,8 @@ type Runtime interface {
 	SetMetrics(m *metrics.Monitor)
 	Monitor() *metrics.Monitor
 
+	SetBotHook(b *telebot.Hook)
+	BotHook() *telebot.Bot
 	SetBot(b *telebot.Bot)
 	Bot() *telebot.Bot
 }
