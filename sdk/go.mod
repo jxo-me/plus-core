@@ -21,6 +21,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/text v0.4.0
 	gopkg.in/Acconut/lockfile.v1 v1.1.0
+	gopkg.in/telebot.v3 v3.1.2
 )
 
 require (
@@ -41,9 +42,9 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/golang/mock v1.4.4 // indirect
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/golang/snappy v0.0.1 // indirect
+	github.com/golang/snappy v0.0.3 // indirect
 	github.com/grokify/html-strip-tags-go v0.0.1 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
@@ -51,7 +52,7 @@ require (
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
-	github.com/mattn/go-colorable v0.1.9 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mattn/goveralls v0.0.2 // indirect
@@ -79,9 +80,8 @@ require (
 	go.opentelemetry.io/otel v1.7.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.7.0 // indirect
 	go.opentelemetry.io/otel/trace v1.7.0 // indirect
-	go.uber.org/atomic v1.5.1 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b // indirect
-	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
 	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/tools v0.1.12 // indirect

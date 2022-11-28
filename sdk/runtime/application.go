@@ -18,6 +18,7 @@ import (
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/storage/queue"
 	"github.com/jxo-me/plus-core/sdk/task"
+	"gopkg.in/telebot.v3"
 	"sync"
 )
 
@@ -40,6 +41,7 @@ type Application struct {
 	queue           map[string]storage.AdapterQueue
 	tus             *tus.Uploader
 	monitor         *metrics.Monitor
+	bot             *telebot.Bot
 }
 
 // NewConfig 默认值
@@ -289,4 +291,12 @@ func (e *Application) SetMetrics(m *metrics.Monitor) {
 
 func (e *Application) Monitor() *metrics.Monitor {
 	return e.monitor
+}
+
+func (e *Application) SetBot(b *telebot.Bot) {
+	e.bot = b
+}
+
+func (e *Application) Bot() *telebot.Bot {
+	return e.bot
 }

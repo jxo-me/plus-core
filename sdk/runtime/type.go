@@ -15,6 +15,7 @@ import (
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
 	"github.com/jxo-me/plus-core/sdk/storage"
 	"github.com/jxo-me/plus-core/sdk/task"
+	telebot "gopkg.in/telebot.v3"
 )
 
 type Runtime interface {
@@ -78,4 +79,7 @@ type Runtime interface {
 	Tus() *tus.Uploader
 	SetMetrics(m *metrics.Monitor)
 	Monitor() *metrics.Monitor
+
+	SetBot(b *telebot.Bot)
+	Bot() *telebot.Bot
 }
