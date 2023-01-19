@@ -14,7 +14,7 @@ require (
 	github.com/jxo-me/gf-metrics v0.1.2
 	github.com/jxo-me/gfbot v0.1.6
 	github.com/jxo-me/rabbitmq-go v1.0.1
-	github.com/jxo-me/redislock v1.0.0
+	github.com/jxo-me/redislock v1.0.1
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/robinjoseph08/redisqueue/v2 v2.1.0
