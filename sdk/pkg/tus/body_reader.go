@@ -19,10 +19,9 @@ type bodyReader struct {
 	bytesCounter int64
 }
 
-func newBodyReader(r io.ReadCloser, maxSize int64) *bodyReader {
+func newBodyReader(r io.Reader) *bodyReader {
 	return &bodyReader{
-		reader: io.LimitReader(r, maxSize),
-		closer: r,
+		reader: r,
 	}
 }
 

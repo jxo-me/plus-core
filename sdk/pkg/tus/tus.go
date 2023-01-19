@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/glog"
+	"io"
 	"math"
 	"strconv"
 	"time"
@@ -121,7 +122,7 @@ func (h *Uploader) writeChunk(upload Upload, info FileInfo, r *ghttp.Request) er
 	// available in the case of a malicious request.
 	if r.Body != nil && maxSize > 0 {
 		// Limit the data read from the request's body to the allowed maximum
-		reader := newBodyReader(r.Body, maxSize)
+		reader := newBodyReader(io.LimitReader(r.Body, maxSize))
 
 		// We use a context object to allow the hook system to cancel an upload
 		uploadCtx, stopUpload := context.WithCancel(context.Background())

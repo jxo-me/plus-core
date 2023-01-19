@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -160,7 +161,7 @@ func TestConcatUploads(t *testing.T) {
 func TestDeclareLength(t *testing.T) {
 	a := assert.New(t)
 
-	tmp, err := ioutil.TempDir("", "tus-filestore-declare-length-")
+	tmp, err := os.MkdirTemp("", "tus-filestore-declare-length-")
 	a.NoError(err)
 
 	store := FileStore{tmp}
