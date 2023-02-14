@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
-	github.com/casbin/casbin/v2 v2.60.0
+	github.com/casbin/casbin/v2 v2.61.1
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/gogf/gf-jwt/v2 v2.0.1
 	github.com/gogf/gf/v2 v2.3.1
@@ -20,7 +20,7 @@ require (
 	github.com/robinjoseph08/redisqueue/v2 v2.1.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/stretchr/testify v1.8.1
-	golang.org/x/text v0.6.0
+	golang.org/x/text v0.7.0
 	gopkg.in/Acconut/lockfile.v1 v1.1.0
 )
 
