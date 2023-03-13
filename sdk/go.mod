@@ -4,10 +4,10 @@ go 1.18
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
-	github.com/casbin/casbin/v2 v2.63.0
+	github.com/casbin/casbin/v2 v2.65.2
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/gogf/gf-jwt/v2 v2.0.1
-	github.com/gogf/gf/v2 v2.3.2
+	github.com/gogf/gf/v2 v2.3.3
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/json-iterator/go v1.1.12
@@ -19,8 +19,8 @@ require (
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/robinjoseph08/redisqueue/v2 v2.1.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
-	github.com/stretchr/testify v1.8.1
-	golang.org/x/text v0.7.0
+	github.com/stretchr/testify v1.8.2
+	golang.org/x/text v0.8.0
 	gopkg.in/Acconut/lockfile.v1 v1.1.0
 )
 
@@ -81,9 +81,9 @@ require (
 	go.uber.org/atomic v1.5.1 // indirect
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
-	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
-	golang.org/x/sys v0.0.0-20220908164124-27713097b956 // indirect
-	golang.org/x/tools v0.1.12 // indirect
+	golang.org/x/net v0.6.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/tools v0.6.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/AlecAivazis/survey.v1 v1.8.5 // indirect
 	gopkg.in/kyokomi/emoji.v1 v1.5.1 // indirect
