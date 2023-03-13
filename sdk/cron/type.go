@@ -17,6 +17,10 @@ type JobSpec struct {
 
 type Adapter interface {
 	String() string
+	GetCron() *gcron.Cron
+	GetRawJobs() []Job
+	GetWorkers() map[string]*gcron.Entry
+
 	Start(context.Context)
 	AddJobs(...Job) Adapter
 	GetJobs() []*gcron.Entry
