@@ -42,7 +42,7 @@ type Application struct {
 	tus             *tus.Uploader
 	monitor         *metrics.Monitor
 	bot             map[string]*telebot.Bot
-	botHook         map[string]*telebot.Hook
+	botHook         map[string]telebot.Hook
 }
 
 // NewConfig 默认值
@@ -314,14 +314,14 @@ func (e *Application) Bots() map[string]*telebot.Bot {
 	return e.bot
 }
 
-func (e *Application) SetBotHook(key string, b *telebot.Hook) {
+func (e *Application) SetBotHook(key string, b telebot.Hook) {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 	e.botHook[key] = b
 }
 
 // BotHookKey 根据key获取BotHook
-func (e *Application) BotHookKey(moduleKey string) *telebot.Hook {
+func (e *Application) BotHookKey(moduleKey string) telebot.Hook {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 	if j, ok := e.botHook["*"]; ok {
@@ -330,6 +330,6 @@ func (e *Application) BotHookKey(moduleKey string) *telebot.Hook {
 	return e.botHook[moduleKey]
 }
 
-func (e *Application) BotHooks() map[string]*telebot.Hook {
+func (e *Application) BotHooks() map[string]telebot.Hook {
 	return e.botHook
 }
