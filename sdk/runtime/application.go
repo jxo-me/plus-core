@@ -51,6 +51,8 @@ func NewConfig() *Application {
 		casbins: make(map[string]*casbin.SyncedEnforcer),
 		jwt:     make(map[string]*jwt.GfJWTMiddleware),
 		queue:   make(map[string]storage.AdapterQueue),
+		bot:     make(map[string]*telebot.Bot),
+		botHook: make(map[string]telebot.Hook),
 	}
 }
 
