@@ -41,8 +41,8 @@ type Application struct {
 	queue           map[string]storage.AdapterQueue
 	tus             *tus.Uploader
 	monitor         *metrics.Monitor
-	bot             *telebot.Bot
-	botHook         telebot.Hook
+	bot             map[string]*telebot.Bot
+	botHook         map[string]*telebot.Hook
 }
 
 // NewConfig 默认值
@@ -294,18 +294,42 @@ func (e *Application) Monitor() *metrics.Monitor {
 	return e.monitor
 }
 
-func (e *Application) SetBot(b *telebot.Bot) {
-	e.bot = b
+func (e *Application) SetBot(key string, b *telebot.Bot) {
+	e.mux.Lock()
+	defer e.mux.Unlock()
+	e.bot[key] = b
 }
 
-func (e *Application) Bot() *telebot.Bot {
+// GetBotKey 根据key获取Bot
+func (e *Application) GetBotKey(moduleKey string) *telebot.Bot {
+	e.mux.Lock()
+	defer e.mux.Unlock()
+	if j, ok := e.bot["*"]; ok {
+		return j
+	}
+	return e.bot[moduleKey]
+}
+
+func (e *Application) Bots() map[string]*telebot.Bot {
 	return e.bot
 }
 
-func (e *Application) SetBotHook(b telebot.Hook) {
-	e.botHook = b
+func (e *Application) SetBotHook(key string, b *telebot.Hook) {
+	e.mux.Lock()
+	defer e.mux.Unlock()
+	e.botHook[key] = b
 }
 
-func (e *Application) BotHook() telebot.Hook {
+// BotHookKey 根据key获取BotHook
+func (e *Application) BotHookKey(moduleKey string) *telebot.Hook {
+	e.mux.Lock()
+	defer e.mux.Unlock()
+	if j, ok := e.botHook["*"]; ok {
+		return j
+	}
+	return e.botHook[moduleKey]
+}
+
+func (e *Application) BotHooks() map[string]*telebot.Hook {
 	return e.botHook
 }
