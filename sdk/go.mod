@@ -1,25 +1,25 @@
 module github.com/jxo-me/plus-core/sdk
 
-go 1.18
+go 1.20
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
-	github.com/casbin/casbin/v2 v2.68.0
+	github.com/casbin/casbin/v2 v2.69.1
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/gogf/gf-jwt/v2 v2.0.1
-	github.com/gogf/gf/v2 v2.4.0
+	github.com/gogf/gf/v2 v2.4.1
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.3
-	github.com/jxo-me/gfbot v0.1.7
+	github.com/jxo-me/gfbot v0.1.14
 	github.com/jxo-me/rabbitmq-go v1.0.2
 	github.com/jxo-me/redislock v1.0.1
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/robinjoseph08/redisqueue/v2 v2.1.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 	golang.org/x/text v0.9.0
 	gopkg.in/Acconut/lockfile.v1 v1.1.0
 )
