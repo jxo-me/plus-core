@@ -135,7 +135,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 	// exchange exchangeType routingKey
 	err = c.StartConsuming(ctx,
 		func(d rabbitmq.Delivery) rabbitmq.Action {
-			glog.Debug(ctx, "Delivery:", d)
+			//glog.Debug(ctx, "Delivery:", d)
 			m := new(Message)
 			m.SetValues(map[string]interface{}{
 				"body": string(d.Body),
