@@ -79,10 +79,7 @@ type Runtime interface {
 	Tus() *tus.Uploader
 	SetMetrics(m *metrics.Monitor)
 	Monitor() *metrics.Monitor
-
-	SetBotHook(key string, b telebot.Hook)
-	BotHooks() map[string]telebot.Hook
-	BotHookKey(moduleKey string) telebot.Hook
+	// SetBot bot
 	SetBot(key string, b *telebot.Bot)
 	Bots() map[string]*telebot.Bot
 	GetBotKey(moduleKey string) *telebot.Bot

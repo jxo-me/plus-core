@@ -42,7 +42,6 @@ type Application struct {
 	tus             *tus.Uploader
 	monitor         *metrics.Monitor
 	bot             map[string]*telebot.Bot
-	botHook         map[string]telebot.Hook
 }
 
 // NewConfig 默认值
@@ -52,7 +51,6 @@ func NewConfig() *Application {
 		jwt:     make(map[string]*jwt.GfJWTMiddleware),
 		queue:   make(map[string]storage.AdapterQueue),
 		bot:     make(map[string]*telebot.Bot),
-		botHook: make(map[string]telebot.Hook),
 	}
 }
 
@@ -314,24 +312,4 @@ func (e *Application) GetBotKey(moduleKey string) *telebot.Bot {
 
 func (e *Application) Bots() map[string]*telebot.Bot {
 	return e.bot
-}
-
-func (e *Application) SetBotHook(key string, b telebot.Hook) {
-	e.mux.Lock()
-	defer e.mux.Unlock()
-	e.botHook[key] = b
-}
-
-// BotHookKey 根据key获取BotHook
-func (e *Application) BotHookKey(moduleKey string) telebot.Hook {
-	e.mux.Lock()
-	defer e.mux.Unlock()
-	if j, ok := e.botHook["*"]; ok {
-		return j
-	}
-	return e.botHook[moduleKey]
-}
-
-func (e *Application) BotHooks() map[string]telebot.Hook {
-	return e.botHook
 }
