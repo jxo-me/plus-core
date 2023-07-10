@@ -82,7 +82,9 @@ type RabbitMqSpec struct {
 
 func (r *RabbitMqSpec) GetRoutingKeys() []string {
 	r.RoutingKeys = make([]string, 0)
-	r.RoutingKeys = append(r.RoutingKeys, r.RoutingKey)
+	if r.RoutingKey != "" {
+		r.RoutingKeys = append(r.RoutingKeys, r.RoutingKey)
+	}
 	for _, subHandler := range r.SubTasks {
 		r.RoutingKeys = append(r.RoutingKeys, subHandler.RoutingKey())
 	}
