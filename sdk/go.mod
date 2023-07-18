@@ -4,14 +4,13 @@ go 1.20
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
-	github.com/casbin/casbin/v2 v2.71.1
+	github.com/casbin/casbin/v2 v2.72.1
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/gogf/gf-jwt/v2 v2.1.0
-	github.com/gogf/gf/v2 v2.4.4
+	github.com/gogf/gf/v2 v2.5.0
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/json-iterator/go v1.1.12
-	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
 	github.com/jxo-me/rabbitmq-go v1.0.3
 	github.com/jxo-me/redislock v1.0.1
@@ -62,15 +61,15 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/prometheus/client_golang v1.16.0 // indirect
+	github.com/prometheus/client_golang v1.1.0 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
-	github.com/prometheus/common v0.42.0 // indirect
+	github.com/prometheus/common v0.6.0 // indirect
 	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/rabbitmq/amqp091-go v1.8.1 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.4.0 // indirect
 	github.com/stathat/consistent v1.0.0 // indirect
-	github.com/tidwall/gjson v1.13.0 // indirect
+	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tsuyoshiwada/go-gitcmd v0.0.0-20180205145712-5f1f5f9475df // indirect
@@ -79,8 +78,8 @@ require (
 	go.opentelemetry.io/otel/sdk v1.7.0 // indirect
 	go.opentelemetry.io/otel/trace v1.7.0 // indirect
 	go.uber.org/atomic v1.5.1 // indirect
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
-	golang.org/x/image v0.0.0-20190501045829-6d32002ffd75 // indirect
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
+	golang.org/x/image v0.1.0 // indirect
 	golang.org/x/lint v0.0.0-20190930215403-16217165b5de // indirect
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
