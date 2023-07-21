@@ -4,12 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/gogf/gf/v2/i18n/gi18n"
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/xuri/excelize/v2"
+	"golang.org/x/text/language"
 	"math"
 	"reflect"
 	"strings"
+	"sync/atomic"
 )
 
 const (
@@ -17,6 +20,7 @@ const (
 	DefaultDescTag   = "description"
 	DefaultPageSize  = 5000
 	DefaultSheetSize = 100000
+	DefaultLimitSize = 100000
 	DefaultSheetName = "Sheet"
 )
 
@@ -27,6 +31,9 @@ type HeaderFunc func(ctx context.Context, excel *excelize.File) ([]interface{}, 
 type TotalFunc func(ctx context.Context) (int, error)
 type ListFunc func(ctx context.Context, page, pageSize int) ([]interface{}, error)
 type RawFunc func(ctx context.Context) (any, error)
+type FinishFunc func(ctx context.Context) error
+type ErrorFunc func(ctx context.Context, err error) error
+type LangFunc func(ctx context.Context, key string) string
 type RawStruct struct {
 	FieldList   []string
 	HeaderCols  []interface{}
@@ -38,6 +45,7 @@ type ExportOptions struct {
 	FileName       string
 	PageSize       int
 	SheetSize      int
+	LimitSize      int
 	SheetPrefix    string
 	TagName        string
 	DescTag        string
@@ -50,6 +58,9 @@ type ExportOptions struct {
 	ListFunc       ListFunc
 	SummaryFunc    RawFunc
 	ParamsFunc     RawFunc
+	FinishFunc     FinishFunc
+	ErrorFunc      ErrorFunc
+	i18n           *gi18n.Manager
 }
 
 func getDefaultExportOptions() ExportOptions {
@@ -58,6 +69,7 @@ func getDefaultExportOptions() ExportOptions {
 		PageSize:    DefaultPageSize,
 		SheetSize:   DefaultSheetSize,
 		SheetPrefix: DefaultSheetName,
+		LimitSize:   DefaultLimitSize,
 	}
 }
 func WithExportOptionsFileName(fileName string) func(*ExportOptions) {
@@ -93,6 +105,11 @@ func WithExportOptionsPageSize(pageSize int) func(*ExportOptions) {
 func WithExportOptionsSheetSize(sheetSize int) func(*ExportOptions) {
 	return func(options *ExportOptions) {
 		options.SheetSize = sheetSize
+	}
+}
+func WithExportOptionsLimitSize(limit int) func(*ExportOptions) {
+	return func(options *ExportOptions) {
+		options.LimitSize = limit
 	}
 }
 func WithExportOptionsFieldFunc(f FieldFunc) func(*ExportOptions) {
@@ -135,8 +152,24 @@ func WithExportOptionsParamsFunc(f RawFunc) func(*ExportOptions) {
 		options.ParamsFunc = f
 	}
 }
+func WithExportOptionsFinishFunc(f FinishFunc) func(*ExportOptions) {
+	return func(options *ExportOptions) {
+		options.FinishFunc = f
+	}
+}
+func WithExportOptionsErrorFunc(f ErrorFunc) func(*ExportOptions) {
+	return func(options *ExportOptions) {
+		options.ErrorFunc = f
+	}
+}
+func WithExportOptionsI18n(i18n *gi18n.Manager) func(*ExportOptions) {
+	return func(options *ExportOptions) {
+		options.i18n = i18n
+	}
+}
 
 type Export struct {
+	ctx          context.Context
 	excel        *excelize.File
 	streamWriter *excelize.StreamWriter
 	options      *ExportOptions
@@ -150,9 +183,10 @@ type Export struct {
 	pageTotal    int
 	sheetTotal   int
 	bodyStyleId  int
+	count        int32
 }
 
-func NewExport(ctx context.Context, optionFuncs ...func(*ExportOptions)) *Export {
+func NewExport(ctx context.Context, lang string, optionFuncs ...func(*ExportOptions)) *Export {
 	defaultOptions := getDefaultExportOptions()
 	options := &defaultOptions
 	for _, optionFunc := range optionFuncs {
@@ -169,19 +203,43 @@ func NewExport(ctx context.Context, optionFuncs ...func(*ExportOptions)) *Export
 	if options.DescTag == "" {
 		options.DescTag = DefaultDescTag
 	}
+	// 语言
+	var preferred []language.Tag
+	if lang != "" {
+		var err error
+		preferred, _, err = language.ParseAcceptLanguage(lang)
+		if err != nil {
+			// err
+			lang = "zh"
+		}
+	}
+	if preferred == nil {
+		lang = "zh"
+	}
+	matcher := language.NewMatcher([]language.Tag{
+		language.English,           // 英语
+		language.Chinese,           // 中文
+		language.SimplifiedChinese, // 简体中文
+		language.Malay,             // 马来西亚语 Malay
+	})
+	code, _, _ := matcher.Match(preferred...)
+	base, _ := code.Base()
+	lang = base.String()
+	ctx = gi18n.WithLanguage(ctx, lang)
+
 	return &Export{
+		ctx:     ctx,
 		options: options,
 	}
 }
 
-func DefaultStatusFunc(fieldList []string, translateMap map[string]string) (statusEnums map[string]map[string]string) {
+func DefaultStatusFunc(ctx context.Context, l LangFunc, fieldList []string, translateMap map[string]string) (statusEnums map[string]map[string]string) {
 	statusEnums = make(map[string]map[string]string)
 	for _, key := range fieldList {
 		value := translateMap[key]
 		// 解析枚举参数
 		if strings.Contains(value, ":") {
 			list := strings.Split(value, ":")
-			value = list[0]
 			if len(list) == 2 {
 				eList := strings.Split(list[1], ",")
 				for _, s := range eList {
@@ -190,7 +248,7 @@ func DefaultStatusFunc(fieldList []string, translateMap map[string]string) (stat
 						if statusEnums[key] == nil {
 							statusEnums[key] = make(map[string]string)
 						}
-						statusEnums[key][vList[0]] = vList[1]
+						statusEnums[key][vList[0]] = l(ctx, vList[1])
 					}
 				}
 			}
@@ -199,7 +257,7 @@ func DefaultStatusFunc(fieldList []string, translateMap map[string]string) (stat
 	return statusEnums
 }
 
-func DefaultHeaderFunc(ctx context.Context, excel *excelize.File, fieldList []string, translateMap map[string]string) (headerCols []interface{}, err error) {
+func DefaultHeaderFunc(ctx context.Context, l LangFunc, excel *excelize.File, fieldList []string, translateMap map[string]string) (headerCols []interface{}, err error) {
 	styleID, err := excel.NewStyle(&excelize.Style{
 		Font:      &excelize.Font{Bold: true, Family: "宋体", Size: 11},
 		Alignment: &excelize.Alignment{Horizontal: "center", Vertical: "center"},
@@ -215,7 +273,7 @@ func DefaultHeaderFunc(ctx context.Context, excel *excelize.File, fieldList []st
 			list := strings.Split(value, ":")
 			value = list[0]
 		}
-		col := excelize.Cell{Value: value, StyleID: styleID}
+		col := excelize.Cell{Value: l(ctx, value), StyleID: styleID}
 		headerCols = append(headerCols, col)
 	}
 	return headerCols, nil
@@ -268,13 +326,13 @@ func (e *Export) before(ctx context.Context) (err error) {
 	if e.options.StatusFunc != nil {
 		e.statusEnums = e.options.StatusFunc(ctx)
 	} else {
-		e.statusEnums = DefaultStatusFunc(e.fieldList, e.translates)
+		e.statusEnums = DefaultStatusFunc(ctx, e.lang, e.fieldList, e.translates)
 	}
 	// 4. 表头构建
 	if e.options.HeaderFunc != nil {
 		e.headerCols, err = e.options.HeaderFunc(ctx, e.excel)
 	} else {
-		e.headerCols, err = DefaultHeaderFunc(ctx, e.excel, e.fieldList, e.translates)
+		e.headerCols, err = DefaultHeaderFunc(ctx, e.lang, e.excel, e.fieldList, e.translates)
 	}
 	// 3. Set table body style
 	e.bodyStyleId, err = e.excel.NewStyle(&excelize.Style{
@@ -357,8 +415,8 @@ func (e *Export) preProcessor(ctx context.Context, ptr any) (r *RawStruct, err e
 		fieldList = append(fieldList, key)
 	}
 	translateMap := GetTagsMap(ptr, e.options.TagName, e.options.DescTag)
-	statusEnums := DefaultStatusFunc(fieldList, translateMap)
-	headerCols, err := DefaultHeaderFunc(ctx, e.excel, fieldList, translateMap)
+	statusEnums := DefaultStatusFunc(ctx, e.lang, fieldList, translateMap)
+	headerCols, err := DefaultHeaderFunc(ctx, e.lang, e.excel, fieldList, translateMap)
 	if err != nil {
 		return nil, err
 	}
@@ -412,6 +470,11 @@ func (e *Export) processor(ctx context.Context) (err error) {
 			if err != nil {
 				return err
 			}
+			if e.count >= int32(e.options.LimitSize) {
+				glog.Warning(ctx, "export excel LimitSize:", e.options.LimitSize, "current count:", e.total)
+				break
+			}
+
 			glog.Info(ctx, fmt.Sprintf("export excel filename: %s, total row: %d, sheetName: %s, current page: %d, Query list len: %d, current query: %d, current offset: %d success", e.options.FileName, e.total, sheetName, e.page, len(list), s, e.offset))
 		}
 		// 4. Flush
@@ -467,6 +530,15 @@ func (e *Export) processor(ctx context.Context) (err error) {
 	// 5. Save
 	if err = e.excel.SaveAs(e.options.FileName); err != nil {
 		glog.Warning(ctx, "export excel SaveAs error:", err.Error())
+		return err
+	}
+	// 6. Finish
+	if e.options.FinishFunc != nil {
+		err = e.options.FinishFunc(ctx)
+		if err != nil {
+			glog.Warning(ctx, "export excel FinishFunc error:", err.Error())
+			return err
+		}
 	}
 	return nil
 }
@@ -494,6 +566,7 @@ func (e *Export) exportList(ctx context.Context, list []any) error {
 			glog.Warning(ctx, "export excel body SetRow error:", err.Error())
 			return err
 		}
+		atomic.AddInt32(&e.count, 1)
 	}
 	return nil
 }
@@ -502,25 +575,45 @@ func (e *Export) after(ctx context.Context) (err error) {
 	// 5. Close
 	if err = e.excel.Close(); err != nil {
 		glog.Warning(ctx, "export excel Close error:", err.Error())
-	}
-	return err
-}
-
-func (e *Export) Run(ctx context.Context) (err error) {
-	err = e.before(ctx)
-	if err != nil {
 		return err
 	}
-	err = e.processor(ctx)
+	return nil
+}
+func (e *Export) lang(ctx context.Context, key string) string {
+	if e.options.i18n != nil {
+		return e.options.i18n.Translate(ctx, key)
+	}
+	return key
+}
+
+func (e *Export) Run() (err error) {
+	err = e.before(e.ctx)
+	if err != nil {
+		if e.options.ErrorFunc != nil {
+			return e.options.ErrorFunc(e.ctx, err)
+		}
+		return err
+	}
+	err = e.processor(e.ctx)
+	if err != nil {
+		if e.options.ErrorFunc != nil {
+			return e.options.ErrorFunc(e.ctx, err)
+		}
+		return err
+	}
 	defer func() {
-		err = e.after(ctx)
+		err = e.after(e.ctx)
 		if err != nil {
-			glog.Warning(ctx, "export excel after error:", err.Error())
+			if e.options.ErrorFunc != nil {
+				_ = e.options.ErrorFunc(e.ctx, err)
+			} else {
+				glog.Warning(e.ctx, "export excel after error:", err.Error())
+			}
 			return
 		}
 	}()
 
-	return err
+	return nil
 }
 
 // GetNonEmptyFields returns a map of non-empty fields of a struct
