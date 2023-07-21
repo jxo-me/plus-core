@@ -130,7 +130,7 @@ func WithExportOptionsSummaryFunc(f RawFunc) func(*ExportOptions) {
 		options.SummaryFunc = f
 	}
 }
-func withExportOptionsParamsFunc(f RawFunc) func(*ExportOptions) {
+func WithExportOptionsParamsFunc(f RawFunc) func(*ExportOptions) {
 	return func(options *ExportOptions) {
 		options.ParamsFunc = f
 	}
