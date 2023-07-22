@@ -406,19 +406,39 @@ func (e *Export) processorRaw(ctx context.Context, name string, r *RawStruct) (e
 		return err
 	}
 	if r.Obj != nil {
-		BodyRow := make([]interface{}, 0)
-		mapObj := gconv.Map(r.Obj)
-		for _, v := range r.FieldList {
-			col := excelize.Cell{StyleID: e.bodyStyleId, Value: mapObj[v]}
-			if r.StatusEnums[v] != nil {
-				col.Value = r.StatusEnums[v][gconv.String(mapObj[v])]
-			}
-			BodyRow = append(BodyRow, col)
-		}
+		if IsSlice(r.Obj) {
+			list := gconv.SliceAny(r.Obj)
+			for _, item := range list {
+				BodyRow := make([]interface{}, 0)
+				mapObj := gconv.Map(item)
+				for _, v := range r.FieldList {
+					col := excelize.Cell{StyleID: e.bodyStyleId, Value: mapObj[v]}
+					if r.StatusEnums[v] != nil {
+						col.Value = r.StatusEnums[v][gconv.String(mapObj[v])]
+					}
+					BodyRow = append(BodyRow, col)
+				}
 
-		if err = e.streamWriter.SetRow(cell, BodyRow); err != nil {
-			glog.Warning(ctx, "export excel processorRaw body SetRow error:", err.Error())
-			return err
+				if err = e.streamWriter.SetRow(cell, BodyRow); err != nil {
+					glog.Warning(ctx, "export excel processorRaw body SetRow error:", err.Error())
+					return err
+				}
+			}
+		} else {
+			BodyRow := make([]interface{}, 0)
+			mapObj := gconv.Map(r.Obj)
+			for _, v := range r.FieldList {
+				col := excelize.Cell{StyleID: e.bodyStyleId, Value: mapObj[v]}
+				if r.StatusEnums[v] != nil {
+					col.Value = r.StatusEnums[v][gconv.String(mapObj[v])]
+				}
+				BodyRow = append(BodyRow, col)
+			}
+
+			if err = e.streamWriter.SetRow(cell, BodyRow); err != nil {
+				glog.Warning(ctx, "export excel processorRaw body SetRow error:", err.Error())
+				return err
+			}
 		}
 	}
 
@@ -523,6 +543,7 @@ func (e *Export) processor(ctx context.Context) (err error) {
 	}
 	// 6. Summary
 	if e.options.SummaryFunc != nil {
+		// 只能是*struct,*[]slice
 		summaryPtr, err := e.options.SummaryFunc(ctx)
 		if err != nil {
 			glog.Warning(ctx, "export excel SummaryFunc error:", err.Error())
@@ -669,17 +690,45 @@ func (e *Export) Run() (err error) {
 	return nil
 }
 
+// IsEmpty returns true if the given value is empty
+func isEmpty(value reflect.Value) bool {
+	zero := reflect.Zero(value.Type())
+	return reflect.DeepEqual(value.Interface(), zero.Interface())
+}
+
 // GetNonEmptyFields returns a map of non-empty fields of a struct
 func GetNonEmptyFields(obj interface{}, tagName string) (map[string]any, error) {
 	t := reflect.TypeOf(obj)
-	if t.Kind() != reflect.Ptr || t.Elem().Kind() != reflect.Struct {
-		return nil, fmt.Errorf("obj must be a pointer to a struct")
+	v := reflect.ValueOf(obj)
+	if t.Kind() != reflect.Struct && (t.Kind() == reflect.Ptr && (t.Elem().Kind() != reflect.Struct && t.Elem().Kind() != reflect.Slice)) {
+		return nil, fmt.Errorf("obj must be a struct or a pointer to a struct")
 	}
 
 	nonEmptyFields := make(map[string]any)
-	v := reflect.ValueOf(obj).Elem()
-	for i := 0; i < t.Elem().NumField(); i++ {
-		field := t.Elem().Field(i)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	if v.Kind() == reflect.Slice {
+		if v.Len() <= 0 {
+			return nil, fmt.Errorf("obj must be a slice len than 0")
+		}
+		// 获取切片元素的反射值
+		v = v.Index(0)
+		t = v.Type()
+		if v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Struct {
+			// 获取结构体的类型
+			t = v.Elem().Type()
+			v = v.Elem()
+		}
+		if t.Kind() != reflect.Struct {
+			return nil, fmt.Errorf("obj must be a slice of struct")
+		}
+	}
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
 		tag := field.Tag.Get(tagName)
 		if tag != "" && tag != "-" {
 			value := v.Field(i)
@@ -688,14 +737,7 @@ func GetNonEmptyFields(obj interface{}, tagName string) (map[string]any, error) 
 			}
 		}
 	}
-
 	return nonEmptyFields, nil
-}
-
-// IsEmpty returns true if the given value is empty
-func isEmpty(value reflect.Value) bool {
-	zero := reflect.Zero(value.Type())
-	return reflect.DeepEqual(value.Interface(), zero.Interface())
 }
 
 // GetTags returns a slice of any tags of a struct
@@ -723,13 +765,33 @@ func GetTags(obj any, tagName string) []string {
 // GetTagsMap returns a map of any tags of a struct
 func GetTagsMap(obj any, tagName, vTagName string) map[string]string {
 	t := reflect.TypeOf(obj)
-	if t == nil || (t.Kind() == reflect.Ptr && t.Elem().Kind() != reflect.Struct) && t.Kind() != reflect.Struct {
+	v := reflect.ValueOf(obj)
+	if t.Kind() != reflect.Struct && (t.Kind() == reflect.Ptr && (t.Elem().Kind() != reflect.Struct && t.Elem().Kind() != reflect.Slice)) {
 		return nil
 	}
 
 	tagsValue := make(map[string]string, 0)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
+	}
+	if v.Kind() == reflect.Slice {
+		if v.Len() <= 0 {
+			return nil
+		}
+		// 获取切片元素的反射值
+		v = v.Index(0)
+		t = v.Type()
+		if v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Struct {
+			// 获取结构体的类型
+			t = v.Elem().Type()
+			v = v.Elem()
+		}
+		if t.Kind() != reflect.Struct {
+			return nil
+		}
 	}
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
@@ -749,6 +811,20 @@ func InSlice(needle string, haystack []string) bool {
 		if item == needle {
 			return true
 		}
+	}
+	return false
+}
+
+func IsSlice(obj any) bool {
+	t := reflect.TypeOf(obj)
+	if t == nil {
+		return false
+	}
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	if t.Kind() == reflect.Slice {
+		return true
 	}
 	return false
 }
