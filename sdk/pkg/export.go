@@ -9,6 +9,9 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/xuri/excelize/v2"
 	"golang.org/x/text/language"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"math"
 	"reflect"
 	"strings"
@@ -34,12 +37,15 @@ type RawFunc func(ctx context.Context) (any, error)
 type FinishFunc func(ctx context.Context) error
 type ErrorFunc func(ctx context.Context, err error) error
 type LangFunc func(ctx context.Context, key string) string
+type PictureFunc func(ctx context.Context, url string) string
 type RawStruct struct {
 	FieldList   []string
 	HeaderCols  []interface{}
 	StatusEnums map[string]map[string]string
 	Obj         any
 }
+
+type GraphicOptions excelize.GraphicOptions
 
 type ExportOptions struct {
 	FileName       string
@@ -49,6 +55,7 @@ type ExportOptions struct {
 	SheetPrefix    string
 	TagName        string
 	DescTag        string
+	PictureKeys    []string
 	RespItemStruct any
 	FieldFunc      FieldFunc
 	TranslateFunc  TranslateFunc
@@ -60,7 +67,9 @@ type ExportOptions struct {
 	ParamsFunc     RawFunc
 	FinishFunc     FinishFunc
 	ErrorFunc      ErrorFunc
+	PictureFunc    PictureFunc
 	i18n           *gi18n.Manager
+	GraphicOptions *GraphicOptions
 }
 
 func getDefaultExportOptions() ExportOptions {
@@ -90,6 +99,11 @@ func WithExportOptionsDescTag(tag string) func(*ExportOptions) {
 func WithExportOptionsTagName(tag string) func(*ExportOptions) {
 	return func(options *ExportOptions) {
 		options.TagName = tag
+	}
+}
+func WithExportOptionsPictureKeys(keys []string) func(*ExportOptions) {
+	return func(options *ExportOptions) {
+		options.PictureKeys = keys
 	}
 }
 func WithExportOptionsRespItemStruct(obj any) func(*ExportOptions) {
@@ -167,6 +181,16 @@ func WithExportOptionsI18n(i18n *gi18n.Manager) func(*ExportOptions) {
 		options.i18n = i18n
 	}
 }
+func WithExportOptionsPictureFunc(f PictureFunc) func(*ExportOptions) {
+	return func(options *ExportOptions) {
+		options.PictureFunc = f
+	}
+}
+func WithExportOptionsGraphicOptions(g *GraphicOptions) func(*ExportOptions) {
+	return func(options *ExportOptions) {
+		options.GraphicOptions = g
+	}
+}
 
 type Export struct {
 	ctx          context.Context
@@ -174,6 +198,7 @@ type Export struct {
 	streamWriter *excelize.StreamWriter
 	options      *ExportOptions
 	fieldList    []string
+	pictureMap   map[string]string
 	statusEnums  map[string]map[string]string
 	translates   map[string]string
 	headerCols   []interface{}
@@ -459,6 +484,7 @@ func (e *Export) processor(ctx context.Context) (err error) {
 		}
 		// 3. Write Body Data
 		maxPage := int(math.Ceil(float64(e.pageTotal) / float64(e.sheetTotal)))
+		e.pictureMap = make(map[string]string)
 		for s := 1; s <= maxPage && e.page < e.pageTotal; s++ {
 			e.page++
 			// 分页查询
@@ -477,13 +503,25 @@ func (e *Export) processor(ctx context.Context) (err error) {
 
 			glog.Info(ctx, fmt.Sprintf("export excel filename: %s, total row: %d, sheetName: %s, current page: %d, Query list len: %d, current query: %d, current offset: %d success", e.options.FileName, e.total, sheetName, e.page, len(list), s, e.offset))
 		}
-		// 4. Flush
+		// 4. Set Picture
+		for col, val := range e.pictureMap {
+			graphicOptions := excelize.GraphicOptions{}
+			if e.options.GraphicOptions != nil {
+				graphicOptions = excelize.GraphicOptions(*e.options.GraphicOptions)
+			}
+			err = e.excel.AddPicture(sheetName, col, val, &graphicOptions)
+			if err != nil {
+				glog.Warning(ctx, "export excel AddPicture error:", err.Error())
+				return err
+			}
+		}
+		// 5. Flush
 		if err = e.streamWriter.Flush(); err != nil {
 			glog.Warning(ctx, "export excel Flush error:", err.Error())
 			return err
 		}
 	}
-	// 5. Summary
+	// 6. Summary
 	if e.options.SummaryFunc != nil {
 		summaryPtr, err := e.options.SummaryFunc(ctx)
 		if err != nil {
@@ -501,7 +539,7 @@ func (e *Export) processor(ctx context.Context) (err error) {
 			return err
 		}
 	}
-	// 6. Params
+	// 7. Params
 	if e.options.ParamsFunc != nil {
 		paramsPtr, err := e.options.ParamsFunc(ctx)
 		if err != nil {
@@ -527,12 +565,14 @@ func (e *Export) processor(ctx context.Context) (err error) {
 			return err
 		}
 	}
-	// 5. Save
+	// Set first sheet active
+	e.excel.SetActiveSheet(0)
+	// 8. Save
 	if err = e.excel.SaveAs(e.options.FileName); err != nil {
 		glog.Warning(ctx, "export excel SaveAs error:", err.Error())
 		return err
 	}
-	// 6. Finish
+	// 9. Finish
 	if e.options.FinishFunc != nil {
 		err = e.options.FinishFunc(ctx)
 		if err != nil {
@@ -554,10 +594,23 @@ func (e *Export) exportList(ctx context.Context, list []any) error {
 		}
 		BodyRow := make([]interface{}, 0)
 		mapObj := gconv.Map(item)
-		for _, v := range e.fieldList {
+
+		for k, v := range e.fieldList {
 			col := excelize.Cell{StyleID: e.bodyStyleId, Value: mapObj[v]}
 			if e.statusEnums[v] != nil {
+				// 状态翻译
 				col.Value = e.statusEnums[v][gconv.String(mapObj[v])]
+			}
+			// 图片处理
+			if e.options.PictureFunc != nil && InSlice(v, e.options.PictureKeys) {
+				imgPath := e.options.PictureFunc(ctx, gconv.String(mapObj[v]))
+				colName, err := excelize.CoordinatesToCellName(k+1, e.offset)
+				if err != nil {
+					glog.Warning(ctx, "export excel CoordinatesToCellName error:", err.Error())
+					return err
+				}
+				e.pictureMap[colName] = imgPath
+				col.Value = ""
 			}
 			BodyRow = append(BodyRow, col)
 		}
@@ -688,4 +741,14 @@ func GetTagsMap(obj any, tagName, vTagName string) map[string]string {
 	}
 
 	return tagsValue
+}
+
+// InSlice returns true if the needle string is found in the haystack slice
+func InSlice(needle string, haystack []string) bool {
+	for _, item := range haystack {
+		if item == needle {
+			return true
+		}
+	}
+	return false
 }
