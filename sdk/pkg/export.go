@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/gogf/gf/v2/i18n/gi18n"
 	"github.com/gogf/gf/v2/os/glog"
@@ -55,7 +54,6 @@ type ExportOptions struct {
 	TagName        string
 	DescTag        string
 	PictureKeys    []string
-	RespItemStruct any
 	FieldFunc      FieldFunc
 	TranslateFunc  TranslateFunc
 	StatusFunc     StatusFunc
@@ -105,11 +103,7 @@ func WithExportOptionsPictureKeys(keys []string) func(*ExportOptions) {
 		options.PictureKeys = keys
 	}
 }
-func WithExportOptionsRespItemStruct(obj any) func(*ExportOptions) {
-	return func(options *ExportOptions) {
-		options.RespItemStruct = obj
-	}
-}
+
 func WithExportOptionsPageSize(pageSize int) func(*ExportOptions) {
 	return func(options *ExportOptions) {
 		options.PageSize = pageSize
@@ -208,6 +202,7 @@ type Export struct {
 	sheetTotal   int
 	bodyStyleId  int
 	count        int32
+	limit        bool
 }
 
 func NewExport(ctx context.Context, optionFuncs ...func(*ExportOptions)) *Export {
@@ -298,52 +293,19 @@ func (e *Export) before(ctx context.Context) (err error) {
 	}
 	// 0. 计算分页
 	e.pageTotal = int(math.Ceil(float64(e.total) / float64(e.options.PageSize)))
+	if e.total >= e.options.LimitSize {
+		e.pageTotal = int(math.Ceil(float64(e.options.LimitSize) / float64(e.options.PageSize)))
+	}
 	if e.pageTotal == 0 {
 		e.pageTotal = 1
 	}
 	// 计算分表
 	e.sheetTotal = int(math.Ceil(float64(e.total) / float64(e.options.SheetSize)))
+	if e.total >= e.options.LimitSize {
+		e.sheetTotal = int(math.Ceil(float64(e.options.LimitSize) / float64(e.options.SheetSize)))
+	}
 	e.page = 0
 
-	// 1. 字段列表
-	if e.options.FieldFunc != nil {
-		e.fieldList = e.options.FieldFunc(ctx)
-	} else {
-		if e.options.RespItemStruct == nil {
-			return errors.New("export excel RespItemStruct is nil")
-		}
-		e.fieldList = DefaultFieldFunc(e.options.RespItemStruct, e.options.TagName)
-	}
-	// 2. 翻译列表
-	if e.options.TranslateFunc != nil {
-		e.translates = e.options.TranslateFunc(ctx)
-	} else {
-		if e.options.RespItemStruct == nil {
-			return errors.New("export excel RespItemStruct is nil")
-		}
-		e.translates = DefaultTranslateFunc(e.options.RespItemStruct, e.options.TagName, e.options.DescTag)
-	}
-	// 3. 状态列表
-	if e.options.StatusFunc != nil {
-		e.statusEnums = e.options.StatusFunc(ctx)
-	} else {
-		e.statusEnums = DefaultStatusFunc(ctx, e.lang, e.fieldList, e.translates)
-	}
-	// 4. 表头构建
-	if e.options.HeaderFunc != nil {
-		e.headerCols, err = e.options.HeaderFunc(ctx, e.excel)
-	} else {
-		e.headerCols, err = DefaultHeaderFunc(ctx, e.lang, e.excel, e.fieldList, e.translates)
-	}
-	// 3. Set table body style
-	e.bodyStyleId, err = e.excel.NewStyle(&excelize.Style{
-		Font:      &excelize.Font{Family: "Calibri", Size: 11},
-		Alignment: &excelize.Alignment{Horizontal: "center", Vertical: "center"},
-	})
-	if err != nil {
-		glog.Warning(ctx, "export excel body NewStyle error:", err.Error())
-		return err
-	}
 	return err
 }
 
@@ -432,6 +394,42 @@ func (e *Export) processorRaw(ctx context.Context, name string, r *RawStruct) (e
 	return nil
 }
 
+func (e *Export) preBuildHeader(ctx context.Context, obj any) (err error) {
+	// 1. 字段列表
+	if e.options.FieldFunc != nil {
+		e.fieldList = e.options.FieldFunc(ctx)
+	} else {
+		e.fieldList = DefaultFieldFunc(obj, e.options.TagName)
+	}
+	// 2. 翻译列表
+	if e.options.TranslateFunc != nil {
+		e.translates = e.options.TranslateFunc(ctx)
+	} else {
+		e.translates = DefaultTranslateFunc(obj, e.options.TagName, e.options.DescTag)
+	}
+	// 3. 状态列表
+	if e.options.StatusFunc != nil {
+		e.statusEnums = e.options.StatusFunc(ctx)
+	} else {
+		e.statusEnums = DefaultStatusFunc(ctx, e.lang, e.fieldList, e.translates)
+	}
+	// 4. 表头构建
+	if e.options.HeaderFunc != nil {
+		e.headerCols, err = e.options.HeaderFunc(ctx, e.excel)
+	} else {
+		e.headerCols, err = DefaultHeaderFunc(ctx, e.lang, e.excel, e.fieldList, e.translates)
+	}
+	// 3. Set table body style
+	e.bodyStyleId, err = e.excel.NewStyle(&excelize.Style{
+		Font:      &excelize.Font{Family: "Calibri", Size: 11},
+		Alignment: &excelize.Alignment{Horizontal: "center", Vertical: "center"},
+	})
+	if err != nil {
+		glog.Warning(ctx, "export excel body NewStyle error:", err.Error())
+		return err
+	}
+	return nil
+}
 func (e *Export) preProcessor(ctx context.Context, ptr any) (r *RawStruct, err error) {
 	fields, err := GetNonEmptyFields(ptr, e.options.TagName)
 	if err != nil {
@@ -458,9 +456,12 @@ func (e *Export) preProcessor(ctx context.Context, ptr any) (r *RawStruct, err e
 }
 
 func (e *Export) processor(ctx context.Context) (err error) {
+	isBuildHeader := false
+	e.limit = false
 	// excel 分表处理
-	for currentSheet := 1; currentSheet <= e.sheetTotal; currentSheet++ {
+	for currentSheet := 1; currentSheet <= e.sheetTotal && !e.limit; currentSheet++ {
 		e.offset = 1
+		isSetHeader := false
 		cell, err := excelize.CoordinatesToCellName(1, e.offset)
 		if err != nil {
 			glog.Warning(ctx, "export excel CoordinatesToCellName error:", err.Error())
@@ -479,26 +480,42 @@ func (e *Export) processor(ctx context.Context) (err error) {
 			glog.Warning(ctx, "export excel NewStreamWriter error:", err.Error())
 			return err
 		}
-		// 2. Write Header
-		if err = e.streamWriter.SetRow(cell, e.headerCols, excelize.RowOpts{OutlineLevel: 1}); err != nil {
-			glog.Warning(ctx, "export excel SetRow error:", err.Error())
-			return err
-		}
-		// 3. Write Body Data
+		// 2. Get list data
 		maxPage := int(math.Ceil(float64(e.pageTotal) / float64(e.sheetTotal)))
 		e.pictureMap = make(map[string]string)
-		for s := 1; s <= maxPage && e.page < e.pageTotal; s++ {
+		for s := 1; s <= maxPage && e.page < e.pageTotal && !e.limit; s++ {
 			e.page++
 			// 分页查询
 			list, err := e.options.ListFunc(ctx, e.page, e.options.PageSize)
 			if err != nil {
+				glog.Warning(ctx, "export excel ListFunc error:", err.Error())
 				return err
 			}
+			if !isBuildHeader {
+				// 3.根据返回结构动态构建表头
+				err = e.preBuildHeader(ctx, list)
+				if err != nil {
+					glog.Warning(ctx, "export excel preBuildHeader error:", err.Error())
+					return err
+				}
+				isBuildHeader = true
+			}
+			if !isSetHeader {
+				// 4. Write Header
+				if err = e.streamWriter.SetRow(cell, e.headerCols, excelize.RowOpts{OutlineLevel: 1}); err != nil {
+					glog.Warning(ctx, "export excel SetRow error:", err.Error())
+					return err
+				}
+				isSetHeader = true
+			}
+
+			// 5. Write Body Data
 			err = e.exportList(ctx, list)
 			if err != nil {
+				glog.Warning(ctx, "export excel exportList error:", err.Error())
 				return err
 			}
-			if e.count >= int32(e.options.LimitSize) {
+			if e.limit {
 				glog.Warning(ctx, "export excel LimitSize:", e.options.LimitSize, "current count:", e.total)
 				break
 			}
@@ -589,6 +606,10 @@ func (e *Export) processor(ctx context.Context) (err error) {
 func (e *Export) exportList(ctx context.Context, list []any) error {
 	// 4. For loop Set table body
 	for _, item := range list {
+		if e.count >= int32(e.options.LimitSize) {
+			e.limit = true
+			return nil
+		}
 		e.offset++
 		cell, err := excelize.CoordinatesToCellName(1, e.offset)
 		if err != nil {
@@ -700,13 +721,13 @@ func GetNonEmptyFields(obj interface{}, tagName string) (map[string]any, error) 
 		// 获取切片元素的反射值
 		v = v.Index(0)
 		t = v.Type()
-		if v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Struct {
+		if (v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Struct) || (v.Kind() == reflect.Interface) {
 			// 获取结构体的类型
 			t = v.Elem().Type()
 			v = v.Elem()
 		}
-		if t.Kind() != reflect.Struct {
-			return nil, fmt.Errorf("obj must be a slice of struct")
+		if t.Kind() != reflect.Struct && t.Kind() != reflect.Interface {
+			return nil, fmt.Errorf("obj must be a slice of struct or interface")
 		}
 	}
 	for i := 0; i < t.NumField(); i++ {
@@ -725,13 +746,32 @@ func GetNonEmptyFields(obj interface{}, tagName string) (map[string]any, error) 
 // GetTags returns a slice of any tags of a struct
 func GetTags(obj any, tagName string) []string {
 	t := reflect.TypeOf(obj)
-	if t == nil || (t.Kind() == reflect.Ptr && t.Elem().Kind() != reflect.Struct) && t.Kind() != reflect.Struct {
+	v := reflect.ValueOf(obj)
+	if t.Kind() != reflect.Struct && (t.Kind() == reflect.Ptr && (t.Elem().Kind() != reflect.Struct && t.Elem().Kind() != reflect.Slice)) {
 		return nil
 	}
-
 	tags := make([]string, 0)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
+	}
+	if v.Kind() == reflect.Slice {
+		if v.Len() <= 0 {
+			return nil
+		}
+		// 获取切片元素的反射值
+		v = v.Index(0)
+		t = v.Type()
+		if (v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Struct) || (v.Kind() == reflect.Interface) {
+			// 获取结构体的类型
+			t = v.Elem().Type()
+			v = v.Elem()
+		}
+		if t.Kind() != reflect.Struct && t.Kind() != reflect.Interface {
+			return nil
+		}
 	}
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
@@ -766,12 +806,12 @@ func GetTagsMap(obj any, tagName, vTagName string) map[string]string {
 		// 获取切片元素的反射值
 		v = v.Index(0)
 		t = v.Type()
-		if v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Struct {
+		if (v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Struct) || (v.Kind() == reflect.Interface) {
 			// 获取结构体的类型
 			t = v.Elem().Type()
 			v = v.Elem()
 		}
-		if t.Kind() != reflect.Struct {
+		if t.Kind() != reflect.Struct && t.Kind() != reflect.Interface {
 			return nil
 		}
 	}
