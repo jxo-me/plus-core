@@ -8,7 +8,6 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/xuri/excelize/v2"
-	"golang.org/x/text/language"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
@@ -211,7 +210,7 @@ type Export struct {
 	count        int32
 }
 
-func NewExport(ctx context.Context, lang string, optionFuncs ...func(*ExportOptions)) *Export {
+func NewExport(ctx context.Context, optionFuncs ...func(*ExportOptions)) *Export {
 	defaultOptions := getDefaultExportOptions()
 	options := &defaultOptions
 	for _, optionFunc := range optionFuncs {
@@ -228,29 +227,6 @@ func NewExport(ctx context.Context, lang string, optionFuncs ...func(*ExportOpti
 	if options.DescTag == "" {
 		options.DescTag = DefaultDescTag
 	}
-	// 语言
-	var preferred []language.Tag
-	if lang != "" {
-		var err error
-		preferred, _, err = language.ParseAcceptLanguage(lang)
-		if err != nil {
-			// err
-			lang = "zh"
-		}
-	}
-	if preferred == nil {
-		lang = "zh"
-	}
-	matcher := language.NewMatcher([]language.Tag{
-		language.English,           // 英语
-		language.Chinese,           // 中文
-		language.SimplifiedChinese, // 简体中文
-		language.Malay,             // 马来西亚语 Malay
-	})
-	code, _, _ := matcher.Match(preferred...)
-	base, _ := code.Base()
-	lang = base.String()
-	ctx = gi18n.WithLanguage(ctx, lang)
 
 	return &Export{
 		ctx:     ctx,
@@ -399,16 +375,16 @@ func (e *Export) processorRaw(ctx context.Context, name string, r *RawStruct) (e
 		glog.Warning(ctx, "export excel processorRaw SetRow error:", err.Error())
 		return err
 	}
-	// 3. Write Body Data
-	cell, err = excelize.CoordinatesToCellName(1, 2)
-	if err != nil {
-		glog.Warning(ctx, "export excel processorRaw CoordinatesToCellName error:", err.Error())
-		return err
-	}
 	if r.Obj != nil {
 		if IsSlice(r.Obj) {
 			list := gconv.SliceAny(r.Obj)
-			for _, item := range list {
+			for i, item := range list {
+				// 3. Write Body Data
+				cell, err = excelize.CoordinatesToCellName(1, i+2)
+				if err != nil {
+					glog.Warning(ctx, "export excel processorRaw CoordinatesToCellName error:", err.Error())
+					return err
+				}
 				BodyRow := make([]interface{}, 0)
 				mapObj := gconv.Map(item)
 				for _, v := range r.FieldList {
@@ -425,6 +401,12 @@ func (e *Export) processorRaw(ctx context.Context, name string, r *RawStruct) (e
 				}
 			}
 		} else {
+			// 3. Write Body Data
+			cell, err = excelize.CoordinatesToCellName(1, 2)
+			if err != nil {
+				glog.Warning(ctx, "export excel processorRaw CoordinatesToCellName error:", err.Error())
+				return err
+			}
 			BodyRow := make([]interface{}, 0)
 			mapObj := gconv.Map(r.Obj)
 			for _, v := range r.FieldList {
