@@ -47,7 +47,7 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 			}
 			for i := 0; i < spec.ConsumerNum; i++ {
 				// Consumer
-				go mQueue.Consumer(ctx, spec.QueueName, worker.Handle,
+				mQueue.Consumer(ctx, spec.QueueName, worker.Handle,
 					storage.WithRabbitMqConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()),
 					storage.WithRabbitMqConsumeOptionsBindingExchangeName(spec.Exchange),
 					storage.WithRabbitMqConsumeOptionsBindingExchangeType(spec.ExchangeType),

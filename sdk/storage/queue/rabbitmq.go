@@ -3,7 +3,6 @@ package queue
 import (
 	"context"
 	"encoding/json"
-	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/plus-core/sdk/storage"
@@ -25,7 +24,7 @@ func NewRabbitMQ(
 		Url:               dsn,
 		ReconnectInterval: reconnectInterval,
 		producers:         map[string]*rabbitmq.Publisher{},
-		consumers:         map[string]rabbitmq.Consumer{},
+		consumers:         map[string]*rabbitmq.Consumer{},
 		Logger:            logger,
 	}
 	if cfg != nil {
@@ -41,33 +40,69 @@ type RabbitMQ struct {
 	Handler           []rabbitmq.Handler
 	Config            rabbitmq.Config
 	mux               sync.RWMutex
-	consumers         map[string]rabbitmq.Consumer
+	consumers         map[string]*rabbitmq.Consumer
 	ConsumerOptions   *rabbitmq.ConsumerOptions
 	producers         map[string]*rabbitmq.Publisher
 	PublisherOptions  *rabbitmq.PublisherOptions
 	Logger            rabbitmq.Logger
+	conn              *rabbitmq.Conn
 }
 
 func (r *RabbitMQ) String() string {
 	return "rabbitmq"
 }
 
-func (r *RabbitMQ) newConsumer(ctx context.Context) (rabbitmq.Consumer, error) {
+func (r *RabbitMQ) newConn(ctx context.Context) (*rabbitmq.Conn, error) {
+	var err error
+	if r.conn == nil {
+		r.conn, err = rabbitmq.NewConn(
+			ctx,
+			r.Url,
+			rabbitmq.WithConnectionOptionsLogger(r.Logger),
+			rabbitmq.WithConnectionOptionsConfig(r.Config),
+			rabbitmq.WithConnectionOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
+		)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return r.conn, nil
+}
+
+func (r *RabbitMQ) newConsumer(ctx context.Context, queueName string, handler rabbitmq.Handler, options storage.ConsumeOptions) (*rabbitmq.Consumer, error) {
+	var err error
+	var conn *rabbitmq.Conn
+	conn, err = r.newConn(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return rabbitmq.NewConsumer(ctx,
-		r.Url,
-		r.Config,
-		rabbitmq.WithConsumerOptionsLogger(g.Log()),
-		rabbitmq.WithConsumerOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
-		rabbitmq.WithConsumerOptionsLogger(r.Logger),
+		conn,
+		handler,
+		queueName,
+		rabbitmq.WithConsumerOptionsExchangeDeclare,
+		rabbitmq.WithConsumerOptionsRoutingKeys(options.BindingRoutingKeys),
+		rabbitmq.WithConsumerOptionsConsumerName(options.ConsumerName),
+		rabbitmq.WithConsumerOptionsExchangeName(options.BindingExchange.Name),
+		rabbitmq.WithConsumerOptionsExchangeKind(options.BindingExchange.Kind),
+		rabbitmq.WithConsumerOptionsConcurrency(options.Concurrency), // goroutine num
+		rabbitmq.WithConsumerOptionsConsumerAutoAck(options.ConsumerAutoAck),
+		rabbitmq.WithConsumerOptionsQOSPrefetch(options.QOSPrefetch),
+		rabbitmq.WithConsumerOptionsExchangeDurable,
+		rabbitmq.WithConsumerOptionsQueueDurable,
 	)
 }
 
 func (r *RabbitMQ) newProducer(ctx context.Context) (*rabbitmq.Publisher, error) {
+	var err error
+	var conn *rabbitmq.Conn
+	conn, err = r.newConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	return rabbitmq.NewPublisher(ctx,
-		r.Url,
-		r.Config,
-		rabbitmq.WithPublisherOptionsLogger(g.Log()),
-		rabbitmq.WithPublisherOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
+		conn,
 		rabbitmq.WithPublisherOptionsLogger(r.Logger),
 	)
 }
@@ -97,7 +132,7 @@ func (r *RabbitMQ) Publish(ctx context.Context, message storage.Messager, option
 		r.producers[options.Exchange] = p
 	}
 
-	err = p.Publish(
+	err = p.PublishWithContext(
 		ctx,
 		rb,
 		[]string{message.GetRoutingKey()},
@@ -119,23 +154,13 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 	for _, optionFunc := range optionFuncs {
 		optionFunc(&options)
 	}
-	var c rabbitmq.Consumer
+	var c *rabbitmq.Consumer
 	var err error
 	var ok bool
 	r.mux.Lock()
 	defer r.mux.Unlock()
 	if c, ok = r.consumers[options.BindingExchange.Name]; !ok {
-		c, err = r.newConsumer(ctx)
-		if err != nil {
-			glog.Error(ctx, "rabbitmq newConsumer error:", err)
-			return
-		}
-		r.consumers[options.BindingExchange.Name] = c
-	}
-	// exchange exchangeType routingKey
-	err = c.StartConsuming(ctx,
-		func(d rabbitmq.Delivery) rabbitmq.Action {
-			//glog.Debug(ctx, "Delivery:", d)
+		header := func(d rabbitmq.Delivery) rabbitmq.Action {
 			m := new(Message)
 			m.SetValues(map[string]interface{}{
 				"body": string(d.Body),
@@ -152,22 +177,15 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f storage.Con
 			}
 			// rabbitmq.Ack, rabbitmq.NackDiscard, rabbitmq.NackRequeue
 			return rabbitmq.Ack
-		},
-		queueName,
-		options.BindingRoutingKeys,
-		rabbitmq.WithConsumeOptionsConsumerName(options.ConsumerName),
-		rabbitmq.WithConsumeOptionsBindingExchangeName(options.BindingExchange.Name),
-		rabbitmq.WithConsumeOptionsBindingExchangeKind(options.BindingExchange.Kind),
-		rabbitmq.WithConsumeOptionsConcurrency(options.Concurrency), // goroutine num
-		rabbitmq.WithConsumeOptionsConsumerAutoAck(options.ConsumerAutoAck),
-		rabbitmq.WithConsumeOptionsQOSPrefetch(options.QOSPrefetch),
-		rabbitmq.WithConsumeOptionsBindingExchangeDurable,
-		rabbitmq.WithConsumeOptionsQueueDurable,
-	)
-	if err != nil {
-		glog.Errorf(ctx, "rabbitmq consumer StartConsuming error:%v", err)
-		return
+		}
+		c, err = r.newConsumer(ctx, queueName, header, options)
+		if err != nil {
+			glog.Error(ctx, "rabbitmq newConsumer error:", err)
+			return
+		}
+		r.consumers[options.BindingExchange.Name] = c
 	}
+
 }
 
 func (r *RabbitMQ) Run(ctx context.Context) {
@@ -176,15 +194,15 @@ func (r *RabbitMQ) Run(ctx context.Context) {
 
 func (r *RabbitMQ) Shutdown(ctx context.Context) {
 	for _, pd := range r.producers {
-		err := pd.Close(ctx)
-		if err != nil {
-			glog.Warning(ctx, "rabbitmq producer Close error", err)
-		}
+		pd.Close(ctx)
 	}
 	for _, pushConsumer := range r.consumers {
-		err := pushConsumer.Close(ctx)
+		pushConsumer.Close(ctx)
+	}
+	if r.conn != nil {
+		err := r.conn.Close(ctx)
 		if err != nil {
-			glog.Warning(ctx, "rabbitmq consumer Close error", err)
+			glog.Warning(ctx, "rabbitmq conn close error:", err.Error())
 		}
 	}
 }
