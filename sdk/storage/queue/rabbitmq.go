@@ -81,6 +81,7 @@ func (r *RabbitMQ) newConsumer(ctx context.Context, queueName string, handler ra
 		handler,
 		queueName,
 		rabbitmq.WithConsumerOptionsExchangeDeclare,
+		rabbitmq.WithConsumerOptionsLogger(r.Logger),
 		rabbitmq.WithConsumerOptionsRoutingKeys(options.BindingRoutingKeys),
 		rabbitmq.WithConsumerOptionsConsumerName(options.ConsumerName),
 		rabbitmq.WithConsumerOptionsExchangeName(options.BindingExchange.Name),
