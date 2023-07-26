@@ -41,7 +41,7 @@ func (c *cQueueRabbit) Init(ctx context.Context, s *Settings) error {
 func (c *cQueueRabbit) GetQueue(ctx context.Context) (storage.AdapterQueue, error) {
 	logger := glog.New()
 	err := logger.SetConfigWithMap(g.Map{
-		"flags":  42,
+		"flags":  glog.F_TIME_STD | glog.F_FILE_LONG,
 		"path":   c.LogPath,
 		"file":   c.LogFile,
 		"level":  c.LogLevel,
