@@ -2,23 +2,22 @@ package captcha
 
 import (
 	"fmt"
+	cacheLib "github.com/jxo-me/plus-core/core/cache"
+	"github.com/jxo-me/plus-core/sdk/cache/memory"
+	"github.com/mojocn/base64Captcha"
 	"math/rand"
 	"testing"
 	"time"
-
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/storage/cache"
-	"github.com/mojocn/base64Captcha"
 )
 
 var _expiration = 6000
 
-func getStore(_ *testing.T) storage.AdapterCache {
-	return cache.NewMemory()
+func getStore(_ *testing.T) cacheLib.ICache {
+	return memory.NewMemory()
 }
 
 func TestSetGet(t *testing.T) {
-	s := NewCacheStore(getStore(t), _expiration)
+	s := NewCacheStore(getStore(t), "", _expiration)
 	id := "captcha id"
 	d := "random-string"
 	s.Set(id, d)
@@ -29,7 +28,7 @@ func TestSetGet(t *testing.T) {
 }
 
 func TestGetClear(t *testing.T) {
-	s := NewCacheStore(getStore(t), _expiration)
+	s := NewCacheStore(getStore(t), "", _expiration)
 	id := "captcha id"
 	d := "932839jfffjkdss"
 	s.Set(id, d)
@@ -44,10 +43,10 @@ func TestGetClear(t *testing.T) {
 }
 
 func BenchmarkSetCollect(b *testing.B) {
-	store := cache.NewMemory()
+	store := memory.NewMemory()
 	b.StopTimer()
 	d := "fdskfew9832232r"
-	s := NewCacheStore(store, -1)
+	s := NewCacheStore(store, "", -1)
 	ids := make([]string, 1000)
 	for i := range ids {
 		ids[i] = fmt.Sprintf("%d", rand.Int63())
@@ -60,14 +59,14 @@ func BenchmarkSetCollect(b *testing.B) {
 	}
 }
 func TestStore_SetGoCollect(t *testing.T) {
-	s := NewCacheStore(getStore(t), -1)
+	s := NewCacheStore(getStore(t), "", -1)
 	for i := 0; i <= 100; i++ {
 		s.Set(fmt.Sprint(i), fmt.Sprint(i))
 	}
 }
 
 func TestStore_CollectNotExpire(t *testing.T) {
-	s := NewCacheStore(getStore(t), 36000)
+	s := NewCacheStore(getStore(t), "", 36000)
 	for i := 0; i < 50; i++ {
 		s.Set(fmt.Sprint(i), fmt.Sprint(i))
 	}
@@ -83,7 +82,7 @@ func TestStore_CollectNotExpire(t *testing.T) {
 
 func TestNewCacheStore(t *testing.T) {
 	type args struct {
-		store      storage.AdapterCache
+		store      cacheLib.ICache
 		expiration int
 	}
 	tests := []struct {
@@ -96,7 +95,7 @@ func TestNewCacheStore(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewCacheStore(tt.args.store, tt.args.expiration); got == nil {
+			if got := NewCacheStore(tt.args.store, "", tt.args.expiration); got == nil {
 				t.Errorf("NewMemoryStore() = %v, want %v", got, tt.want)
 			}
 		})

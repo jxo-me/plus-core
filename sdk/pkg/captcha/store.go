@@ -3,12 +3,12 @@ package captcha
 import (
 	"context"
 	"fmt"
-	"github.com/jxo-me/plus-core/sdk/storage"
+	cacheLib "github.com/jxo-me/plus-core/core/cache"
 	"github.com/mojocn/base64Captcha"
 )
 
 type cacheStore struct {
-	cache      storage.AdapterCache
+	cache      cacheLib.ICache
 	expiration int
 	prefix     string
 }
@@ -16,7 +16,7 @@ type cacheStore struct {
 // NewCacheStore returns a new standard memory store for captchas with the
 // given collection threshold and expiration time (duration). The returned
 // store must be registered with SetCustomStore to replace the default one.
-func NewCacheStore(cache storage.AdapterCache, prefix string, expiration int) base64Captcha.Store {
+func NewCacheStore(cache cacheLib.ICache, prefix string, expiration int) base64Captcha.Store {
 	s := new(cacheStore)
 	s.cache = cache
 	s.prefix = prefix
