@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/queue"
+	"github.com/jxo-me/plus-core/core/task"
 	"github.com/jxo-me/plus-core/sdk"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/task"
 )
 
 const (
@@ -48,13 +48,13 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 			for i := 0; i < spec.ConsumerNum; i++ {
 				// Consumer
 				mQueue.Consumer(ctx, spec.QueueName, worker.Handle,
-					storage.WithRabbitMqConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()),
-					storage.WithRabbitMqConsumeOptionsBindingExchangeName(spec.Exchange),
-					storage.WithRabbitMqConsumeOptionsBindingExchangeType(spec.ExchangeType),
-					storage.WithRabbitMqConsumeOptionsConcurrency(spec.CoroutineNum),
-					storage.WithRabbitMqConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)),
-					storage.WithRabbitMqConsumeOptionsConsumerAutoAck(spec.AutoAck),
-					storage.WithRabbitMqConsumeOptionsQOSPrefetch(spec.Prefetch),
+					queue.WithRabbitMqConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()),
+					queue.WithRabbitMqConsumeOptionsBindingExchangeName(spec.Exchange),
+					queue.WithRabbitMqConsumeOptionsBindingExchangeType(spec.ExchangeType),
+					queue.WithRabbitMqConsumeOptionsConcurrency(spec.CoroutineNum),
+					queue.WithRabbitMqConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)),
+					queue.WithRabbitMqConsumeOptionsConsumerAutoAck(spec.AutoAck),
+					queue.WithRabbitMqConsumeOptionsQOSPrefetch(spec.Prefetch),
 				)
 			}
 		}

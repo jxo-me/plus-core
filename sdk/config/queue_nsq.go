@@ -2,8 +2,8 @@ package config
 
 import (
 	"context"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/storage/queue"
+	queueLib "github.com/jxo-me/plus-core/core/queue"
+	nsq2 "github.com/jxo-me/plus-core/sdk/queue/nsq"
 	"github.com/nsqio/go-nsq"
 )
 
@@ -39,6 +39,6 @@ func (c *cQueueNsq) Init(ctx context.Context, s *Settings) error {
 }
 
 // GetQueue get NSQ queue
-func (c *cQueueNsq) GetQueue(ctx context.Context) (storage.AdapterQueue, error) {
-	return queue.NewNSQ(c.Addresses, c.Cfg, c.ChannelPrefix)
+func (c *cQueueNsq) GetQueue(ctx context.Context) (queueLib.IQueue, error) {
+	return nsq2.NewNSQ(c.Addresses, c.Cfg, c.ChannelPrefix)
 }

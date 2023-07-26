@@ -12,13 +12,19 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/gf-metrics"
 	"github.com/jxo-me/gfbot"
+	cacheLib "github.com/jxo-me/plus-core/core/cache"
+	"github.com/jxo-me/plus-core/core/cron"
+	lockerLib "github.com/jxo-me/plus-core/core/locker"
+	messageLib "github.com/jxo-me/plus-core/core/message"
+	queueLib "github.com/jxo-me/plus-core/core/queue"
+	"github.com/jxo-me/plus-core/core/task"
+	"github.com/jxo-me/plus-core/sdk/cache"
 	"github.com/jxo-me/plus-core/sdk/config"
-	"github.com/jxo-me/plus-core/sdk/cron"
+	"github.com/jxo-me/plus-core/sdk/locker"
+	"github.com/jxo-me/plus-core/sdk/message"
 	"github.com/jxo-me/plus-core/sdk/pkg/tus"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/storage/queue"
-	"github.com/jxo-me/plus-core/sdk/task"
+	"github.com/jxo-me/plus-core/sdk/queue"
 	"sync"
 )
 
@@ -30,15 +36,15 @@ type Application struct {
 	lang            *gi18n.Manager
 	config          *gcfg.Config
 	settings        *config.Settings
-	cache           storage.AdapterCache
-	locker          storage.AdapterLocker
+	cache           cacheLib.ICache
+	locker          lockerLib.ILocker
 	websocket       *ws.Instance
-	crontab         cron.Adapter
+	crontab         cron.ICron
 	taskService     task.TasksService
 	rabbitmqService task.RabbitMqService
 	rocketMqService task.RocketMqService
 	memoryService   task.MemoryService
-	queue           map[string]storage.AdapterQueue
+	queue           map[string]queueLib.IQueue
 	tus             *tus.Uploader
 	monitor         *metrics.Monitor
 	bot             map[string]*telebot.Bot
@@ -49,16 +55,16 @@ func NewConfig() *Application {
 	return &Application{
 		casbins: make(map[string]*casbin.SyncedEnforcer),
 		jwt:     make(map[string]*jwt.GfJWTMiddleware),
-		queue:   make(map[string]storage.AdapterQueue),
+		queue:   make(map[string]queueLib.IQueue),
 		bot:     make(map[string]*telebot.Bot),
 	}
 }
 
-func (e *Application) SetCron(srv cron.Adapter) {
+func (e *Application) SetCron(srv cron.ICron) {
 	e.crontab = srv
 }
 
-func (e *Application) Cron() cron.Adapter {
+func (e *Application) Cron() cron.ICron {
 	return e.crontab
 }
 
@@ -188,22 +194,22 @@ func (e *Application) Settings() *config.Settings {
 }
 
 // SetCache 设置缓存
-func (e *Application) SetCache(c storage.AdapterCache) {
+func (e *Application) SetCache(c cacheLib.ICache) {
 	e.cache = c
 }
 
-func (e *Application) Cache() storage.AdapterCache {
-	return NewCache("", e.cache)
+func (e *Application) Cache() cacheLib.ICache {
+	return cache.NewCache("", e.cache)
 }
 
 // GetCacheAdapter 获取缓存
-func (e *Application) GetCacheAdapter() storage.AdapterCache {
-	return NewCache("", e.cache)
+func (e *Application) GetCacheAdapter() cacheLib.ICache {
+	return cache.NewCache("", e.cache)
 }
 
 // GetCachePrefix 获取带租户标记的cache
-func (e *Application) GetCachePrefix(key string) storage.AdapterCache {
-	return NewCache(key, e.cache)
+func (e *Application) GetCachePrefix(key string) cacheLib.ICache {
+	return cache.NewCache(key, e.cache)
 }
 
 func (e *Application) SetWebSocket(s *ws.Instance) {
@@ -218,7 +224,7 @@ func (e *Application) GetWebSocket() *ws.Instance {
 	return e.websocket
 }
 
-func (e *Application) GetMemoryQueue(prefix string) storage.AdapterQueue {
+func (e *Application) GetMemoryQueue(prefix string) queueLib.IQueue {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 	if q, ok := e.queue[fmt.Sprintf("%s_%s", prefix, config.MemoryQueueName)]; ok {
@@ -227,7 +233,7 @@ func (e *Application) GetMemoryQueue(prefix string) storage.AdapterQueue {
 	return nil
 }
 
-func (e *Application) GetRabbitQueue(prefix string) storage.AdapterQueue {
+func (e *Application) GetRabbitQueue(prefix string) queueLib.IQueue {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 	if q, ok := e.queue[fmt.Sprintf("%s_%s", prefix, config.RabbitmqQueueName)]; ok {
@@ -236,7 +242,7 @@ func (e *Application) GetRabbitQueue(prefix string) storage.AdapterQueue {
 	return nil
 }
 
-func (e *Application) GetRocketQueue(prefix string) storage.AdapterQueue {
+func (e *Application) GetRocketQueue(prefix string) queueLib.IQueue {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 	if q, ok := e.queue[fmt.Sprintf("%s_%s", prefix, config.RocketQueueName)]; ok {
@@ -246,14 +252,14 @@ func (e *Application) GetRocketQueue(prefix string) storage.AdapterQueue {
 }
 
 // SetQueueAdapter 设置队列适配器
-func (e *Application) SetQueueAdapter(key string, c storage.AdapterQueue) {
+func (e *Application) SetQueueAdapter(key string, c queueLib.IQueue) {
 	e.mux.Lock()
 	defer e.mux.Unlock()
-	e.queue[fmt.Sprintf("%s_%s", key, c.String())] = NewQueue(key, c)
+	e.queue[fmt.Sprintf("%s_%s", key, c.String())] = queue.NewQueue(key, c)
 }
 
 // GetQueueAdapter 获取队列适配器
-func (e *Application) GetQueueAdapter(key string) storage.AdapterQueue {
+func (e *Application) GetQueueAdapter(key string) queueLib.IQueue {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 	// 优先返回全局
@@ -264,26 +270,26 @@ func (e *Application) GetQueueAdapter(key string) storage.AdapterQueue {
 }
 
 // GetQueueMessage 获取队列需要用的message
-func (e *Application) GetQueueMessage(id, routingKey string, value map[string]interface{}) (storage.Messager, error) {
-	message := &queue.Message{}
-	message.SetId(id)
-	message.SetRoutingKey(routingKey)
-	message.SetValues(value)
-	return message, nil
+func (e *Application) GetQueueMessage(id, routingKey string, value map[string]interface{}) (messageLib.IMessage, error) {
+	m := &message.Message{}
+	m.SetId(id)
+	m.SetRoutingKey(routingKey)
+	m.SetValues(value)
+	return m, nil
 }
 
 // SetLockerAdapter 设置分布式锁
-func (e *Application) SetLockerAdapter(c storage.AdapterLocker) {
+func (e *Application) SetLockerAdapter(c lockerLib.ILocker) {
 	e.locker = c
 }
 
 // GetLockerAdapter 获取分布式锁
-func (e *Application) GetLockerAdapter() storage.AdapterLocker {
-	return NewLocker("", e.locker)
+func (e *Application) GetLockerAdapter() lockerLib.ILocker {
+	return locker.NewLocker("", e.locker)
 }
 
-func (e *Application) GetLockerPrefix(key string) storage.AdapterLocker {
-	return NewLocker(key, e.locker)
+func (e *Application) GetLockerPrefix(key string) lockerLib.ILocker {
+	return locker.NewLocker(key, e.locker)
 }
 
 func (e *Application) SetMetrics(m *metrics.Monitor) {

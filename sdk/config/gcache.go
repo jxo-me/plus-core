@@ -6,8 +6,9 @@ import (
 	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/storage/cache"
+	cacheLib "github.com/jxo-me/plus-core/core/cache"
+	gredisLib "github.com/jxo-me/plus-core/sdk/cache/gredis"
+	memory2 "github.com/jxo-me/plus-core/sdk/cache/memory"
 )
 
 var insCache = Cache{}
@@ -23,10 +24,10 @@ func CacheConfig() *Cache {
 }
 
 // Setup 构造cache 顺序 redis > 其他 > memory
-func (e *Cache) Setup(ctx context.Context, s *Settings) (storage.AdapterCache, error) {
+func (e *Cache) Setup(ctx context.Context, s *Settings) (cacheLib.ICache, error) {
 	redis := g.Redis(gredis.DefaultGroupName)
 	if redis != nil {
-		r, err := cache.NewGredis(redis)
+		r, err := gredisLib.NewGredis(redis)
 		if err != nil {
 			return nil, err
 		}
@@ -42,10 +43,10 @@ func (e *Cache) Setup(ctx context.Context, s *Settings) (storage.AdapterCache, e
 		return nil, err
 	}
 	GRedis().SetClient(ctx, redis)
-	r, err := cache.NewGredis(redis)
+	r, err := gredisLib.NewGredis(redis)
 	if err != nil {
 		glog.Warning(ctx, fmt.Sprintf("get redis cache options: %v error: %v", options, err))
-		return cache.NewMemory(), nil
+		return memory2.NewMemory(), nil
 	}
 	return r, nil
 }

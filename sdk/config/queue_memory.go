@@ -2,8 +2,8 @@ package config
 
 import (
 	"context"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/storage/queue"
+	queueLib "github.com/jxo-me/plus-core/core/queue"
+	"github.com/jxo-me/plus-core/sdk/queue/memory"
 )
 
 const (
@@ -34,6 +34,6 @@ func (c *cQueueMemory) Init(ctx context.Context, s *Settings) error {
 }
 
 // GetQueue get Memory queue
-func (c *cQueueMemory) GetQueue(ctx context.Context) (storage.AdapterQueue, error) {
-	return queue.NewMemory(c.PoolSize), nil
+func (c *cQueueMemory) GetQueue(ctx context.Context) (queueLib.IQueue, error) {
+	return memory.NewMemory(c.PoolSize), nil
 }

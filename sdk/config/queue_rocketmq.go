@@ -5,8 +5,8 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/storage/queue"
+	queueLib "github.com/jxo-me/plus-core/core/queue"
+	"github.com/jxo-me/plus-core/sdk/queue/rocketmq"
 )
 
 const (
@@ -46,7 +46,7 @@ func (c *cQueueRocket) Init(ctx context.Context, s *Settings) error {
 }
 
 // GetQueue get Rocket queue
-func (c *cQueueRocket) GetQueue(ctx context.Context) (storage.AdapterQueue, error) {
+func (c *cQueueRocket) GetQueue(ctx context.Context) (queueLib.IQueue, error) {
 	logger := glog.New()
 	err := logger.SetConfigWithMap(g.Map{
 		"path":   c.LogPath,
@@ -57,7 +57,7 @@ func (c *cQueueRocket) GetQueue(ctx context.Context) (storage.AdapterQueue, erro
 	if err != nil {
 		return nil, err
 	}
-	return queue.NewRocketMQ(
+	return rocketmq.NewRocketMQ(
 		ctx,
 		c.Urls,
 		c.Credentials,

@@ -10,12 +10,15 @@ import (
 	"github.com/gogf/gf/v2/os/gcfg"
 	metrics "github.com/jxo-me/gf-metrics"
 	"github.com/jxo-me/gfbot"
+	"github.com/jxo-me/plus-core/core/cache"
+	"github.com/jxo-me/plus-core/core/cron"
+	"github.com/jxo-me/plus-core/core/locker"
+	"github.com/jxo-me/plus-core/core/message"
+	"github.com/jxo-me/plus-core/core/queue"
+	"github.com/jxo-me/plus-core/core/task"
 	"github.com/jxo-me/plus-core/sdk/config"
-	"github.com/jxo-me/plus-core/sdk/cron"
 	"github.com/jxo-me/plus-core/sdk/pkg/tus"
 	"github.com/jxo-me/plus-core/sdk/pkg/ws"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/task"
 )
 
 type Runtime interface {
@@ -42,29 +45,29 @@ type Runtime interface {
 	SetSettings(c *config.Settings)
 	Settings() *config.Settings
 	// SetCache cache
-	SetCache(storage.AdapterCache)
-	Cache() storage.AdapterCache
-	GetCacheAdapter() storage.AdapterCache
-	GetCachePrefix(string) storage.AdapterCache
+	SetCache(cache.ICache)
+	Cache() cache.ICache
+	GetCacheAdapter() cache.ICache
+	GetCachePrefix(string) cache.ICache
 	// SetWebSocket websocket
 	SetWebSocket(s *ws.Instance)
 	WebSocket() *ws.Instance
 	GetWebSocket() *ws.Instance
 
-	GetMemoryQueue(prefix string) storage.AdapterQueue
-	GetRabbitQueue(prefix string) storage.AdapterQueue
-	GetRocketQueue(prefix string) storage.AdapterQueue
+	GetMemoryQueue(prefix string) queue.IQueue
+	GetRabbitQueue(prefix string) queue.IQueue
+	GetRocketQueue(prefix string) queue.IQueue
 
-	SetQueueAdapter(string, storage.AdapterQueue)
-	GetQueueAdapter(key string) storage.AdapterQueue
-	GetQueueMessage(id, routingKey string, value map[string]interface{}) (storage.Messager, error)
+	SetQueueAdapter(string, queue.IQueue)
+	GetQueueAdapter(key string) queue.IQueue
+	GetQueueMessage(id, routingKey string, value map[string]interface{}) (message.IMessage, error)
 
-	SetLockerAdapter(storage.AdapterLocker)
-	GetLockerAdapter() storage.AdapterLocker
-	GetLockerPrefix(string) storage.AdapterLocker
+	SetLockerAdapter(locker.ILocker)
+	GetLockerAdapter() locker.ILocker
+	GetLockerPrefix(string) locker.ILocker
 
-	SetCron(srv cron.Adapter)
-	Cron() cron.Adapter
+	SetCron(srv cron.ICron)
+	Cron() cron.ICron
 
 	SetTask(srv task.TasksService)
 	Task() task.TasksService

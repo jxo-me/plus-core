@@ -36,10 +36,6 @@ func (e *Settings) runCallback(ctx context.Context) {
 	}
 }
 
-func (e *Settings) Init(ctx context.Context) {
-	e.runCallback(ctx)
-}
-
 // Config 配置集合
 type Config struct {
 	Jwt     map[string]*Jwt `yaml:"jwt"`
@@ -63,7 +59,7 @@ func (e *Settings) Bootstrap(ctx context.Context, fs ...Initialize) {
 		Ws:     &ws.Config{},
 	}
 	e.callbacks = fs
-	e.Init(ctx)
+	e.runCallback(ctx)
 }
 
 func (e *Settings) SetCfg(cf *gcfg.Config) *Settings {

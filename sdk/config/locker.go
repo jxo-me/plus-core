@@ -6,8 +6,8 @@ import (
 	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/storage/locker"
+	lockerLib "github.com/jxo-me/plus-core/core/locker"
+	"github.com/jxo-me/plus-core/sdk/locker/redis"
 )
 
 var insLocker = Locker{}
@@ -26,10 +26,10 @@ func (e *Locker) Empty() bool {
 }
 
 // Setup 启用顺序 redis > 其他 > memory
-func (e *Locker) Setup(ctx context.Context, s *Settings) (storage.AdapterLocker, error) {
+func (e *Locker) Setup(ctx context.Context, s *Settings) (lockerLib.ILocker, error) {
 	client := g.Redis(gredis.DefaultGroupName)
 	if client != nil {
-		return locker.NewRedis(client), nil
+		return redis.NewRedis(client), nil
 	}
 	options, err := e.Redis.GetClientOptions(ctx, s)
 	if err != nil {
@@ -40,5 +40,5 @@ func (e *Locker) Setup(ctx context.Context, s *Settings) (storage.AdapterLocker,
 	if err != nil {
 		return nil, err
 	}
-	return locker.NewRedis(client), nil
+	return redis.NewRedis(client), nil
 }

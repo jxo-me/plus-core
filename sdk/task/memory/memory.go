@@ -3,9 +3,9 @@ package memory
 import (
 	"context"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/queue"
+	"github.com/jxo-me/plus-core/core/task"
 	"github.com/jxo-me/plus-core/sdk"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/task"
 )
 
 const (
@@ -18,7 +18,7 @@ var instMemory = tMemory{
 }
 
 type tMemory struct {
-	Queue   storage.AdapterQueue
+	Queue   queue.IQueue
 	Routers []task.MemoryTask
 }
 

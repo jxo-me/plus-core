@@ -3,8 +3,8 @@ package config
 import (
 	"context"
 	"github.com/go-redis/redis/v7"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/storage/queue"
+	queueLib "github.com/jxo-me/plus-core/core/queue"
+	redis2 "github.com/jxo-me/plus-core/sdk/queue/redis"
 	"github.com/robinjoseph08/redisqueue/v2"
 	"time"
 )
@@ -51,6 +51,6 @@ func (c *cQueueRedis) Init(ctx context.Context, s *Settings) error {
 }
 
 // GetQueue get Redis queue
-func (c *cQueueRedis) GetQueue(ctx context.Context) (storage.AdapterQueue, error) {
-	return queue.NewRedis(c.Producer, c.Consumer)
+func (c *cQueueRedis) GetQueue(ctx context.Context) (queueLib.IQueue, error) {
+	return redis2.NewRedis(c.Producer, c.Consumer)
 }

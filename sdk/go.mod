@@ -2,6 +2,8 @@ module github.com/jxo-me/plus-core/sdk
 
 go 1.20
 
+replace github.com/jxo-me/plus-core/core => ../core
+
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
 	github.com/casbin/casbin/v2 v2.72.1
@@ -13,6 +15,7 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
+	github.com/jxo-me/plus-core/core v0.0.0-00010101000000-000000000000
 	github.com/jxo-me/rabbitmq-go v1.0.4
 	github.com/jxo-me/redislock v1.0.2
 	github.com/mojocn/base64Captcha v1.3.5

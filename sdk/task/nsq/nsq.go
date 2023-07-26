@@ -3,8 +3,8 @@ package nsq
 import (
 	"context"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/task"
+	"github.com/jxo-me/plus-core/core/queue"
+	"github.com/jxo-me/plus-core/core/task"
 )
 
 const (
@@ -16,7 +16,7 @@ var insNsq = tNsq{
 }
 
 type tNsq struct {
-	Queue   storage.AdapterQueue
+	Queue   queue.IQueue
 	Routers []task.NsqTask
 }
 

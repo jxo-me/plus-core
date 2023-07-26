@@ -2,7 +2,7 @@ package config
 
 import (
 	"context"
-	"github.com/jxo-me/plus-core/sdk/storage"
+	"github.com/jxo-me/plus-core/core/queue"
 )
 
 type Initialize interface {
@@ -12,5 +12,5 @@ type Initialize interface {
 
 type QueueInitialize interface {
 	Initialize
-	GetQueue(ctx context.Context) (storage.AdapterQueue, error)
+	GetQueue(ctx context.Context) (queue.IQueue, error)
 }

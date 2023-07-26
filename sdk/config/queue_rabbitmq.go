@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/storage/queue"
+	queueLib "github.com/jxo-me/plus-core/core/queue"
+	"github.com/jxo-me/plus-core/sdk/queue/rabbitmq"
 )
 
 const (
@@ -38,7 +38,7 @@ func (c *cQueueRabbit) Init(ctx context.Context, s *Settings) error {
 }
 
 // GetQueue get Rabbit queue
-func (c *cQueueRabbit) GetQueue(ctx context.Context) (storage.AdapterQueue, error) {
+func (c *cQueueRabbit) GetQueue(ctx context.Context) (queueLib.IQueue, error) {
 	logger := glog.New()
 	err := logger.SetConfigWithMap(g.Map{
 		"flags":  glog.F_TIME_STD | glog.F_FILE_LONG,
@@ -50,7 +50,7 @@ func (c *cQueueRabbit) GetQueue(ctx context.Context) (storage.AdapterQueue, erro
 	if err != nil {
 		return nil, err
 	}
-	return queue.NewRabbitMQ(
+	return rabbitmq.NewRabbitMQ(
 		ctx,
 		c.RabbitOptions.Dsn,
 		c.RabbitOptions.ReconnectInterval,

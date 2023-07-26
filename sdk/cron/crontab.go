@@ -4,16 +4,17 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/os/gcron"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/cron"
 )
 
 var insCrontab = crontab{
-	Jobs:    []Job{},
+	Jobs:    []cron.Job{},
 	Cron:    gcron.New(),
 	Workers: map[string]*gcron.Entry{},
 }
 
 type crontab struct {
-	Jobs    []Job
+	Jobs    []cron.Job
 	Cron    *gcron.Cron
 	Workers map[string]*gcron.Entry
 }
@@ -30,7 +31,7 @@ func (t *crontab) GetCron() *gcron.Cron {
 	return t.Cron
 }
 
-func (t *crontab) GetRawJobs() []Job {
+func (t *crontab) GetRawJobs() []cron.Job {
 	return t.Jobs
 }
 
@@ -38,7 +39,7 @@ func (t *crontab) GetWorkers() map[string]*gcron.Entry {
 	return t.Workers
 }
 
-func (t *crontab) AddJobs(jobs ...Job) Adapter {
+func (t *crontab) AddJobs(jobs ...cron.Job) cron.ICron {
 	t.Jobs = jobs
 	return t
 }

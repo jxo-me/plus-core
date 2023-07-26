@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/queue"
+	"github.com/jxo-me/plus-core/core/task"
 	"github.com/jxo-me/plus-core/sdk"
-	"github.com/jxo-me/plus-core/sdk/storage"
-	"github.com/jxo-me/plus-core/sdk/task"
 )
 
 const (
@@ -47,9 +47,9 @@ func (t *tRocketMq) Start(ctx context.Context) {
 			for i := 0; i < spec.ConsumerNum; i++ {
 				// Consumer
 				mQueue.Consumer(ctx, spec.TopicName, worker.Handle,
-					storage.WithRocketMqGroupName(spec.GroupName),
-					storage.WithRocketMqAutoCommit(spec.AutoCommit),
-					storage.WithRocketMqMaxReconsumeTimes(spec.MaxReconsumeTimes),
+					queue.WithRocketMqGroupName(spec.GroupName),
+					queue.WithRocketMqAutoCommit(spec.AutoCommit),
+					queue.WithRocketMqMaxReconsumeTimes(spec.MaxReconsumeTimes),
 				)
 			}
 		}
