@@ -1,4 +1,4 @@
-module github.com/jxo-me/plus-core/pkg
+module github.com/jxo-me/plus-core/pkg/v2
 
 go 1.20
 

@@ -1,4 +1,4 @@
-module github.com/jxo-me/plus-core/sdk
+module github.com/jxo-me/plus-core/sdk/v2
 
 go 1.20
 
