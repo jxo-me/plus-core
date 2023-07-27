@@ -29,9 +29,9 @@ func (c *cQueueNsq) String() string {
 	return NsqQueueName
 }
 
-func (c *cQueueNsq) Init(ctx context.Context, s *Settings) error {
+func (c *cQueueNsq) Init(ctx context.Context) error {
 	var err error
-	c.Cfg, err = c.GetNsqOptions(ctx, s)
+	c.Cfg, err = c.GetNsqOptions(ctx, Setting())
 	if err != nil {
 		return err
 	}

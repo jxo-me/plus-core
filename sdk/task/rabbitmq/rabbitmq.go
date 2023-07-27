@@ -8,6 +8,7 @@ import (
 	"github.com/jxo-me/plus-core/core/queue"
 	"github.com/jxo-me/plus-core/core/task"
 	"github.com/jxo-me/plus-core/sdk"
+	"github.com/jxo-me/plus-core/sdk/config"
 )
 
 const (
@@ -37,7 +38,7 @@ func (t *tRabbitMq) AddTasks(tasks ...task.RabbitMqTask) task.RabbitMqService {
 
 func (t *tRabbitMq) Start(ctx context.Context) {
 	glog.Info(ctx, "RabbitMq task start ...")
-	mQueue := sdk.Runtime.GetRabbitQueue(task.DefaultQueue) // get rabbitmq instance
+	mQueue := sdk.Runtime.QueueRegistry().Get(config.RabbitmqQueueName) // get rabbitmq instance
 	if mQueue != nil {
 		for _, worker := range t.Routers {
 			spec := worker.GetSpec(ctx)

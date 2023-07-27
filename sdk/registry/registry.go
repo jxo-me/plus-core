@@ -10,13 +10,17 @@ var (
 	ErrDup = errors.New("registry: duplicate object")
 )
 
+const (
+	Default = "default"
+)
+
 type registry[T any] struct {
 	m sync.Map
 }
 
 func (r *registry[T]) Register(name string, v T) error {
 	if name == "" {
-		return nil
+		name = Default
 	}
 	if _, loaded := r.m.LoadOrStore(name, v); loaded {
 		return ErrDup
@@ -28,7 +32,7 @@ func (r *registry[T]) Register(name string, v T) error {
 func (r *registry[T]) Unregister(name string) {
 	if v, ok := r.m.Load(name); ok {
 		if closer, ok := v.(io.Closer); ok {
-			closer.Close()
+			_ = closer.Close()
 		}
 		r.m.Delete(name)
 	}
@@ -41,7 +45,7 @@ func (r *registry[T]) IsRegistered(name string) bool {
 
 func (r *registry[T]) Get(name string) (t T) {
 	if name == "" {
-		return
+		name = Default
 	}
 	v, _ := r.m.Load(name)
 	t, _ = v.(T)

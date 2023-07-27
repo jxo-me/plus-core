@@ -1,8 +1,11 @@
 package runtime
 
 import (
+	"context"
+	"fmt"
 	"github.com/casbin/casbin/v2"
 	"github.com/gogf/gf-jwt/v2"
+	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/i18n/gi18n"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
@@ -11,11 +14,13 @@ import (
 	cacheLib "github.com/jxo-me/plus-core/core/cache"
 	"github.com/jxo-me/plus-core/core/cron"
 	lockerLib "github.com/jxo-me/plus-core/core/locker"
+	messageLib "github.com/jxo-me/plus-core/core/message"
 	queueLib "github.com/jxo-me/plus-core/core/queue"
 	reg "github.com/jxo-me/plus-core/core/registry"
 	"github.com/jxo-me/plus-core/core/task"
 	"github.com/jxo-me/plus-core/pkg/tus"
 	"github.com/jxo-me/plus-core/pkg/ws"
+	"github.com/jxo-me/plus-core/sdk/message"
 	"github.com/jxo-me/plus-core/sdk/registry"
 )
 
@@ -78,6 +83,14 @@ func (a *Application) ConfigRegister() reg.IRegistry[*gcfg.Config] {
 	return a.configReg
 }
 
+func (a *Application) Config(ctx context.Context, key string) *gvar.Var {
+	r, err := a.cacheReg.Get("").Get(ctx, key)
+	if err != nil {
+		return gvar.New(nil)
+	}
+	return r
+}
+
 func (a *Application) CronRegistry() reg.IRegistry[cron.ICron] {
 	return a.crontabReg
 }
@@ -88,6 +101,10 @@ func (a *Application) JwtRegister() reg.IRegistry[*jwt.GfJWTMiddleware] {
 
 func (a *Application) LanguageRegister() reg.IRegistry[*gi18n.Manager] {
 	return a.languageReg
+}
+
+func (a *Application) Lang(ctx context.Context, langKey string) string {
+	return a.languageReg.Get("").Translate(ctx, fmt.Sprintf(`{#%s}`, langKey))
 }
 
 func (a *Application) LockerRegistry() reg.IRegistry[lockerLib.ILocker] {
@@ -128,4 +145,13 @@ func (a *Application) TusUploaderRegister() reg.IRegistry[*tus.Uploader] {
 
 func (a *Application) WebSocketRegister() reg.IRegistry[*ws.Instance] {
 	return a.websocketReg
+}
+
+// GetQueueMessage 获取队列需要用的message
+func (a *Application) GetQueueMessage(id, routingKey string, value map[string]interface{}) (messageLib.IMessage, error) {
+	m := &message.Message{}
+	m.SetId(id)
+	m.SetRoutingKey(routingKey)
+	m.SetValues(value)
+	return m, nil
 }

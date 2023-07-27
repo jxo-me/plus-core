@@ -24,9 +24,9 @@ func (q *Upload) String() string {
 	return UploadCfgName
 }
 
-func (q *Upload) Init(ctx context.Context, s *Settings) error {
+func (q *Upload) Init(ctx context.Context) error {
 	cf := tus.Config{}
-	c, err := s.Cfg().Get(ctx, "settings.uploads.tus.default", "")
+	c, err := Setting().Cfg().Get(ctx, "settings.uploads.tus.default", "")
 	if err != nil {
 		return err
 	}
@@ -63,6 +63,6 @@ func (q *Upload) Init(ctx context.Context, s *Settings) error {
 		return err
 	}
 	cf.Logger = logger
-	s.Config().Tus = cf
+	Setting().Config().Tus = cf
 	return nil
 }

@@ -1,8 +1,10 @@
 package app
 
 import (
+	"context"
 	"github.com/casbin/casbin/v2"
 	jwt "github.com/gogf/gf-jwt/v2"
+	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/i18n/gi18n"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
@@ -11,6 +13,7 @@ import (
 	"github.com/jxo-me/plus-core/core/cache"
 	"github.com/jxo-me/plus-core/core/cron"
 	"github.com/jxo-me/plus-core/core/locker"
+	messageLib "github.com/jxo-me/plus-core/core/message"
 	"github.com/jxo-me/plus-core/core/queue"
 	reg "github.com/jxo-me/plus-core/core/registry"
 	"github.com/jxo-me/plus-core/core/task"
@@ -36,4 +39,7 @@ type IRuntime interface {
 	TaskRegister() reg.IRegistry[task.TasksService]
 	TusUploaderRegister() reg.IRegistry[*tus.Uploader]
 	WebSocketRegister() reg.IRegistry[*ws.Instance]
+	Lang(ctx context.Context, langKey string) string
+	Config(ctx context.Context, key string) *gvar.Var
+	GetQueueMessage(id, routingKey string, value map[string]interface{}) (messageLib.IMessage, error)
 }

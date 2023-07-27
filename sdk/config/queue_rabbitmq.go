@@ -28,9 +28,9 @@ func (c *cQueueRabbit) String() string {
 	return RabbitmqQueueName
 }
 
-func (c *cQueueRabbit) Init(ctx context.Context, s *Settings) error {
+func (c *cQueueRabbit) Init(ctx context.Context) error {
 	var err error
-	c.RabbitOptions, err = c.GetRabbitOptions(ctx, s)
+	c.RabbitOptions, err = c.GetRabbitOptions(ctx, Setting())
 	if err != nil {
 		return err
 	}

@@ -29,9 +29,9 @@ func (c *cQueueRocket) String() string {
 	return RocketQueueName
 }
 
-func (c *cQueueRocket) Init(ctx context.Context, s *Settings) error {
+func (c *cQueueRocket) Init(ctx context.Context) error {
 	var err error
-	c.RocketOptions, err = c.GetRocketOptions(ctx, s)
+	c.RocketOptions, err = c.GetRocketOptions(ctx, Setting())
 	if err != nil {
 		return err
 	}

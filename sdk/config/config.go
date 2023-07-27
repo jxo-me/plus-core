@@ -3,9 +3,9 @@ package config
 import (
 	"context"
 	"fmt"
-	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/boot"
 	"github.com/jxo-me/plus-core/pkg/tus"
 	"github.com/jxo-me/plus-core/pkg/ws"
 )
@@ -17,10 +17,9 @@ var (
 
 // Settings 兼容原先的配置结构
 type Settings struct {
-	srv       *ghttp.Server
 	cfg       *gcfg.Config
 	config    Config `yaml:"config"`
-	callbacks []Initialize
+	callbacks []boot.Initialize
 }
 
 func Setting() *Settings {
@@ -29,7 +28,7 @@ func Setting() *Settings {
 
 func (e *Settings) runCallback(ctx context.Context) {
 	for i := range e.callbacks {
-		err := e.callbacks[i].Init(ctx, e)
+		err := e.callbacks[i].Init(ctx)
 		if err != nil {
 			glog.Error(ctx, fmt.Sprintf("runCallback %s error: %v", e.callbacks[i].String(), err))
 		}
@@ -49,7 +48,7 @@ type Config struct {
 }
 
 // Bootstrap 载入启动配置文件
-func (e *Settings) Bootstrap(ctx context.Context, fs ...Initialize) {
+func (e *Settings) Bootstrap(ctx context.Context, fs ...boot.Initialize) {
 	e.config = Config{
 		Jwt:    map[string]*Jwt{},
 		Cache:  CacheConfig(),
@@ -78,15 +77,6 @@ func (e *Settings) SetConfig(c Config) *Settings {
 
 func (e *Settings) Config() *Config {
 	return &e.config
-}
-
-func (e *Settings) SetSrv(srv *ghttp.Server) *Settings {
-	e.srv = srv
-	return e
-}
-
-func (e *Settings) Srv() *ghttp.Server {
-	return e.srv
 }
 
 func (e *Settings) SetJwt(module string, jwt *Jwt) *Settings {

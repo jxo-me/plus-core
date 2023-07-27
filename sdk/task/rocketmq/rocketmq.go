@@ -7,6 +7,7 @@ import (
 	"github.com/jxo-me/plus-core/core/queue"
 	"github.com/jxo-me/plus-core/core/task"
 	"github.com/jxo-me/plus-core/sdk"
+	"github.com/jxo-me/plus-core/sdk/config"
 )
 
 const (
@@ -36,7 +37,7 @@ func (t *tRocketMq) AddTasks(tasks ...task.RocketMqTask) task.RocketMqService {
 
 func (t *tRocketMq) Start(ctx context.Context) {
 	glog.Info(ctx, "RocketMq task start ...")
-	mQueue := sdk.Runtime.GetRocketQueue(task.DefaultQueue) // get rabbitmq instance
+	mQueue := sdk.Runtime.QueueRegistry().Get(config.RocketQueueName) // get rabbitmq instance
 	if mQueue != nil {
 		for _, worker := range t.Routers {
 			spec := worker.GetSpec(ctx)

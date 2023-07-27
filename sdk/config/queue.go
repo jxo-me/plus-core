@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/boot"
 )
 
 const (
@@ -12,7 +13,7 @@ const (
 var insQueue = Queue{}
 
 type Queue struct {
-	CfgList []QueueInitialize
+	CfgList []boot.QueueInitialize
 }
 
 func QueueConfig() *Queue {
@@ -23,7 +24,8 @@ func (q *Queue) String() string {
 	return QueueCfgName
 }
 
-func (q *Queue) Init(ctx context.Context, s *Settings) error {
+func (q *Queue) Init(ctx context.Context) error {
+	s := Setting()
 	rabbit, err := s.Cfg().Get(ctx, "settings.queue.rabbitmq", "")
 	if err != nil {
 		return err
@@ -61,7 +63,7 @@ func (q *Queue) Init(ctx context.Context, s *Settings) error {
 	}
 
 	for _, queueCfg := range q.CfgList {
-		err = queueCfg.Init(ctx, s)
+		err = queueCfg.Init(ctx)
 		if err != nil {
 			glog.Error(ctx, "Queue config init error:", err)
 			return err

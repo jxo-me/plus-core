@@ -6,6 +6,7 @@ import (
 	"github.com/jxo-me/plus-core/core/queue"
 	"github.com/jxo-me/plus-core/core/task"
 	"github.com/jxo-me/plus-core/sdk"
+	"github.com/jxo-me/plus-core/sdk/config"
 )
 
 const (
@@ -37,7 +38,7 @@ func (t *tMemory) AddTasks(tasks ...task.MemoryTask) task.MemoryService {
 
 func (t *tMemory) Start(ctx context.Context) {
 	glog.Info(ctx, "MemoryMq task start ...")
-	t.Queue = sdk.Runtime.GetMemoryQueue(DefaultQueue)
+	t.Queue = sdk.Runtime.QueueRegistry().Get(config.MemoryQueueName)
 	if t.Queue != nil {
 		for _, worker := range t.Routers {
 			sp := worker.GetSpec()

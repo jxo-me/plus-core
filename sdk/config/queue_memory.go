@@ -24,8 +24,8 @@ func (c *cQueueMemory) String() string {
 	return MemoryQueueName
 }
 
-func (c *cQueueMemory) Init(ctx context.Context, s *Settings) error {
-	poolSize, err := s.Cfg().Get(ctx, "settings.queue.memory.poolSize", 10000)
+func (c *cQueueMemory) Init(ctx context.Context) error {
+	poolSize, err := Setting().Cfg().Get(ctx, "settings.queue.memory.poolSize", 10000)
 	if err != nil {
 		return err
 	}

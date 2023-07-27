@@ -32,10 +32,10 @@ func (c *cQueueRedis) String() string {
 	return RedisQueueName
 }
 
-func (c *cQueueRedis) Init(ctx context.Context, s *Settings) error {
+func (c *cQueueRedis) Init(ctx context.Context) error {
 	client := Redis().GetClient()
 	if client == nil {
-		options, err := c.RedisConnectOptions.GetRedisOptions(ctx, s)
+		options, err := c.RedisConnectOptions.GetRedisOptions(ctx, Setting())
 		if err != nil {
 			return err
 		}
