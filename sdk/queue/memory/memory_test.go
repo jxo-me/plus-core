@@ -3,9 +3,9 @@ package memory
 import (
 	"context"
 	"fmt"
-	messageLib "github.com/jxo-me/plus-core/core/message"
-	queueLib "github.com/jxo-me/plus-core/core/queue"
-	"github.com/jxo-me/plus-core/sdk/message"
+	messageLib "github.com/jxo-me/plus-core/core/v2/message"
+	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
+	"github.com/jxo-me/plus-core/sdk/v2/message"
 	"log"
 	"sync"
 	"testing"

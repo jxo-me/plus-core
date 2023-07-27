@@ -2,17 +2,17 @@ module github.com/jxo-me/plus-core/pkg/v2
 
 go 1.20
 
-//replace (
-//	github.com/jxo-me/plus-core/core => ../core
-//	github.com/jxo-me/plus-core/sdk => ../sdk
-//)
+replace (
+	github.com/jxo-me/plus-core/core/v2 => ../core
+	github.com/jxo-me/plus-core/sdk/v2 => ../sdk
+)
 
 require (
 	github.com/gogf/gf/v2 v2.5.1
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/jxo-me/plus-core/core/v2 v2.0.0
-	github.com/jxo-me/plus-core/sdk/v2 v2.0.0
+	github.com/jxo-me/plus-core/sdk/v2 v2.0.0-00010101000000-000000000000
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/stretchr/testify v1.8.4

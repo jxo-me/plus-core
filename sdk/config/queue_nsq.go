@@ -2,8 +2,8 @@ package config
 
 import (
 	"context"
-	queueLib "github.com/jxo-me/plus-core/core/queue"
-	nsq2 "github.com/jxo-me/plus-core/sdk/queue/nsq"
+	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
+	nsq2 "github.com/jxo-me/plus-core/sdk/v2/queue/nsq"
 	"github.com/nsqio/go-nsq"
 )
 

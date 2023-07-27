@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gogf/gf/v2/container/gvar"
-	"github.com/jxo-me/plus-core/core/cache"
+	"github.com/jxo-me/plus-core/core/v2/cache"
 	"time"
 )
 

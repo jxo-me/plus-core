@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/os/gcron"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/core/cron"
+	"github.com/jxo-me/plus-core/core/v2/cron"
 )
 
 var insCrontab = crontab{

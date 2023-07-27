@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/core/boot"
-	"github.com/jxo-me/plus-core/pkg/tus"
-	"github.com/jxo-me/plus-core/pkg/ws"
+	"github.com/jxo-me/plus-core/core/v2/boot"
+	"github.com/jxo-me/plus-core/pkg/v2/tus"
+	"github.com/jxo-me/plus-core/pkg/v2/ws"
 )
 
 var (

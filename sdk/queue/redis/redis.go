@@ -3,9 +3,9 @@ package redis
 import (
 	"context"
 	"github.com/go-redis/redis/v7"
-	messageLib "github.com/jxo-me/plus-core/core/message"
-	queueLib "github.com/jxo-me/plus-core/core/queue"
-	"github.com/jxo-me/plus-core/sdk/message"
+	messageLib "github.com/jxo-me/plus-core/core/v2/message"
+	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
+	"github.com/jxo-me/plus-core/sdk/v2/message"
 	"github.com/robinjoseph08/redisqueue/v2"
 )
 

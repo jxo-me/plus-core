@@ -10,9 +10,9 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/rlog"
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/gogf/gf/v2/util/gconv"
-	messageLib "github.com/jxo-me/plus-core/core/message"
-	queueLib "github.com/jxo-me/plus-core/core/queue"
-	"github.com/jxo-me/plus-core/sdk/message"
+	messageLib "github.com/jxo-me/plus-core/core/v2/message"
+	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
+	"github.com/jxo-me/plus-core/sdk/v2/message"
 	"sync"
 )
 

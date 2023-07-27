@@ -3,8 +3,8 @@ package config
 import (
 	"context"
 	"github.com/go-redis/redis/v7"
-	queueLib "github.com/jxo-me/plus-core/core/queue"
-	redis2 "github.com/jxo-me/plus-core/sdk/queue/redis"
+	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
+	redis2 "github.com/jxo-me/plus-core/sdk/v2/queue/redis"
 	"github.com/robinjoseph08/redisqueue/v2"
 	"time"
 )

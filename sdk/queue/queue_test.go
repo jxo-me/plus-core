@@ -3,16 +3,15 @@ package queue
 import (
 	"context"
 	"fmt"
-	"github.com/jxo-me/plus-core/core/message"
-	queueLib "github.com/jxo-me/plus-core/core/queue"
-	"github.com/jxo-me/plus-core/sdk/queue/memory"
-	redis2 "github.com/jxo-me/plus-core/sdk/queue/redis"
+	"github.com/go-redis/redis/v7"
+	"github.com/jxo-me/plus-core/core/v2/message"
+	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
+	"github.com/jxo-me/plus-core/sdk/v2/queue/memory"
+	redis2 "github.com/jxo-me/plus-core/sdk/v2/queue/redis"
+	"github.com/robinjoseph08/redisqueue/v2"
 	"reflect"
 	"testing"
 	"time"
-
-	"github.com/go-redis/redis/v7"
-	"github.com/robinjoseph08/redisqueue/v2"
 )
 
 func TestNewMemoryQueue(t *testing.T) {

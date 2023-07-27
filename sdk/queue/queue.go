@@ -2,8 +2,8 @@ package queue
 
 import (
 	"context"
-	"github.com/jxo-me/plus-core/core/message"
-	queueLib "github.com/jxo-me/plus-core/core/queue"
+	"github.com/jxo-me/plus-core/core/v2/message"
+	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 )
 
 // NewQueue 创建对应上下文队列

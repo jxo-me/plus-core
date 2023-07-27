@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/core/boot"
+	"github.com/jxo-me/plus-core/core/v2/boot"
 )
 
 const (

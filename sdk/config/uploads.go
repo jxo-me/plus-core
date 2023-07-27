@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/pkg/tus"
-	"github.com/jxo-me/plus-core/pkg/tus/filestore"
+	"github.com/jxo-me/plus-core/pkg/v2/tus"
+	"github.com/jxo-me/plus-core/pkg/v2/tus/filestore"
 )
 
 const (

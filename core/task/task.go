@@ -3,8 +3,8 @@ package task
 import (
 	"context"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/core/message"
-	"github.com/jxo-me/plus-core/core/queue"
+	"github.com/jxo-me/plus-core/core/v2/message"
+	"github.com/jxo-me/plus-core/core/v2/queue"
 )
 
 const (

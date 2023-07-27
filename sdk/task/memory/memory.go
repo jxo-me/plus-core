@@ -3,10 +3,10 @@ package memory
 import (
 	"context"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/core/queue"
-	"github.com/jxo-me/plus-core/core/task"
-	"github.com/jxo-me/plus-core/sdk"
-	"github.com/jxo-me/plus-core/sdk/config"
+	"github.com/jxo-me/plus-core/core/v2/queue"
+	"github.com/jxo-me/plus-core/core/v2/task"
+	"github.com/jxo-me/plus-core/sdk/v2"
+	"github.com/jxo-me/plus-core/sdk/v2/config"
 )
 
 const (

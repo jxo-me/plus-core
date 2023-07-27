@@ -6,9 +6,9 @@ import (
 	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
-	cacheLib "github.com/jxo-me/plus-core/core/cache"
-	redisLib "github.com/jxo-me/plus-core/sdk/cache/gredis"
-	memory2 "github.com/jxo-me/plus-core/sdk/cache/memory"
+	cacheLib "github.com/jxo-me/plus-core/core/v2/cache"
+	redisLib "github.com/jxo-me/plus-core/sdk/v2/cache/gredis"
+	memory2 "github.com/jxo-me/plus-core/sdk/v2/cache/memory"
 )
 
 var insCache = Cache{}

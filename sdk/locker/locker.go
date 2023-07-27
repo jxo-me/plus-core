@@ -2,7 +2,7 @@ package locker
 
 import (
 	"fmt"
-	"github.com/jxo-me/plus-core/core/locker"
+	"github.com/jxo-me/plus-core/core/v2/locker"
 	"github.com/jxo-me/redislock"
 )
 

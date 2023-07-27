@@ -2,7 +2,7 @@ package queue
 
 import (
 	"context"
-	"github.com/jxo-me/plus-core/core/message"
+	"github.com/jxo-me/plus-core/core/v2/message"
 )
 
 type IQueue interface {

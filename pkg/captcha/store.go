@@ -3,7 +3,7 @@ package captcha
 import (
 	"context"
 	"fmt"
-	cacheLib "github.com/jxo-me/plus-core/core/cache"
+	cacheLib "github.com/jxo-me/plus-core/core/v2/cache"
 	"github.com/mojocn/base64Captcha"
 )
 

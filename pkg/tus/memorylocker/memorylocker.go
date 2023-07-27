@@ -11,7 +11,7 @@
 package memorylocker
 
 import (
-	"github.com/jxo-me/plus-core/pkg/tus"
+	"github.com/jxo-me/plus-core/pkg/v2/tus"
 	"sync"
 )
 

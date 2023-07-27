@@ -6,8 +6,8 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/gogf/gf/v2/util/gconv"
-	"github.com/jxo-me/plus-core/pkg/response"
-	"github.com/jxo-me/plus-core/pkg/security"
+	"github.com/jxo-me/plus-core/pkg/v2/response"
+	"github.com/jxo-me/plus-core/pkg/v2/security"
 	"io"
 )
 

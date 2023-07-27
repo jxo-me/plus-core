@@ -6,8 +6,8 @@ import (
 	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
-	lockerLib "github.com/jxo-me/plus-core/core/locker"
-	"github.com/jxo-me/plus-core/sdk/locker/redis"
+	lockerLib "github.com/jxo-me/plus-core/core/v2/locker"
+	"github.com/jxo-me/plus-core/sdk/v2/locker/redis"
 )
 
 var insLocker = Locker{}
