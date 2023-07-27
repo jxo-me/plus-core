@@ -9,6 +9,7 @@ import (
 	"github.com/gogf/gf/v2/i18n/gi18n"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
+	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/gf-metrics"
 	"github.com/jxo-me/gfbot"
 	cacheLib "github.com/jxo-me/plus-core/core/cache"
@@ -84,8 +85,9 @@ func (a *Application) ConfigRegister() reg.IRegistry[*gcfg.Config] {
 }
 
 func (a *Application) Config(ctx context.Context, key string) *gvar.Var {
-	r, err := a.cacheReg.Get("").Get(ctx, key)
+	r, err := a.configReg.Get("").Get(ctx, key)
 	if err != nil {
+		glog.Error(ctx, "get global config error:", err.Error())
 		return gvar.New(nil)
 	}
 	return r
