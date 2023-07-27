@@ -1,6 +1,6 @@
 package config
 
-import "github.com/jxo-me/plus-core/sdk/pkg/security"
+import "github.com/jxo-me/plus-core/pkg/security"
 
 type Crypto struct {
 	Enable    bool                      `json:"enable" yaml:"enable"`

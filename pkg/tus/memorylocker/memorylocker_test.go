@@ -1,7 +1,7 @@
 package memorylocker
 
 import (
-	"github.com/jxo-me/plus-core/sdk/pkg/tus"
+	"github.com/jxo-me/plus-core/pkg/tus"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

@@ -6,8 +6,8 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/sdk/pkg/tus"
-	"github.com/jxo-me/plus-core/sdk/pkg/ws"
+	"github.com/jxo-me/plus-core/pkg/tus"
+	"github.com/jxo-me/plus-core/pkg/ws"
 )
 
 var (

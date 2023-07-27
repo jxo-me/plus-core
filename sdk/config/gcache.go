@@ -7,7 +7,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
 	cacheLib "github.com/jxo-me/plus-core/core/cache"
-	gredisLib "github.com/jxo-me/plus-core/sdk/cache/gredis"
+	redisLib "github.com/jxo-me/plus-core/sdk/cache/gredis"
 	memory2 "github.com/jxo-me/plus-core/sdk/cache/memory"
 )
 
@@ -27,7 +27,7 @@ func CacheConfig() *Cache {
 func (e *Cache) Setup(ctx context.Context, s *Settings) (cacheLib.ICache, error) {
 	redis := g.Redis(gredis.DefaultGroupName)
 	if redis != nil {
-		r, err := gredisLib.NewGredis(redis)
+		r, err := redisLib.NewGredis(redis)
 		if err != nil {
 			return nil, err
 		}
@@ -43,7 +43,7 @@ func (e *Cache) Setup(ctx context.Context, s *Settings) (cacheLib.ICache, error)
 		return nil, err
 	}
 	GRedis().SetClient(ctx, redis)
-	r, err := gredisLib.NewGredis(redis)
+	r, err := redisLib.NewGredis(redis)
 	if err != nil {
 		glog.Warning(ctx, fmt.Sprintf("get redis cache options: %v error: %v", options, err))
 		return memory2.NewMemory(), nil
