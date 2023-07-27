@@ -2,7 +2,7 @@ module github.com/jxo-me/plus-core/core
 
 go 1.20
 
-replace github.com/jxo-me/plus-core/pkg => ../pkg
+//replace github.com/jxo-me/plus-core/pkg => ../pkg
 
 require (
 	github.com/casbin/casbin/v2 v2.72.1

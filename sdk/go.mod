@@ -2,10 +2,10 @@ module github.com/jxo-me/plus-core/sdk
 
 go 1.20
 
-replace (
-	github.com/jxo-me/plus-core/core => ../core
-	github.com/jxo-me/plus-core/pkg => ../pkg
-)
+//replace (
+//	github.com/jxo-me/plus-core/core => ../core
+//	github.com/jxo-me/plus-core/pkg => ../pkg
+//)
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1

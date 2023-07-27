@@ -2,10 +2,10 @@ module github.com/jxo-me/plus-core/pkg
 
 go 1.20
 
-replace (
-	github.com/jxo-me/plus-core/core => ../core
-	github.com/jxo-me/plus-core/sdk => ../sdk
-)
+//replace (
+//	github.com/jxo-me/plus-core/core => ../core
+//	github.com/jxo-me/plus-core/sdk => ../sdk
+//)
 
 require (
 	github.com/gogf/gf/v2 v2.5.1
