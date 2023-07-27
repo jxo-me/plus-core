@@ -65,7 +65,7 @@ type Uploader struct {
 	TerminatedUploads chan HookEvent
 	// UploadProgress is used to send notifications about the progress of the
 	// currently running uploads. For each open PATCH request, every second
-	// a HookEvent instance will be send over this channel with the Offset field
+	// a HookEvent instance will be sent over this channel with the Offset field
 	// being set to the number of bytes which have been transfered to the server.
 	// Please be aware that this number may be higher than the number of bytes
 	// which have been stored by the data store! Sending to this channel will only
@@ -83,7 +83,7 @@ type Uploader struct {
 }
 
 // writeChunk reads the body from the requests r and appends it to the upload
-// with the corresponding id. Afterwards, it will set the necessary response
+// with the corresponding id. Afterward, it will set the necessary response
 // headers but will not send the response.
 func (h *Uploader) writeChunk(upload Upload, info FileInfo, r *ghttp.Request) error {
 	ctx := r.GetCtx()
@@ -128,7 +128,7 @@ func (h *Uploader) writeChunk(upload Upload, info FileInfo, r *ghttp.Request) er
 		uploadCtx, stopUpload := context.WithCancel(context.Background())
 		info.stopUpload = stopUpload
 		// terminateUpload specifies whether the upload should be deleted after
-		// the write has finished
+		// to write has finished
 		terminateUpload := false
 		// Cancel the context when the function exits to ensure that the goroutine
 		// is properly cleaned up
@@ -250,7 +250,7 @@ func (h *Uploader) sendProgressMessages(hook HookEvent, reader *bodyReader) chan
 // terminateUpload passes a given upload to the DataStore's Terminater,
 // send the corresponding upload info on the TerminatedUploads channnel
 // and updates the statistics.
-// Note the the info argument is only needed if the terminated uploads
+// Note the info argument is only needed if the terminated uploads
 // notifications are enabled.
 func (h *Uploader) terminateUpload(ctx context.Context, upload Upload, info FileInfo, r *ghttp.Request) error {
 	terminatableUpload := h.composer.Terminater.AsTerminatableUpload(upload)

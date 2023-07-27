@@ -9,7 +9,7 @@ import (
 // Metrics provides numbers about the usage of the tus handler. Since these may
 // be accessed from multiple goroutines, it is necessary to read and modify them
 // atomically using the functions exposed in the sync/atomic package, such as
-// atomic.LoadUint64. In addition the maps must not be modified to prevent data
+// atomic.LoadUint64. In addition, the maps must not be modified to prevent data
 // races.
 type Metrics struct {
 	// RequestTotal counts the number of incoming requests per method

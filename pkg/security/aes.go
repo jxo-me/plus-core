@@ -100,11 +100,11 @@ func (a *AesCipher) Encrypt(plaintext string) (string, error) {
 	// initialise 1st 8 bytes of counter block with nonce (NIST SP800-38A §B.2): [0-1] = millisec,
 	// [2-3] = random, [4-7] = seconds, together giving full sub-millisec uniqueness up to Feb 2106
 	var counterBlock = make([]int, BlockSize)
-	rand.Seed(time.Now().UnixNano())
+	var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 	var nonce = time.Now().Unix()
 	var nonceMs = int(nonce % 1000)
 	var nonceSec = int(math.Floor(float64(nonce / 1000)))
-	var nonceRnd = int(math.Floor(rand.Float64() * 0xffff))
+	var nonceRnd = int(math.Floor(r.Float64() * 0xffff))
 	// for debugging: nonce = nonceMs = nonceSec = nonceRnd = 0;
 	for i = 0; i < 2; i++ {
 		counterBlock[i] = (nonceMs >> (i * 8)) & 0xff

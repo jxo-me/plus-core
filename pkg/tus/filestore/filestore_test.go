@@ -5,7 +5,6 @@ import (
 	"github.com/jxo-me/plus-core/pkg/tus"
 	"github.com/stretchr/testify/assert"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,7 +20,7 @@ var _ tus.LengthDeferrerDataStore = FileStore{}
 func TestFilestore(t *testing.T) {
 	a := assert.New(t)
 
-	tmp, err := ioutil.TempDir("", "tus-filestore-")
+	tmp, err := os.MkdirTemp("", "tus-filestore-")
 	a.NoError(err)
 
 	store := FileStore{tmp}
@@ -62,7 +61,7 @@ func TestFilestore(t *testing.T) {
 	reader, err := upload.GetReader(ctx)
 	a.NoError(err)
 
-	content, err := ioutil.ReadAll(reader)
+	content, err := io.ReadAll(reader)
 	a.NoError(err)
 	a.Equal("hello world", string(content))
 	reader.(io.Closer).Close()
@@ -103,7 +102,7 @@ func TestNotFound(t *testing.T) {
 func TestConcatUploads(t *testing.T) {
 	a := assert.New(t)
 
-	tmp, err := ioutil.TempDir("", "tus-filestore-concat-")
+	tmp, err := os.MkdirTemp("", "tus-filestore-concat-")
 	a.NoError(err)
 
 	store := FileStore{tmp}
@@ -152,7 +151,7 @@ func TestConcatUploads(t *testing.T) {
 	reader, err := finUpload.GetReader(ctx)
 	a.NoError(err)
 
-	content, err := ioutil.ReadAll(reader)
+	content, err := io.ReadAll(reader)
 	a.NoError(err)
 	a.Equal("abcdefghi", string(content))
 	reader.(io.Closer).Close()

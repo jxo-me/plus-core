@@ -3,7 +3,7 @@ package filelocker
 import (
 	"github.com/jxo-me/plus-core/pkg/tus"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -12,7 +12,7 @@ var _ tus.Locker = &FileLocker{}
 func TestFileLocker(t *testing.T) {
 	a := assert.New(t)
 
-	dir, err := ioutil.TempDir("", "tus-file-locker")
+	dir, err := os.MkdirTemp("", "tus-file-locker")
 	a.NoError(err)
 
 	locker := FileLocker{dir}

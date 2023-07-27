@@ -14,7 +14,7 @@ type NSQOptions struct {
 	ReadTimeout  time.Duration `opt:"read_timeout" min:"100ms" max:"5m" default:"60s"`
 	WriteTimeout time.Duration `opt:"write_timeout" min:"100ms" max:"5m" default:"1s"`
 
-	// Addresses is the local address to use when dialing an nsqd.
+	// Addresses is the local address to use when dialing a nsqd.
 	Addresses []string `opt:"addresses"`
 
 	// Duration between polling lookupd for new producers, and fractional jitter to add to
@@ -38,10 +38,10 @@ type NSQOptions struct {
 	// Maximum number of times this consumer will attempt to process a message before giving up
 	MaxAttempts uint16 `opt:"max_attempts" min:"0" max:"65535" default:"5"`
 
-	// Duration to wait for a message from an nsqd when in a state where RDY
+	// Duration to wait for a message from a nsqd when in a state where RDY
 	// counts are re-distributed (e.g. max_in_flight < num_producers)
 	LowRdyIdleTimeout time.Duration `opt:"low_rdy_idle_timeout" min:"1s" max:"5m" default:"10s"`
-	// Duration to wait until redistributing RDY for an nsqd regardless of LowRdyIdleTimeout
+	// Duration to wait until redistributing RDY for a nsqd regardless of LowRdyIdleTimeout
 	LowRdyTimeout time.Duration `opt:"low_rdy_timeout" min:"1s" max:"5m" default:"30s"`
 	// Duration between redistributing max-in-flight to connections
 	RDYRedistributeInterval time.Duration `opt:"rdy_redistribute_interval" min:"1ms" max:"5s" default:"5s"`

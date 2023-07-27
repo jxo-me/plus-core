@@ -16,7 +16,7 @@ type Config struct {
 	// TODO: Remove pointer?
 	StoreComposer *StoreComposer `yaml:"-" json:"-"`
 	// MaxSize defines how many bytes may be stored in one single upload. If its
-	// value is is 0 or smaller no limit will be enforced.
+	// value is 0 or smaller no limit will be enforced.
 	MaxSize int64 `yaml:"maxSize" json:"max_size"`
 	// BasePath defines the URL path used for handling uploads, e.g. "/files/".
 	// If no trailing slash is presented it will be added. You may specify an
@@ -53,7 +53,7 @@ type Config struct {
 	RespectForwardedHeaders bool `yaml:"respectForwardedHeaders" json:"respect_forwarded_headers"`
 	// PreUploadCreateCallback will be invoked before a new upload is created, if the
 	// property is supplied. If the callback returns nil, the upload will be created.
-	// Otherwise the HTTP request will be aborted. This can be used to implement
+	// Otherwise, the HTTP request will be aborted. This can be used to implement
 	// validation of upload metadata etc.
 	PreUploadCreateCallback func(hook HookEvent) error `yaml:"-" json:"-"`
 	// PreFinishResponseCallback will be invoked after an upload is completed but before

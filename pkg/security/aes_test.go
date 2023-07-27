@@ -8,7 +8,7 @@ import (
 )
 
 func TestEncryptAndDecrypt(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
+	rand.NewSource(time.Now().UnixNano())
 	nonce := time.Now().Unix()
 	var tests = []struct {
 		key       string

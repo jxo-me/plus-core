@@ -4,7 +4,7 @@
 // It stores the uploads in a directory specified in two different files: The
 // `[id].info` files are used to store the fileinfo in JSON format. The
 // `[id]` files without an extension contain the raw binary data uploaded.
-// No cleanup is performed so you may want to run a cronjob to ensure your disk
+// No cleanup is performed, so you may want to run a cronjob to ensure your disk
 // is not filled up with old and finished uploads.
 package filestore
 
@@ -15,7 +15,6 @@ import (
 	"github.com/jxo-me/plus-core/pkg/tus"
 	"github.com/jxo-me/plus-core/pkg/tus/uid"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -38,7 +37,7 @@ func New(path string) FileStore {
 	return FileStore{path}
 }
 
-// UseIn sets this store as the core data store in the passed composer and adds
+// UseIn sets this store as the core data store in the past composer and adds
 // all possible extension to it.
 func (store FileStore) UseIn(composer *tus.StoreComposer) {
 	composer.UseCore(store)
@@ -86,7 +85,7 @@ func (store FileStore) NewUpload(ctx context.Context, info tus.FileInfo) (tus.Up
 
 func (store FileStore) GetUpload(ctx context.Context, id string) (tus.Upload, error) {
 	info := tus.FileInfo{}
-	data, err := ioutil.ReadFile(store.infoPath(id))
+	data, err := os.ReadFile(store.infoPath(id))
 	if err != nil {
 		if os.IsNotExist(err) {
 			// Interpret os.ErrNotExist as 404 Not Found
@@ -215,7 +214,7 @@ func (upload *fileUpload) writeInfo() error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(upload.infoPath, data, defaultFilePerm)
+	return os.WriteFile(upload.infoPath, data, defaultFilePerm)
 }
 
 func (upload *fileUpload) FinishUpload(ctx context.Context) error {

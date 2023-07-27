@@ -45,9 +45,9 @@ func (q *Upload) Init(ctx context.Context) error {
 	}
 
 	// A storage backend for tusd may consist of multiple different parts which
-	// handle upload creation, locking, termination and so on. The composer is a
-	// place where all those separated pieces are joined together. In this example
-	// we only use the file store but you may plug in multiple.
+	// handle upload creation, locking, termination, and so on. The composer is a
+	// place where all those separated pieces are joined together. In this example,
+	// we only use the file store, but you may plug in multiple.
 	composer := tus.NewStoreComposer()
 	store.UseIn(composer)
 	cf.StoreComposer = composer

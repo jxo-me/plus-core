@@ -105,7 +105,7 @@ func (c *OTPConfig) checkTotpCode(t0, code int) bool {
 				// code hasn't been used before
 				c.DisallowReuse = append(c.DisallowReuse, t)
 
-				// remove all time codes outside of the valid window
+				// remove all time codes outside the valid window
 				sort.Ints(c.DisallowReuse)
 				min := 0
 				for c.DisallowReuse[min] < minT {

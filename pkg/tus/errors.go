@@ -28,7 +28,7 @@ var (
 )
 
 // HTTPError represents an error with an additional status code attached
-// which may be used when this error is sent in a HTTP response.
+// which may be used when this error is sent in an HTTP response.
 // See the net/http package for standardized status codes.
 type HTTPError interface {
 	error
