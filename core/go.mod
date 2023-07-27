@@ -10,7 +10,7 @@ require (
 	github.com/gogf/gf/v2 v2.5.1
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
-	github.com/jxo-me/plus-core/pkg v0.0.0-00010101000000-000000000000
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.0
 	github.com/jxo-me/redislock v1.0.2
 )
 
