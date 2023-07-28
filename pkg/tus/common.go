@@ -3,6 +3,7 @@ package tus
 import (
 	"encoding/base64"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gctx"
 	"regexp"
 	"strconv"
 	"strings"
@@ -160,7 +161,7 @@ func i64toa(num int64) string {
 func getRequestId(r *ghttp.Request) string {
 	reqId := r.Header.Get("X-Request-ID")
 	if reqId == "" {
-		return ""
+		return gctx.CtxId(r.GetCtx())
 	}
 
 	// Limit the length of the request ID to 36 characters, which is enough

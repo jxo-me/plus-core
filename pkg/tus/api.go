@@ -1,7 +1,6 @@
 package tus
 
 import (
-	"context"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"io"
 	"net/http"
@@ -11,7 +10,7 @@ import (
 // PostFile creates a new file upload using the datastore after validating the
 // length and parsing the metadata.
 func (u *Uploader) PostFile(r *ghttp.Request) {
-	ctx := context.Background()
+	ctx := r.GetCtx()
 
 	// Check for the presence of application/offset+octet-stream.
 	// If another content
@@ -155,7 +154,7 @@ func (u *Uploader) PostFile(r *ghttp.Request) {
 
 // HeadFile returns the length and offset for the HEAD request
 func (u *Uploader) HeadFile(r *ghttp.Request) {
-	ctx := context.Background()
+	ctx := r.GetCtx()
 
 	id, err := extractIDFromPath(r.URL.Path)
 	if err != nil {
@@ -220,7 +219,7 @@ func (u *Uploader) HeadFile(r *ghttp.Request) {
 // PatchFile adds a chunk to an upload. This operation is only allowed
 // if enough space in the upload is left.
 func (u *Uploader) PatchFile(r *ghttp.Request) {
-	ctx := context.Background()
+	ctx := r.GetCtx()
 
 	// Check for presence of application/offset+octet-stream
 	if r.Header.Get("Content-Type") != "application/offset+octet-stream" {
@@ -318,7 +317,7 @@ func (u *Uploader) PatchFile(r *ghttp.Request) {
 // GetFile handles requests to download a file using a GET request. This is not
 // part of the specification.
 func (u *Uploader) GetFile(r *ghttp.Request) {
-	ctx := context.Background()
+	ctx := r.GetCtx()
 
 	id, err := extractIDFromPath(r.URL.Path)
 	if err != nil {
@@ -378,7 +377,7 @@ func (u *Uploader) GetFile(r *ghttp.Request) {
 
 // DelFile terminates an upload permanently.
 func (u *Uploader) DelFile(r *ghttp.Request) {
-	ctx := context.Background()
+	ctx := r.GetCtx()
 
 	// Abort the request handling if the required interface is not implemented
 	if !u.composer.UsesTerminater {
