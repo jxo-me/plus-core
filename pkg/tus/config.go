@@ -2,10 +2,10 @@ package tus
 
 import (
 	"errors"
-	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/v2/logger"
 	"net/url"
-	"time"
+	"os"
 )
 
 // Config provides a way to configure the Handler depending on your needs.
@@ -16,10 +16,10 @@ type Config struct {
 	// TODO: Remove pointer?
 	StoreComposer *StoreComposer `yaml:"-" json:"-"`
 	// MaxSize defines how many bytes may be stored in one single upload. If its
-	// value is 0 or smaller no limit will be enforced.
+	// value is 0 or smaller, no limit will be enforced.
 	MaxSize int64 `yaml:"maxSize" json:"max_size"`
 	// BasePath defines the URL path used for handling uploads, e.g. "/files/".
-	// If no trailing slash is presented it will be added. You may specify an
+	// If no trailing slash is presented, it will be added. You may specify an
 	// absolute URL containing a scheme, e.g. "http://tus.io"
 	BasePath string `yaml:"basePath" json:"base_path"`
 	IsAbs    bool   `yaml:"isAbs" json:"is_abs"`
@@ -41,12 +41,8 @@ type Config struct {
 	// NotifyCreatedUploads indicates whether sending notifications about
 	// the upload having been created using the CreatedUploads channel should be enabled.
 	NotifyCreatedUploads bool `yaml:"notifyCreatedUploads" json:"notify_created_uploads"`
-	// UploadProgressInterval specifies the interval at which the upload progress
-	// notifications are sent to the UploadProgress channel, if enabled.
-	// Defaults to 1s.
-	UploadProgressInterval time.Duration
-	// Logger is the Logger to use internally, mostly for printing requests.
-	Logger *glog.Logger `yaml:"-" json:"-"`
+	// Logger is the logger to use internally, mostly for printing requests.
+	Logger logger.ILogger `yaml:"-" json:"-"`
 	// Respect the X-Forwarded-Host, X-Forwarded-Proto and Forwarded headers
 	// potentially set by proxies when generating an absolute URL in the
 	// response to POST requests.
@@ -54,7 +50,7 @@ type Config struct {
 	// PreUploadCreateCallback will be invoked before a new upload is created, if the
 	// property is supplied. If the callback returns nil, the upload will be created.
 	// Otherwise, the HTTP request will be aborted. This can be used to implement
-	// validation of upload metadata etc.
+	// validation of upload metadata, etc.
 	PreUploadCreateCallback func(hook HookEvent) error `yaml:"-" json:"-"`
 	// PreFinishResponseCallback will be invoked after an upload is completed but before
 	// a response is returned to the client. Error responses from the callback will be passed
@@ -71,7 +67,9 @@ type Config struct {
 
 func (config *Config) validate() error {
 	if config.Logger == nil {
-		config.Logger = g.Log()
+		log := glog.NewWithWriter(os.Stdout)
+		log.SetFlags(glog.F_TIME_STD | glog.F_FILE_LONG)
+		config.Logger = log
 	}
 
 	base := config.BasePath
@@ -80,12 +78,12 @@ func (config *Config) validate() error {
 		return err
 	}
 
-	// Ensure base path ends with slash to remove logic from absFileURL
+	// Ensure a base path ends with slash to remove logic from absFileURL
 	if base != "" && string(base[len(base)-1]) != "/" {
 		base += "/"
 	}
 
-	// Ensure base path begins with slash if not absolute (starts with scheme)
+	// Ensure a base path begins with slash if not absolute (starts with scheme)
 	if !uri.IsAbs() && len(base) > 0 && string(base[0]) != "/" {
 		base = "/" + base
 	}
@@ -98,9 +96,6 @@ func (config *Config) validate() error {
 
 	if config.StoreComposer.Core == nil {
 		return errors.New("tus: StoreComposer in Config needs to contain a non-nil core")
-	}
-	if config.UploadProgressInterval <= 0 {
-		config.UploadProgressInterval = 1 * time.Second
 	}
 
 	return nil

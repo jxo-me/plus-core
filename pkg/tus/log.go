@@ -2,14 +2,14 @@ package tus
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/v2/logger"
 )
 
-func (h *Uploader) log(ctx context.Context, eventName string, details ...string) {
-	LogEvent(ctx, h.Logger, eventName, details...)
+func (u *Uploader) log(ctx context.Context, eventName string, details ...string) {
+	LogEvent(ctx, u.logger, eventName, details...)
 }
 
-func LogEvent(ctx context.Context, logger *glog.Logger, eventName string, details ...string) {
+func LogEvent(ctx context.Context, log logger.ILogger, eventName string, details ...string) {
 	result := make([]byte, 0, 100)
 
 	result = append(result, `event="`...)
@@ -24,5 +24,5 @@ func LogEvent(ctx context.Context, logger *glog.Logger, eventName string, detail
 	}
 
 	result = append(result, "\n"...)
-	logger.Info(ctx, string(result))
+	log.Infof(ctx, string(result))
 }

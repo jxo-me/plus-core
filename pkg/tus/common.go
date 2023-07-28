@@ -220,7 +220,7 @@ func filterContentType(info FileInfo) (contentType string, contentDisposition st
 	filetype := info.MetaData["filetype"]
 
 	if reMimeType.MatchString(filetype) {
-		// If the filetype from metadata is well-formed, we forward use this
+		// If the filetype from metadata is well formed, we forward use this
 		// for the Content-Type header. However, only whitelisted mime types
 		// will be allowed to be shown inline in the browser
 		contentType = filetype
@@ -230,7 +230,7 @@ func filterContentType(info FileInfo) (contentType string, contentDisposition st
 			contentDisposition = "attachment"
 		}
 	} else {
-		// If the filetype from the metadata is not well-formed, we use a
+		// If the filetype from the metadata is not well formed, we use a
 		// default type and force the browser to download the content.
 		contentType = "application/octet-stream"
 		contentDisposition = "attachment"

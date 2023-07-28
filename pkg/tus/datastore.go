@@ -36,7 +36,7 @@ type FileInfo struct {
 	stopUpload context.CancelFunc
 }
 
-// StopUpload interrupts a running upload from the server-side. This means that
+// StopUpload interrupts an running upload from the server-side. This means that
 // the current request body is closed, so that the data store does not get any
 // more data. Furthermore, a response is sent to notify the client of the
 // interrupting and the upload is terminated (if supported by the data store),
@@ -62,12 +62,12 @@ type Upload interface {
 	GetInfo(ctx context.Context) (FileInfo, error)
 	// GetReader returns a reader which allows iterating of the content of an
 	// upload specified by its ID. It should attempt to provide a reader even if
-	// the upload has not been finished yet, but it's not required.
+	// the upload has not been finished yet but it's not required.
 	// If the returned reader also implements the io.Closer interface, the
 	// Close() method will be invoked once everything has been read.
 	// If the given upload could not be found, the error tus.ErrNotFound should
 	// be returned.
-	GetReader(ctx context.Context) (io.ReadCloser, error)
+	GetReader(ctx context.Context) (io.Reader, error)
 	// FinishUpload FinisherDataStore is the interface which can be implemented by DataStores
 	// which need to do additional operations once an entire upload has been
 	// completed. These tasks may include but are not limited to freeing unused
@@ -80,7 +80,7 @@ type Upload interface {
 
 type DataStore interface {
 	// NewUpload Create a new upload using the size as the file's length. The method must
-	// return a unique id which is used to identify the upload. If no backend
+	// return an unique id which is used to identify the upload. If no backend
 	// (e.g. Riak) specifes the id you may want to use the uid package to
 	// generate one. The properties Size and MetaData will be filled.
 	NewUpload(ctx context.Context, info FileInfo) (upload Upload, err error)

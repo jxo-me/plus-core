@@ -6,18 +6,25 @@ import (
 	"strconv"
 )
 
-func (h *Uploader) Middleware(r *ghttp.Request) {
+// Middleware checks various aspects of the request and ensures that it
+// conforms with the spec.
+// Also handles method overriding for clients which
+// cannot make PATCH AND DELETE requests.
+// If you are using the tus handlers
+// directly, you will need to wrap at least the POST and PATCH endpoints in
+// this middleware.
+func (u *Uploader) Middleware(r *ghttp.Request) {
 	ctx := r.GetCtx()
 	// Allow overriding the HTTP method. The reason for this is
-	// that some libraries/environments to not support PATCH and
-	// DELETE requests, e.g. Flash in a browser and parts of Java
+	// that some libraries/environments are to not support PATCH and
+	// DELETE requests, e.g., Flash in a browser and parts of Java
 	if newMethod := r.Header.Get("X-HTTP-Method-Override"); newMethod != "" {
 		r.Method = newMethod
 	}
 
-	h.log(ctx, "RequestIncoming", "method", r.Method, "path", r.URL.Path, "requestId", getRequestId(r))
+	u.log(ctx, "RequestIncoming", "method", r.Method, "path", r.URL.Path, "requestId", getRequestId(r))
 
-	h.Metrics.incRequestsTotal(r.Method)
+	u.Metrics.incRequestsTotal(r.Method)
 
 	header := r.Response.Header()
 
@@ -26,11 +33,11 @@ func (h *Uploader) Middleware(r *ghttp.Request) {
 
 		if r.Method == "OPTIONS" {
 			allowedMethods := "POST, HEAD, PATCH, OPTIONS"
-			if !h.config.DisableDownload {
+			if !u.config.DisableDownload {
 				allowedMethods += ", GET"
 			}
 
-			if !h.config.DisableTermination {
+			if !u.config.DisableTermination {
 				allowedMethods += ", DELETE"
 			}
 
@@ -54,12 +61,12 @@ func (h *Uploader) Middleware(r *ghttp.Request) {
 	// Set appropriated headers in case of OPTIONS method allowing protocol
 	// discovery and end with an 204 No Content
 	if r.Method == "OPTIONS" {
-		if h.config.MaxSize > 0 {
-			header.Set("Tus-Max-Size", strconv.FormatInt(h.config.MaxSize, 10))
+		if u.config.MaxSize > 0 {
+			header.Set("Tus-Max-Size", strconv.FormatInt(u.config.MaxSize, 10))
 		}
 
 		header.Set("Tus-Version", "1.0.0")
-		header.Set("Tus-Extension", h.extensions)
+		header.Set("Tus-Extension", u.extensions)
 
 		// Although the 204 No Content status code is a better fit in this case,
 		// since we do not have a response body included, we cannot use it here
@@ -68,7 +75,7 @@ func (h *Uploader) Middleware(r *ghttp.Request) {
 		// will be ignored or interpreted as a rejection.
 		// For example, the Presto engine, which is used in older versions of
 		// Opera, Opera Mobile and Opera Mini, handles CORS this way.
-		h.sendResp(r, http.StatusOK)
+		u.sendResp(r, http.StatusOK)
 		return
 	}
 
@@ -76,8 +83,10 @@ func (h *Uploader) Middleware(r *ghttp.Request) {
 	// GET and HEAD methods are not checked since a browser may visit this URL and does
 	// not include this header. GET requests are not part of the specification.
 	if r.Method != "GET" && r.Method != "HEAD" && r.Header.Get("Tus-Resumable") != "1.0.0" {
-		h.sendError(r, ErrUnsupportedVersion)
+		u.sendError(r, ErrUnsupportedVersion)
 		return
 	}
+
+	// Proceed with routing the request
 	r.Middleware.Next()
 }

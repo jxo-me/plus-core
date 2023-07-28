@@ -1,6 +1,8 @@
 package tus
 
-import "github.com/gogf/gf/v2/net/ghttp"
+import (
+	"github.com/gogf/gf/v2/net/ghttp"
+)
 
 // HookEvent represents an event from tus which can be handled by the application.
 type HookEvent struct {
