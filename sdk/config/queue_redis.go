@@ -51,6 +51,9 @@ func (c *cQueueRedis) Init(ctx context.Context) error {
 }
 
 // GetQueue get Redis queue
-func (c *cQueueRedis) GetQueue(ctx context.Context) (queueLib.IQueue, error) {
-	return redis2.NewRedis(c.Producer, c.Consumer)
+func (c *cQueueRedis) GetQueue(ctx context.Context) (map[string]queueLib.IQueue, error) {
+	var err error
+	list := make(map[string]queueLib.IQueue)
+	list[DefaultGroupName], err = redis2.NewRedis(c.Producer, c.Consumer)
+	return list, err
 }

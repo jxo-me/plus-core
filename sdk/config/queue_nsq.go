@@ -39,6 +39,9 @@ func (c *cQueueNsq) Init(ctx context.Context) error {
 }
 
 // GetQueue get NSQ queue
-func (c *cQueueNsq) GetQueue(ctx context.Context) (queueLib.IQueue, error) {
-	return nsq2.NewNSQ(c.Addresses, c.Cfg, c.ChannelPrefix)
+func (c *cQueueNsq) GetQueue(ctx context.Context) (map[string]queueLib.IQueue, error) {
+	var err error
+	list := make(map[string]queueLib.IQueue)
+	list[DefaultGroupName], err = nsq2.NewNSQ(c.Addresses, c.Cfg, c.ChannelPrefix)
+	return list, err
 }

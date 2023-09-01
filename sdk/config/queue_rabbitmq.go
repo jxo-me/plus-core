@@ -13,11 +13,11 @@ const (
 )
 
 var insQueueRabbit = cQueueRabbit{
-	RabbitOptions: &RabbitOptions{},
+	List: map[string]*RabbitOptions{},
 }
 
 type cQueueRabbit struct {
-	*RabbitOptions
+	List map[string]*RabbitOptions
 }
 
 func QueueRabbit() *cQueueRabbit {
@@ -30,31 +30,62 @@ func (c *cQueueRabbit) String() string {
 
 func (c *cQueueRabbit) Init(ctx context.Context) error {
 	var err error
-	c.RabbitOptions, err = c.GetRabbitOptions(ctx, Setting())
+	conf, err := Setting().Cfg().Get(ctx, "settings.queue.rabbitmq", "")
 	if err != nil {
 		return err
 	}
+	list := make(map[string]*RabbitOptions)
+	err = conf.Scan(&list)
+	if err != nil {
+		return err
+	}
+	for key, config := range list {
+		if config.Tls != nil {
+			tls := &Tls{
+				Cert: config.Tls.Cert,
+				Ca:   config.Tls.Ca,
+				Key:  config.Tls.Key,
+			}
+			config.Cfg.TLSClientConfig, err = getTLS(tls)
+			if err != nil {
+				return err
+			}
+		}
+		if config.Dsn == "" {
+			config.GetDsn()
+		}
+		c.List[key] = config
+	}
+
 	return nil
 }
 
 // GetQueue get Rabbit queue
-func (c *cQueueRabbit) GetQueue(ctx context.Context) (queueLib.IQueue, error) {
-	logger := glog.New()
-	err := logger.SetConfigWithMap(g.Map{
-		"flags":  glog.F_TIME_STD | glog.F_FILE_LONG,
-		"path":   c.LogPath,
-		"file":   c.LogFile,
-		"level":  c.LogLevel,
-		"stdout": c.LogStdout,
-	})
-	if err != nil {
-		return nil, err
+func (c *cQueueRabbit) GetQueue(ctx context.Context) (map[string]queueLib.IQueue, error) {
+	list := make(map[string]queueLib.IQueue)
+	for key, options := range c.List {
+		logger := glog.New()
+		err := logger.SetConfigWithMap(g.Map{
+			"flags":  glog.F_TIME_STD | glog.F_FILE_LONG,
+			"path":   options.LogPath,
+			"file":   options.LogFile,
+			"level":  options.LogLevel,
+			"stdout": options.LogStdout,
+		})
+		if err != nil {
+			return nil, err
+		}
+		list[key], err = rabbitmq.NewRabbitMQ(
+			ctx,
+			options.Dsn,
+			options.ReconnectInterval,
+			options.Cfg,
+			logger,
+		)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return rabbitmq.NewRabbitMQ(
-		ctx,
-		c.RabbitOptions.Dsn,
-		c.RabbitOptions.ReconnectInterval,
-		c.RabbitOptions.Cfg,
-		logger,
-	)
+
+	return list, nil
 }

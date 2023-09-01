@@ -38,7 +38,7 @@ func (t *tRabbitMq) AddTasks(tasks ...task.RabbitMqTask) task.RabbitMqService {
 
 func (t *tRabbitMq) Start(ctx context.Context) {
 	glog.Info(ctx, "RabbitMq task start ...")
-	mQueue := sdk.Runtime.QueueRegistry().Get(config.RabbitmqQueueName) // get rabbitmq instance
+	mQueue := sdk.Runtime.QueueRegistry().Get(config.GetQueueName(config.RabbitmqQueueName, config.DefaultGroupName)) // get rabbitmq instance
 	if mQueue != nil {
 		for _, worker := range t.Routers {
 			spec := worker.GetSpec(ctx)

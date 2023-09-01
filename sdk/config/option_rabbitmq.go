@@ -1,14 +1,9 @@
 package config
 
 import (
-	"context"
 	"fmt"
 	"github.com/jxo-me/rabbitmq-go"
 	"time"
-)
-
-const (
-	DefaultGroupName = "default" // Default configuration group name.
 )
 
 type RabbitOptions struct {
@@ -40,42 +35,10 @@ func (e *RabbitOptions) GetReconnectInterval() int {
 	return e.ReconnectInterval
 }
 
-func (e *RabbitOptions) GetCfg() *rabbitmq.Config {
-	return e.Cfg
-}
-
 func (e *RabbitOptions) GetDsn() string {
 	if e.Dsn != "" {
 		return e.Dsn
 	}
 	e.Dsn = fmt.Sprintf("amqp://%s:%s@%s/%s", e.Username, e.Password, e.Addr, e.Vhost)
 	return e.Dsn
-}
-
-func (e *RabbitOptions) GetRabbitOptions(ctx context.Context, s *Settings) (*RabbitOptions, error) {
-	// reconnectInterval
-	e.Cfg = &rabbitmq.Config{}
-	conf, err := s.Cfg().Get(ctx, fmt.Sprintf("settings.queue.rabbitmq.%s", DefaultGroupName), "")
-	if err != nil {
-		return nil, err
-	}
-	err = conf.Scan(e)
-	if err != nil {
-		return nil, err
-	}
-	if e.Tls != nil {
-		tls := &Tls{
-			Cert: e.Tls.Cert,
-			Ca:   e.Tls.Ca,
-			Key:  e.Tls.Key,
-		}
-		e.Cfg.TLSClientConfig, err = getTLS(tls)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if e.Dsn == "" {
-		e.GetDsn()
-	}
-	return e, nil
 }

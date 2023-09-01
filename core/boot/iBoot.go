@@ -12,7 +12,7 @@ type Initialize interface {
 
 type QueueInitialize interface {
 	Initialize
-	GetQueue(ctx context.Context) (queue.IQueue, error)
+	GetQueue(ctx context.Context) (map[string]queue.IQueue, error)
 }
 
 type IBootstrap interface {

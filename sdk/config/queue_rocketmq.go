@@ -13,12 +13,21 @@ const (
 	RocketQueueName = "rocketmq"
 )
 
+type RocketOptions struct {
+	Urls []string `yaml:"urls" json:"urls"`
+	*primitive.Credentials
+	LogPath   string `yaml:"logPath" json:"log_path"`
+	LogFile   string `yaml:"logFile" json:"log_file"`
+	LogLevel  string `yaml:"logLevel" json:"log_level"`
+	LogStdout bool   `yaml:"logStdout" json:"log_stdout"`
+}
+
 var insQueueRocket = cQueueRocket{
-	RocketOptions: &RocketOptions{},
+	List: map[string]*RocketOptions{},
 }
 
 type cQueueRocket struct {
-	*RocketOptions
+	List map[string]*RocketOptions
 }
 
 func QueueRocket() *cQueueRocket {
@@ -31,36 +40,54 @@ func (c *cQueueRocket) String() string {
 
 func (c *cQueueRocket) Init(ctx context.Context) error {
 	var err error
-	c.RocketOptions, err = c.GetRocketOptions(ctx, Setting())
+	conf, err := Setting().Cfg().Get(ctx, "settings.queue.rabbitmq", "")
 	if err != nil {
 		return err
 	}
-	// primitive.Credentials
-	if c.AccessKey != "" && c.SecretKey != "" {
-		c.Credentials = &primitive.Credentials{
-			AccessKey: c.AccessKey,
-			SecretKey: c.SecretKey,
-		}
+	list := make(map[string]*RocketOptions)
+	err = conf.Scan(&list)
+	if err != nil {
+		return err
 	}
+	for key, config := range list {
+		// primitive.Credentials
+		if config.AccessKey != "" && config.SecretKey != "" {
+			config.Credentials = &primitive.Credentials{
+				AccessKey: config.AccessKey,
+				SecretKey: config.SecretKey,
+			}
+		}
+		c.List[key] = config
+	}
+
 	return nil
 }
 
 // GetQueue get Rocket queue
-func (c *cQueueRocket) GetQueue(ctx context.Context) (queueLib.IQueue, error) {
-	logger := glog.New()
-	err := logger.SetConfigWithMap(g.Map{
-		"path":   c.LogPath,
-		"file":   c.LogFile,
-		"level":  c.LogLevel,
-		"stdout": c.LogStdout,
-	})
-	if err != nil {
-		return nil, err
+func (c *cQueueRocket) GetQueue(ctx context.Context) (map[string]queueLib.IQueue, error) {
+	list := make(map[string]queueLib.IQueue)
+	for key, options := range c.List {
+		logger := glog.New()
+		err := logger.SetConfigWithMap(g.Map{
+			"flags":  glog.F_TIME_STD | glog.F_FILE_LONG,
+			"path":   options.LogPath,
+			"file":   options.LogFile,
+			"level":  options.LogLevel,
+			"stdout": options.LogStdout,
+		})
+		if err != nil {
+			return nil, err
+		}
+		list[key], err = rocketmq.NewRocketMQ(
+			ctx,
+			options.Urls,
+			options.Credentials,
+			logger,
+		)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return rocketmq.NewRocketMQ(
-		ctx,
-		c.Urls,
-		c.Credentials,
-		logger,
-	)
+
+	return list, nil
 }

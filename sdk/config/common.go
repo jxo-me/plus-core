@@ -7,6 +7,10 @@ import (
 	"os"
 )
 
+const (
+	DefaultGroupName = "default" // Default configuration group name.
+)
+
 type Tls struct {
 	Cert string `yaml:"cert" json:"cert"`
 	Key  string `yaml:"key" json:"key"`
@@ -43,4 +47,8 @@ func getTLS(c *Tls) (*tls.Config, error) {
 		}, nil
 	}
 	return nil, nil
+}
+
+func GetQueueName(typeName, name string) string {
+	return fmt.Sprintf("%s_%s", typeName, name)
 }

@@ -38,7 +38,7 @@ func (t *tMemory) AddTasks(tasks ...task.MemoryTask) task.MemoryService {
 
 func (t *tMemory) Start(ctx context.Context) {
 	glog.Info(ctx, "MemoryMq task start ...")
-	t.Queue = sdk.Runtime.QueueRegistry().Get(config.MemoryQueueName)
+	t.Queue = sdk.Runtime.QueueRegistry().Get(config.GetQueueName(config.MemoryQueueName, config.DefaultGroupName))
 	if t.Queue != nil {
 		for _, worker := range t.Routers {
 			sp := worker.GetSpec()

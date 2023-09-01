@@ -34,6 +34,8 @@ func (c *cQueueMemory) Init(ctx context.Context) error {
 }
 
 // GetQueue get Memory queue
-func (c *cQueueMemory) GetQueue(ctx context.Context) (queueLib.IQueue, error) {
-	return memory.NewMemory(c.PoolSize), nil
+func (c *cQueueMemory) GetQueue(ctx context.Context) (map[string]queueLib.IQueue, error) {
+	list := make(map[string]queueLib.IQueue)
+	list[DefaultGroupName] = memory.NewMemory(c.PoolSize)
+	return list, nil
 }
