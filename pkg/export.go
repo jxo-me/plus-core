@@ -461,7 +461,7 @@ func (e *Export) processor(ctx context.Context) (err error) {
 	if e.pageTotal == 0 {
 		e.pageTotal = 1
 	}
-	e.page = 1
+	e.page = 0
 	// excel 分表处理
 	for currentSheet := 1; currentSheet <= e.sheetTotal && !e.limit; currentSheet++ {
 		e.offset = 1
