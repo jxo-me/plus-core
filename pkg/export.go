@@ -12,6 +12,7 @@ import (
 	_ "image/png"
 	"math"
 	"reflect"
+	"sort"
 	"strings"
 	"sync/atomic"
 )
@@ -296,15 +297,11 @@ func (e *Export) before(ctx context.Context) (err error) {
 	if e.total >= e.options.LimitSize {
 		e.pageTotal = int(math.Ceil(float64(e.options.LimitSize) / float64(e.options.PageSize)))
 	}
-	if e.pageTotal == 0 {
-		e.pageTotal = 1
-	}
-	// 计算分表
-	e.sheetTotal = int(math.Ceil(float64(e.total) / float64(e.options.SheetSize)))
-	if e.total >= e.options.LimitSize {
-		e.sheetTotal = int(math.Ceil(float64(e.options.LimitSize) / float64(e.options.SheetSize)))
-	}
-	e.page = 0
+	// 计算分表 = 总分页数 / (单表行数/分页大小) 30 / (100000/5000)
+	e.sheetTotal = int(math.Ceil(float64(e.pageTotal) / float64(e.options.SheetSize/e.options.PageSize)))
+	//if e.total >= e.options.LimitSize {
+	//	e.sheetTotal = int(math.Ceil(float64(e.options.LimitSize) / float64(e.options.SheetSize)))
+	//}
 
 	return err
 }
@@ -441,6 +438,7 @@ func (e *Export) preProcessor(ctx context.Context, ptr any) (r *RawStruct, err e
 	for key := range fields {
 		fieldList = append(fieldList, key)
 	}
+	sort.Strings(fieldList)
 	translateMap := GetTagsMap(ptr, e.options.TagName, e.options.DescTag)
 	statusEnums := DefaultStatusFunc(ctx, e.lang, fieldList, translateMap)
 	headerCols, err := DefaultHeaderFunc(ctx, e.lang, e.excel, fieldList, translateMap)
@@ -460,6 +458,10 @@ func (e *Export) preProcessor(ctx context.Context, ptr any) (r *RawStruct, err e
 func (e *Export) processor(ctx context.Context) (err error) {
 	isBuildHeader := false
 	e.limit = false
+	if e.pageTotal == 0 {
+		e.pageTotal = 1
+	}
+	e.page = 1
 	// excel 分表处理
 	for currentSheet := 1; currentSheet <= e.sheetTotal && !e.limit; currentSheet++ {
 		e.offset = 1
@@ -483,9 +485,8 @@ func (e *Export) processor(ctx context.Context) (err error) {
 			return err
 		}
 		// 2. Get list data
-		maxPage := int(math.Ceil(float64(e.pageTotal) / float64(e.sheetTotal)))
 		e.pictureMap = make(map[string]string)
-		for s := 1; s <= maxPage && e.page < e.pageTotal && !e.limit; s++ {
+		for currentPage := 1; e.options.SheetSize < currentPage*e.options.PageSize && e.page < e.pageTotal && !e.limit; currentPage++ {
 			e.page++
 			// 分页查询
 			list, err := e.options.ListFunc(ctx, e.page, e.options.PageSize)
@@ -522,7 +523,7 @@ func (e *Export) processor(ctx context.Context) (err error) {
 				break
 			}
 
-			glog.Info(ctx, fmt.Sprintf("export excel filename: %s, total row: %d, sheetName: %s, current page: %d, Query list len: %d, current query: %d, current offset: %d success", e.options.FileName, e.total, sheetName, e.page, len(list), s, e.offset))
+			glog.Info(ctx, fmt.Sprintf("export excel filename: %s, total row: %d, sheetName: %s, current page: %d, Query list len: %d, current query: %d, current offset: %d success", e.options.FileName, e.total, sheetName, e.page, len(list), currentPage, e.offset))
 		}
 		// 4. Set Picture
 		for col, val := range e.pictureMap {
