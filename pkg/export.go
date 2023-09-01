@@ -486,7 +486,7 @@ func (e *Export) processor(ctx context.Context) (err error) {
 		}
 		// 2. Get list data
 		e.pictureMap = make(map[string]string)
-		for currentPage := 1; currentPage*e.options.PageSize < e.options.SheetSize && e.page < e.pageTotal && !e.limit; currentPage++ {
+		for currentPage := 1; currentPage*e.options.PageSize <= e.options.SheetSize && e.page < e.pageTotal && !e.limit; currentPage++ {
 			e.page++
 			// 分页查询
 			list, err := e.options.ListFunc(ctx, e.page, e.options.PageSize)
