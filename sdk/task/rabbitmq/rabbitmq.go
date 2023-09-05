@@ -17,10 +17,12 @@ const (
 
 var insRabbitMq = tRabbitMq{
 	Routers: []task.RabbitMqTask{},
+	Queue:   map[string]queue.IQueue{},
 }
 
 type tRabbitMq struct {
 	Routers []task.RabbitMqTask
+	Queue   map[string]queue.IQueue
 }
 
 func Service() *tRabbitMq {
@@ -37,29 +39,51 @@ func (t *tRabbitMq) AddTasks(tasks ...task.RabbitMqTask) task.RabbitMqService {
 }
 
 func (t *tRabbitMq) Start(ctx context.Context) {
+	var q queue.IQueue
 	glog.Info(ctx, "RabbitMq task start ...")
-	mQueue := sdk.Runtime.QueueRegistry().Get(config.GetQueueName(config.RabbitmqQueueName, config.DefaultGroupName)) // get rabbitmq instance
-	if mQueue != nil {
-		for _, worker := range t.Routers {
-			spec := worker.GetSpec(ctx)
-			if spec == nil {
-				glog.Warning(ctx, "get tRabbitMq spec is nil ignore...")
-				continue
-			}
-			for i := 0; i < spec.ConsumerNum; i++ {
-				// Consumer
-				mQueue.Consumer(ctx, spec.QueueName, worker.Handle,
-					queue.WithRabbitMqConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()),
-					queue.WithRabbitMqConsumeOptionsBindingExchangeName(spec.Exchange),
-					queue.WithRabbitMqConsumeOptionsBindingExchangeType(spec.ExchangeType),
-					queue.WithRabbitMqConsumeOptionsConcurrency(spec.CoroutineNum),
-					queue.WithRabbitMqConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)),
-					queue.WithRabbitMqConsumeOptionsConsumerAutoAck(spec.AutoAck),
-					queue.WithRabbitMqConsumeOptionsQOSPrefetch(spec.Prefetch),
-				)
-			}
-		}
+	dQueue := sdk.Runtime.QueueRegistry().Get(config.GetQueueName(config.RabbitmqQueueName, config.DefaultGroupName)) // get rabbitmq instance
+	if dQueue != nil {
+		t.Queue[config.DefaultGroupName] = dQueue
 	} else {
 		panic(gerror.New("sdk.Runtime.GetRabbitQueue is nil!"))
+	}
+	// register task
+	for _, worker := range t.Routers {
+		spec := worker.GetSpec(ctx)
+		if spec == nil {
+			glog.Warning(ctx, "get tRabbitMq spec is nil ignore...")
+			continue
+		}
+		q = dQueue
+		gName := spec.Vhost
+		if gName != "" {
+			if cQueue, ok := t.Queue[gName]; ok {
+				if cQueue != nil {
+					t.Queue[gName] = cQueue
+					q = cQueue
+				}
+			} else {
+				// get custom queue
+				cQueue = sdk.Runtime.QueueRegistry().Get(config.GetQueueName(config.RabbitmqQueueName, gName)) // get rabbitmq instance
+				if cQueue != nil {
+					t.Queue[gName] = cQueue
+					q = cQueue
+				}
+			}
+			// use default queue
+		}
+
+		for i := 0; i < spec.ConsumerNum; i++ {
+			// Consumer
+			q.Consumer(ctx, spec.QueueName, worker.Handle,
+				queue.WithRabbitMqConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()),
+				queue.WithRabbitMqConsumeOptionsBindingExchangeName(spec.Exchange),
+				queue.WithRabbitMqConsumeOptionsBindingExchangeType(spec.ExchangeType),
+				queue.WithRabbitMqConsumeOptionsConcurrency(spec.CoroutineNum),
+				queue.WithRabbitMqConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)),
+				queue.WithRabbitMqConsumeOptionsConsumerAutoAck(spec.AutoAck),
+				queue.WithRabbitMqConsumeOptionsQOSPrefetch(spec.Prefetch),
+			)
+		}
 	}
 }
