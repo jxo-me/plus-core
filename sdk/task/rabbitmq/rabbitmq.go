@@ -59,12 +59,8 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 		if spec.Vhost != "" {
 			gName = spec.Vhost
 			if cQueue, ok := t.Queue[gName]; ok {
-				if cQueue != nil {
-					t.Queue[gName] = cQueue
-					q = cQueue
-				} else {
-					glog.Warning(ctx, fmt.Sprintf("task name: %s, queue %s group is nil, use default queue.", spec.TaskName, gName))
-				}
+				t.Queue[gName] = cQueue
+				q = cQueue
 			} else {
 				// get custom queue
 				cQueue = sdk.Runtime.QueueRegistry().Get(config.GetQueueName(config.RabbitmqQueueName, gName)) // get rabbitmq instance
