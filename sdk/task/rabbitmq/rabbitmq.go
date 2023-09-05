@@ -61,6 +61,8 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 				if cQueue != nil {
 					t.Queue[gName] = cQueue
 					q = cQueue
+				} else {
+					glog.Warning(ctx, fmt.Sprintf("cQueue %s is nil use default queue: %s", gName, q.String()))
 				}
 			} else {
 				// get custom queue
@@ -68,10 +70,12 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 				if cQueue != nil {
 					t.Queue[gName] = cQueue
 					q = cQueue
+				} else {
+					glog.Warning(ctx, fmt.Sprintf("get cQueue %s is nil use default queue: %s", gName, q.String()))
 				}
 			}
+			glog.Info(ctx, fmt.Sprintf("queue group name: %s queue name: %s", gName, q.String()))
 			// use default queue
-			glog.Warning(ctx, fmt.Sprintf("use default queue: %s", q.String()))
 		}
 
 		for i := 0; i < spec.ConsumerNum; i++ {
