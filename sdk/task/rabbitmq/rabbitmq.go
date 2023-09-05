@@ -41,11 +41,12 @@ func (t *tRabbitMq) AddTasks(tasks ...task.RabbitMqTask) task.RabbitMqService {
 func (t *tRabbitMq) Start(ctx context.Context) {
 	var q queue.IQueue
 	glog.Info(ctx, "RabbitMq task start ...")
-	dQueue := sdk.Runtime.QueueRegistry().Get(config.GetQueueName(config.RabbitmqQueueName, config.DefaultGroupName)) // get rabbitmq instance
+	gName := config.DefaultGroupName
+	dQueue := sdk.Runtime.QueueRegistry().Get(config.GetQueueName(config.RabbitmqQueueName, gName)) // get rabbitmq instance
 	if dQueue != nil {
-		t.Queue[config.DefaultGroupName] = dQueue
+		t.Queue[gName] = dQueue
 	} else {
-		panic(gerror.New("sdk.Runtime.GetRabbitQueue is nil!"))
+		panic(gerror.New("sdk.Runtime.GetRabbitQueue default group is nil!"))
 	}
 	// register task
 	for _, worker := range t.Routers {
@@ -55,14 +56,14 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 			continue
 		}
 		q = dQueue
-		gName := spec.Vhost
-		if gName != "" {
+		if spec.Vhost != "" {
+			gName = spec.Vhost
 			if cQueue, ok := t.Queue[gName]; ok {
 				if cQueue != nil {
 					t.Queue[gName] = cQueue
 					q = cQueue
 				} else {
-					glog.Warning(ctx, fmt.Sprintf("cQueue %s is nil use default queue: %s", gName, q.String()))
+					glog.Warning(ctx, fmt.Sprintf("task name: %s, queue %s group is nil, use default queue.", spec.TaskName, gName))
 				}
 			} else {
 				// get custom queue
@@ -71,13 +72,13 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 					t.Queue[gName] = cQueue
 					q = cQueue
 				} else {
-					glog.Warning(ctx, fmt.Sprintf("get cQueue %s is nil use default queue: %s", gName, q.String()))
+					glog.Warning(ctx, fmt.Sprintf("task name: %s, get queue %s group is nil, use default queue.", spec.TaskName, gName))
 				}
 			}
-			glog.Info(ctx, fmt.Sprintf("queue group name: %s queue name: %s", gName, q.String()))
 			// use default queue
 		}
 
+		glog.Info(ctx, fmt.Sprintf("task name: %s, use queue group name: %s", spec.TaskName, gName))
 		for i := 0; i < spec.ConsumerNum; i++ {
 			// Consumer
 			q.Consumer(ctx, spec.QueueName, worker.Handle,
