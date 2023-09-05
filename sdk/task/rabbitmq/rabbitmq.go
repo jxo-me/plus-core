@@ -71,6 +71,7 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 				}
 			}
 			// use default queue
+			glog.Warning(ctx, fmt.Sprintf("use default queue: %s", q.String()))
 		}
 
 		for i := 0; i < spec.ConsumerNum; i++ {
