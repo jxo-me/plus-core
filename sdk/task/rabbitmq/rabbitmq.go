@@ -48,6 +48,7 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 	} else {
 		panic(gerror.New("sdk.Runtime.GetRabbitQueue default group is nil!"))
 	}
+	q = dQueue
 	// register task
 	for _, worker := range t.Routers {
 		spec := worker.GetSpec(ctx)
@@ -55,7 +56,6 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 			glog.Warning(ctx, "get tRabbitMq spec is nil ignore...")
 			continue
 		}
-		q = dQueue
 		if spec.Vhost != "" {
 			gName = spec.Vhost
 			if cQueue, ok := t.Queue[gName]; ok {
