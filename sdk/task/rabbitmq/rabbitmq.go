@@ -43,11 +43,10 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 	glog.Info(ctx, "RabbitMq task start ...")
 	gName := config.DefaultGroupName
 	dQueue := sdk.Runtime.QueueRegistry().Get(config.GetQueueName(config.RabbitmqQueueName, gName)) // get rabbitmq instance
-	if dQueue != nil {
-		t.Queue[gName] = dQueue
-	} else {
+	if dQueue == nil {
 		panic(gerror.New("sdk.Runtime.GetRabbitQueue default group is nil!"))
 	}
+	t.Queue[gName] = dQueue
 	q = dQueue
 	// register task
 	for _, worker := range t.Routers {
