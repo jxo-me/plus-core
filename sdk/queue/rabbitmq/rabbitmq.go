@@ -2,12 +2,12 @@ package rabbitmq
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/glog"
 	messageLib "github.com/jxo-me/plus-core/core/v2/message"
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 	"github.com/jxo-me/plus-core/sdk/v2/message"
+	"github.com/jxo-me/plus-core/sdk/v2/queue"
 	"github.com/jxo-me/rabbitmq-go"
 	"sync"
 	"time"
@@ -113,7 +113,7 @@ func (r *RabbitMQ) newProducer(ctx context.Context) (*rabbitmq.Publisher, error)
 // Publish 消息入生产者
 func (r *RabbitMQ) Publish(ctx context.Context, message messageLib.IMessage, optionFuncs ...func(*queueLib.PublishOptions)) error {
 	// exchange exchangeType routingKey
-	rb, err := json.Marshal(message.GetValues())
+	rb, err := queue.Marshal(message.GetValues())
 	if err != nil {
 		return err
 	}

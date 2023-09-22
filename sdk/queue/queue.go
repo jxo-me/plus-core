@@ -1,7 +1,9 @@
 package queue
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"github.com/jxo-me/plus-core/core/v2/message"
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 )
@@ -43,4 +45,15 @@ func (e *Queue) Shutdown(ctx context.Context) {
 	if e.queue != nil {
 		e.queue.Shutdown(ctx)
 	}
+}
+
+func Marshal(v any) ([]byte, error) {
+	bf := bytes.NewBuffer([]byte{})
+	jsonEncoder := json.NewEncoder(bf)
+	jsonEncoder.SetEscapeHTML(false)
+	err := jsonEncoder.Encode(v)
+	if err != nil {
+		return nil, err
+	}
+	return bf.Bytes(), nil
 }
