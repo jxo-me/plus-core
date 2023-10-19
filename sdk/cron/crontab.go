@@ -69,7 +69,7 @@ func (t *crontab) Start(ctx context.Context) {
 	var entry *gcron.Entry
 	for _, job := range t.Jobs {
 		sp := job.GetSpec()
-		entry, err = t.Cron.Add(ctx, sp.Pattern, job.Handle, sp.Name)
+		entry, err = t.Cron.AddSingleton(ctx, sp.Pattern, job.Handle, sp.Name)
 		if err != nil {
 			glog.Debug(ctx, "cron job register error:", err.Error())
 			continue
