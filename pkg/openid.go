@@ -43,7 +43,7 @@ func NewOpenIdWithKey(key string) *OpenId {
 	}
 }
 
-func (s *OpenId) Encode(userId int) (string, error) {
+func (s *OpenId) Encode(userId int64) (string, error) {
 	authcode, err := s.encode(fmt.Sprintf("%d", userId))
 	if err != nil {
 		return "", err
@@ -53,17 +53,7 @@ func (s *OpenId) Encode(userId int) (string, error) {
 }
 
 func (s *OpenId) encode(str string) (string, error) {
-	//keyLen := 4
-	//keya := "a6d7ad72c18ac0e15e5cd994b3cc79b4"
-	//keyb := "5df37d77e57300cfb6992fd1857077a4"
-	//times := "e4b38aed46581c30418803a63abb332a"
-
-	//keyHash := md5.Sum([]byte(key))
-	//keya = fmt.Sprintf("%x", md5.Sum(keyHash[:16]))
-	//keyb = fmt.Sprintf("%x", md5.Sum(keyHash[16:]))
-	//keyc := ""
 	keyC := s.substr(s.Salt, len(s.Salt)-s.KeyLen, s.KeyLen)
-	//keyc = fmt.Sprintf("%x", md5.Sum([]byte(time.Now().String())))[32-s.KeyLen:]
 	cryptKey := s.KeyA + s.md5Str(s.KeyA+keyC)
 	cryptKeyLen := len(cryptKey)
 	expiryStr := ""
@@ -88,15 +78,6 @@ func (s *OpenId) Decode(OpenID string) (string, error) {
 }
 
 func (s *OpenId) decode(str string) (string, error) {
-	//keyLen := 4
-	//keya := "a6d7ad72c18ac0e15e5cd994b3cc79b4"
-	//keyb := "5df37d77e57300cfb6992fd1857077a4"
-	//times := "e4b38aed46581c30418803a63abb332a"
-
-	//keyHash := md5.Sum([]byte(key))
-	//keya = fmt.Sprintf("%x", md5.Sum(keyHash[:16]))
-	//keyb = fmt.Sprintf("%x", md5.Sum(keyHash[16:]))
-	//keyC := ""
 	keyC := str[:s.KeyLen]
 	cryptKey := s.KeyA + s.md5Str(s.KeyA+keyC)
 	cryptKeyLen := len(cryptKey)
@@ -112,24 +93,13 @@ func (s *OpenId) decode(str string) (string, error) {
 }
 
 func (s *OpenId) authCode(str, operation, key string, expiry int) (string, error) {
-	keyLen := 4
-	keya := "a6d7ad72c18ac0e15e5cd994b3cc79b4"
-	keyb := "5df37d77e57300cfb6992fd1857077a4"
-	times := "e4b38aed46581c30418803a63abb332a"
-
-	//keyHash := md5.Sum([]byte(key))
-	//keya = fmt.Sprintf("%x", md5.Sum(keyHash[:16]))
-	//keyb = fmt.Sprintf("%x", md5.Sum(keyHash[16:]))
-	keyc := ""
+	keyC := ""
 	if operation == "DECODE" {
-		keyc = str[:keyLen]
+		keyC = str[:s.KeyLen]
 	} else {
-		keyc = s.substr(times, len(times)-keyLen, keyLen)
-		//keyc = fmt.Sprintf("%x", md5.Sum([]byte(time.Now().String())))[32-keyLen:]
+		keyC = s.substr(s.Salt, len(s.Salt)-s.KeyLen, s.KeyLen)
 	}
-	fmt.Println("keyc:", keyc)
-	cryptKey := keya + s.md5Str(keya+keyc)
-	fmt.Println("cryptKey:", cryptKey)
+	cryptKey := s.KeyA + s.md5Str(s.KeyA+keyC)
 	cryptKeyLen := len(cryptKey)
 	str1 := ""
 	if operation == "DECODE" {
@@ -145,17 +115,15 @@ func (s *OpenId) authCode(str, operation, key string, expiry int) (string, error
 		} else {
 			expiryStr = s.sprintf(expiry + int(time.Now().Unix()))
 		}
-		str1 = expiryStr + s.substr(s.md5Str(str+keyb), 0, 16) + str
+		str1 = expiryStr + s.substr(s.md5Str(str+s.KeyB), 0, 16) + str
 	}
-	fmt.Println("str1:", str1)
-	fmt.Println("str1 len:", len(str1))
 	str1Len := len(str1)
 	result := s.core(cryptKey, cryptKeyLen, str1, str1Len)
-	//fmt.Println("result:", result)
+
 	if operation == "DECODE" {
 		return result[26:], nil
 	} else {
-		return keyc + strings.ReplaceAll(base64.StdEncoding.EncodeToString([]byte(result)), "=", ""), nil
+		return keyC + strings.ReplaceAll(base64.StdEncoding.EncodeToString([]byte(result)), "=", ""), nil
 	}
 }
 
