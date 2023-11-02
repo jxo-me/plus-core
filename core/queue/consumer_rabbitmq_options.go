@@ -76,6 +76,13 @@ func WithRabbitMqConsumeOptionsExchangeDeclare(declare bool) func(*ConsumeOption
 	}
 }
 
+// WithRabbitMqConsumeOptionsExchangeDurable returns a function that sets the exchange is a durable exchange
+func WithRabbitMqConsumeOptionsExchangeDurable(durable bool) func(*ConsumeOptions) {
+	return func(options *ConsumeOptions) {
+		getBindingExchangeOptionsOrSetDefault(options).Durable = durable
+	}
+}
+
 // WithRabbitMqConsumeOptionsConcurrency returns a function that sets the concurrency, which means that
 // many goroutines will be spawned to run the provided handler on messages
 func WithRabbitMqConsumeOptionsConcurrency(concurrency int) func(*ConsumeOptions) {

@@ -86,6 +86,7 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 				queue.WithRabbitMqConsumeOptionsQOSPrefetch(spec.Prefetch),
 				queue.WithRabbitMqConsumeOptionsExchangePassive(spec.Passive),
 				queue.WithRabbitMqConsumeOptionsExchangeDeclare(spec.Declare),
+				queue.WithRabbitMqConsumeOptionsExchangeDurable(spec.Durable),
 			)
 		}
 	}
