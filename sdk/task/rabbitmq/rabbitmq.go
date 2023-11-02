@@ -84,6 +84,8 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 				queue.WithRabbitMqConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)),
 				queue.WithRabbitMqConsumeOptionsConsumerAutoAck(spec.AutoAck),
 				queue.WithRabbitMqConsumeOptionsQOSPrefetch(spec.Prefetch),
+				queue.WithRabbitMqConsumeOptionsExchangePassive(spec.Passive),
+				queue.WithRabbitMqConsumeOptionsExchangeDeclare(spec.Declare),
 			)
 		}
 	}

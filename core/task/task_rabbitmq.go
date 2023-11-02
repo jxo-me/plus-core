@@ -17,6 +17,8 @@ type RabbitMqSpec struct {
 	CoroutineNum int
 	Prefetch     int
 	AutoAck      bool
+	Passive      bool // if false, a missing exchange will be created on the server
+	Declare      bool
 }
 
 func (r *RabbitMqSpec) GetRoutingKeys() []string {

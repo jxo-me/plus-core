@@ -78,21 +78,40 @@ func (r *RabbitMQ) newConsumer(ctx context.Context, queueName string, handler ra
 	if err != nil {
 		return nil, err
 	}
+	var optionFuncs []func(*rabbitmq.ConsumerOptions)
+	if options.BindingExchange.Declare {
+		optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsExchangeDeclare)
+	}
+	if options.BindingExchange.Durable {
+		optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsExchangeDurable)
+	}
+	if options.BindingExchange.Passive {
+		optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsExchangePassive)
+	}
+	optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsExchangeName(options.BindingExchange.Name))
+	optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsExchangeKind(options.BindingExchange.Kind))
+	optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsLogger(r.Logger))
+	optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsRoutingKeys(options.BindingRoutingKeys))
+	optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsConsumerName(options.ConsumerName))
+	optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsConcurrency(options.Concurrency))
+	optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsConsumerAutoAck(options.ConsumerAutoAck))
+	optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsQOSPrefetch(options.QOSPrefetch))
 	return rabbitmq.NewConsumer(ctx,
 		conn,
 		handler,
 		queueName,
-		rabbitmq.WithConsumerOptionsExchangeDeclare,
-		rabbitmq.WithConsumerOptionsLogger(r.Logger),
-		rabbitmq.WithConsumerOptionsRoutingKeys(options.BindingRoutingKeys),
-		rabbitmq.WithConsumerOptionsConsumerName(options.ConsumerName),
-		rabbitmq.WithConsumerOptionsExchangeName(options.BindingExchange.Name),
-		rabbitmq.WithConsumerOptionsExchangeKind(options.BindingExchange.Kind),
-		rabbitmq.WithConsumerOptionsConcurrency(options.Concurrency), // goroutine num
-		rabbitmq.WithConsumerOptionsConsumerAutoAck(options.ConsumerAutoAck),
-		rabbitmq.WithConsumerOptionsQOSPrefetch(options.QOSPrefetch),
-		rabbitmq.WithConsumerOptionsExchangeDurable,
-		rabbitmq.WithConsumerOptionsQueueDurable,
+		//rabbitmq.WithConsumerOptionsExchangeDeclare,
+		//rabbitmq.WithConsumerOptionsExchangeDurable,
+		//rabbitmq.WithConsumerOptionsLogger(r.Logger),
+		//rabbitmq.WithConsumerOptionsRoutingKeys(options.BindingRoutingKeys),
+		//rabbitmq.WithConsumerOptionsConsumerName(options.ConsumerName),
+		//rabbitmq.WithConsumerOptionsExchangeName(options.BindingExchange.Name),
+		//rabbitmq.WithConsumerOptionsExchangeKind(options.BindingExchange.Kind),
+		//rabbitmq.WithConsumerOptionsConcurrency(options.Concurrency), // goroutine num
+		//rabbitmq.WithConsumerOptionsConsumerAutoAck(options.ConsumerAutoAck),
+		//rabbitmq.WithConsumerOptionsQOSPrefetch(options.QOSPrefetch),
+		//rabbitmq.WithConsumerOptionsQueueDurable,
+		optionFuncs...,
 	)
 }
 

@@ -1,10 +1,19 @@
 package queue
 
+import "github.com/jxo-me/rabbitmq-go"
+
 // BindingExchangeOptions are used when binding to an exchange.
 // it will verify the exchange is created before binding to it.
 type BindingExchangeOptions struct {
-	Name string
-	Kind string
+	Name       string
+	Kind       string // possible values: empty string for default exchange or direct, topic, fanout
+	Durable    bool
+	AutoDelete bool
+	Internal   bool
+	NoWait     bool
+	Passive    bool // if false, a missing exchange will be created on the server
+	Args       rabbitmq.Table
+	Declare    bool
 }
 
 // GetDefaultConsumeOptions descibes the options that will be used when a value isn't provided
@@ -50,6 +59,20 @@ func WithRabbitMqConsumeOptionsBindingExchangeName(name string) func(*ConsumeOpt
 func WithRabbitMqConsumeOptionsBindingExchangeType(kind string) func(*ConsumeOptions) {
 	return func(options *ConsumeOptions) {
 		getBindingExchangeOptionsOrSetDefault(options).Kind = kind
+	}
+}
+
+// WithRabbitMqConsumeOptionsExchangePassive returns a function that sets the exchange is a passive exchange
+func WithRabbitMqConsumeOptionsExchangePassive(passive bool) func(*ConsumeOptions) {
+	return func(options *ConsumeOptions) {
+		getBindingExchangeOptionsOrSetDefault(options).Passive = passive
+	}
+}
+
+// WithRabbitMqConsumeOptionsExchangeDeclare returns a function that sets the exchange is a passive exchange
+func WithRabbitMqConsumeOptionsExchangeDeclare(declare bool) func(*ConsumeOptions) {
+	return func(options *ConsumeOptions) {
+		getBindingExchangeOptionsOrSetDefault(options).Declare = declare
 	}
 }
 
