@@ -88,6 +88,7 @@ func (r *RabbitMQ) newConsumer(ctx context.Context, queueName string, handler ra
 	if options.BindingExchange.Passive {
 		optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsExchangePassive)
 	}
+	optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsQueueDurable)
 	optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsExchangeName(options.BindingExchange.Name))
 	optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsExchangeKind(options.BindingExchange.Kind))
 	optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsLogger(r.Logger))
@@ -100,17 +101,6 @@ func (r *RabbitMQ) newConsumer(ctx context.Context, queueName string, handler ra
 		conn,
 		handler,
 		queueName,
-		//rabbitmq.WithConsumerOptionsExchangeDeclare,
-		//rabbitmq.WithConsumerOptionsExchangeDurable,
-		//rabbitmq.WithConsumerOptionsLogger(r.Logger),
-		//rabbitmq.WithConsumerOptionsRoutingKeys(options.BindingRoutingKeys),
-		//rabbitmq.WithConsumerOptionsConsumerName(options.ConsumerName),
-		//rabbitmq.WithConsumerOptionsExchangeName(options.BindingExchange.Name),
-		//rabbitmq.WithConsumerOptionsExchangeKind(options.BindingExchange.Kind),
-		//rabbitmq.WithConsumerOptionsConcurrency(options.Concurrency), // goroutine num
-		//rabbitmq.WithConsumerOptionsConsumerAutoAck(options.ConsumerAutoAck),
-		//rabbitmq.WithConsumerOptionsQOSPrefetch(options.QOSPrefetch),
-		//rabbitmq.WithConsumerOptionsQueueDurable,
 		optionFuncs...,
 	)
 }
