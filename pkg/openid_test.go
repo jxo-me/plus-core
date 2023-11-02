@@ -7,7 +7,7 @@ import (
 func TestOpenIdWithKeyEncode(t *testing.T) {
 	var tests = []struct {
 		Key    string
-		userId int
+		userId int64
 		result string
 	}{
 		{"8a6f2805b4515ac12058e79e66539be9", 1, "2fb9GnkjEMA4qlb7BRxz3nuRG50_2BgJ_2BbP91T6V4T"},
@@ -59,7 +59,7 @@ func TestOpenIdEncode(t *testing.T) {
 		KeyA   string
 		KeyB   string
 		Salt   string
-		userId int
+		userId int64
 		result string
 	}{
 		{"8a6f2805b4515ac12058e79e66539be9", "1929f008c8edbcf5756f95bf876466e7", "50f0b71156b779e16825b4e8df502727", 1, "2727fS7bOhnpJXQR9zWiSrNox3unuZJyae_2B5NwuS"},
