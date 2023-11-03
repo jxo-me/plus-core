@@ -41,14 +41,14 @@ func (c *cQueueRabbit) Init(ctx context.Context) error {
 		return err
 	}
 	for key, config := range list {
-		if config.Cfg == nil {
-			config.Cfg = &rabbitmqGo.Config{}
-		}
 		if config.Tls != nil {
 			tls := &Tls{
 				Cert: config.Tls.Cert,
 				Ca:   config.Tls.Ca,
 				Key:  config.Tls.Key,
+			}
+			if config.Cfg == nil {
+				config.Cfg = &rabbitmqGo.Config{}
 			}
 			config.Cfg.TLSClientConfig, err = getTLS(tls)
 			if err != nil {
@@ -57,9 +57,6 @@ func (c *cQueueRabbit) Init(ctx context.Context) error {
 		}
 		if config.Dsn == "" {
 			config.GetDsn()
-		}
-		if config.Vhost != "" {
-			config.Cfg.Vhost = config.Vhost
 		}
 		c.List[key] = config
 	}
