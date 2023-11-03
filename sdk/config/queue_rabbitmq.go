@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 	"github.com/jxo-me/plus-core/sdk/v2/queue/rabbitmq"
+	rabbitmqGo "github.com/jxo-me/rabbitmq-go"
 )
 
 const (
@@ -40,6 +41,9 @@ func (c *cQueueRabbit) Init(ctx context.Context) error {
 		return err
 	}
 	for key, config := range list {
+		if config.Cfg == nil {
+			config.Cfg = &rabbitmqGo.Config{}
+		}
 		if config.Tls != nil {
 			tls := &Tls{
 				Cert: config.Tls.Cert,
