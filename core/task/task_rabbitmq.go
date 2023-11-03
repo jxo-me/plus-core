@@ -6,6 +6,7 @@ import (
 
 type RabbitMqSpec struct {
 	TaskName     string
+	Group        string
 	Vhost        string
 	RoutingKeys  []string
 	RoutingKey   string
@@ -19,6 +20,7 @@ type RabbitMqSpec struct {
 	AutoAck      bool
 	Passive      bool // if false, a missing exchange will be created on the server
 	Declare      bool
+	QueueDeclare bool
 	Durable      bool
 }
 

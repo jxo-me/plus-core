@@ -55,8 +55,8 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 			glog.Warning(ctx, "get tRabbitMq spec is nil ignore...")
 			continue
 		}
-		if spec.Vhost != "" {
-			gName = spec.Vhost
+		if spec.Group != "" {
+			gName = spec.Group
 			if cQueue, ok := t.Queue[gName]; ok {
 				t.Queue[gName] = cQueue
 				q = cQueue
@@ -67,13 +67,13 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 					t.Queue[gName] = cQueue
 					q = cQueue
 				} else {
-					glog.Warning(ctx, fmt.Sprintf("task name: %s, get queue %s group is nil, use default queue.", spec.TaskName, gName))
+					glog.Warning(ctx, fmt.Sprintf("task name: %s, get queue %s config group is nil, use default config group. Exchange: %s ExchangeType: %s QueueName: %s", spec.TaskName, gName, spec.Exchange, spec.ExchangeType, spec.QueueName))
 				}
 			}
 			// use default queue
 		}
 
-		glog.Info(ctx, fmt.Sprintf("task name: %s, use queue group name: %s", spec.TaskName, gName))
+		glog.Info(ctx, fmt.Sprintf("task name: %s, use config group name: %s, Exchange: %s ExchangeType: %s QueueName: %s", spec.TaskName, gName, spec.Exchange, spec.ExchangeType, spec.QueueName))
 		for i := 0; i < spec.ConsumerNum; i++ {
 			// Consumer
 			q.Consumer(ctx, spec.QueueName, worker.Handle,

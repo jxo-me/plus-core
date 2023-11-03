@@ -54,6 +54,9 @@ func (c *cQueueRabbit) Init(ctx context.Context) error {
 		if config.Dsn == "" {
 			config.GetDsn()
 		}
+		if config.Vhost != "" {
+			config.Cfg.Vhost = config.Vhost
+		}
 		c.List[key] = config
 	}
 
