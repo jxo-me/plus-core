@@ -171,7 +171,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f queueLib.Co
 	var ok bool
 	r.mux.Lock()
 	defer r.mux.Unlock()
-	if c, ok = r.consumers[options.BindingExchange.Name]; !ok {
+	if c, ok = r.consumers[queueName]; !ok {
 		header := func(d rabbitmq.Delivery) rabbitmq.Action {
 			m := new(message.Message)
 			m.SetValues(map[string]interface{}{
@@ -195,7 +195,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f queueLib.Co
 			glog.Error(ctx, "rabbitmq newConsumer error:", err)
 			return
 		}
-		r.consumers[options.BindingExchange.Name] = c
+		r.consumers[queueName] = c
 	}
 
 }
