@@ -5,6 +5,7 @@ go 1.20
 replace (
 	github.com/jxo-me/plus-core/core/v2 => ../core
 	github.com/jxo-me/plus-core/pkg/v2 => ../pkg
+	github.com/jxo-me/rabbitmq-go => ../../rabbitmq-go
 )
 
 require (
@@ -17,9 +18,9 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
-	github.com/jxo-me/plus-core/core/v2 v2.0.12
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.15
-	github.com/jxo-me/rabbitmq-go v1.0.5
+	github.com/jxo-me/plus-core/core/v2 v2.0.17
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.16
+	github.com/jxo-me/rabbitmq-go v1.0.9
 	github.com/jxo-me/redislock v1.0.2
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/robinjoseph08/redisqueue/v2 v2.1.0

@@ -60,6 +60,10 @@ func (r *Redis) Publish(ctx context.Context, message messageLib.IMessage, option
 	return err
 }
 
+func (r *Redis) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.PublishOptions)) ([]byte, error) {
+	return nil, nil
+}
+
 // Consumer 监听消费者
 func (r *Redis) Consumer(ctx context.Context, name string, f queueLib.ConsumerFunc, optionFuncs ...func(*queueLib.ConsumeOptions)) {
 	r.consumer.Register(name, func(msg *redisqueue.Message) error {

@@ -142,6 +142,10 @@ func (r *RocketMQ) Publish(ctx context.Context, message messageLib.IMessage, opt
 	return err
 }
 
+func (r *RocketMQ) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.PublishOptions)) ([]byte, error) {
+	return nil, nil
+}
+
 // Consumer 监听消费者
 func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f queueLib.ConsumerFunc, optionFuncs ...func(*queueLib.ConsumeOptions)) {
 	options := queueLib.GetDefaultConsumeOptions()

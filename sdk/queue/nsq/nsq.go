@@ -85,6 +85,10 @@ func (e *NSQ) Consumer(ctx context.Context, name string, f queueLib.ConsumerFunc
 	}
 }
 
+func (e *NSQ) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.PublishOptions)) ([]byte, error) {
+	return nil, nil
+}
+
 func (e *NSQ) Run(ctx context.Context) {
 }
 

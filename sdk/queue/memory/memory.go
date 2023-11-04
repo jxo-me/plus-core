@@ -98,6 +98,10 @@ func (m *Memory) Consumer(ctx context.Context, name string, f queueLib.ConsumerF
 	}(q, f)
 }
 
+func (m *Memory) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.PublishOptions)) ([]byte, error) {
+	return nil, nil
+}
+
 func (m *Memory) Run(ctx context.Context) {
 	m.wait.Add(1)
 	m.wait.Wait()

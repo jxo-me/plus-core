@@ -2,6 +2,7 @@ package rabbitmq
 
 import (
 	"context"
+	"fmt"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/glog"
 	messageLib "github.com/jxo-me/plus-core/core/v2/message"
@@ -27,6 +28,7 @@ func NewRabbitMQ(
 		ReconnectInterval: reconnectInterval,
 		producers:         map[string]*rabbitmq.Publisher{},
 		consumers:         map[string]*rabbitmq.Consumer{},
+		rpcClients:        map[string]*rabbitmq.RpcClient{},
 		Logger:            logger,
 	}
 	if cfg != nil {
@@ -45,6 +47,7 @@ type RabbitMQ struct {
 	consumers         map[string]*rabbitmq.Consumer
 	ConsumerOptions   *rabbitmq.ConsumerOptions
 	producers         map[string]*rabbitmq.Publisher
+	rpcClients        map[string]*rabbitmq.RpcClient
 	PublisherOptions  *rabbitmq.PublisherOptions
 	Logger            rabbitmq.Logger
 	conn              *rabbitmq.Conn
@@ -160,6 +163,72 @@ func (r *RabbitMQ) Publish(ctx context.Context, message messageLib.IMessage, opt
 	return err
 }
 
+func (r *RabbitMQ) newRpcClient(ctx context.Context, optionFuncs ...func(*rabbitmq.PublishOptions)) (*rabbitmq.RpcClient, error) {
+	var err error
+	var conn *rabbitmq.Conn
+	conn, err = r.newConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return rabbitmq.NewRpcClient(ctx,
+		conn,
+		rabbitmq.WithPublisherOptionsLogger(r.Logger),
+	)
+}
+
+// RpcRequest AMQP RPC Request
+func (r *RabbitMQ) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.PublishOptions)) ([]byte, error) {
+	options := &queueLib.PublishOptions{
+		ContentType: "application/json",
+		MessageID:   gctx.CtxId(ctx),
+	}
+	for _, optionFunc := range optionFuncs {
+		optionFunc(options)
+	}
+	var (
+		p        *rabbitmq.RpcClient
+		ok       bool
+		err      error
+		optFuncs []func(*rabbitmq.PublishOptions)
+		resp     []byte
+	)
+	if options.Exchange != "" {
+		optFuncs = append(optFuncs, rabbitmq.WithPublishOptionsExchange(options.Exchange))
+	}
+	if options.ContentType != "" {
+		optFuncs = append(optFuncs, rabbitmq.WithPublishOptionsContentType(options.ContentType))
+	}
+	if options.MessageID != "" {
+		optFuncs = append(optFuncs, rabbitmq.WithPublishOptionsMessageID(options.MessageID))
+	}
+	if options.AppID != "" {
+		optFuncs = append(optFuncs, rabbitmq.WithPublishOptionsAppID(options.AppID))
+	}
+	if options.UserID != "" {
+		optFuncs = append(optFuncs, rabbitmq.WithPublishOptionsUserID(options.UserID))
+	}
+	if options.ReplyTo != "" {
+		optFuncs = append(optFuncs, rabbitmq.WithPublishOptionsReplyTo(options.ReplyTo))
+	}
+
+	if p, ok = r.rpcClients[options.GroupName]; !ok {
+		p, err = r.newRpcClient(ctx, optFuncs...)
+		if err != nil {
+			glog.Warning(ctx, "rabbitmq new rpcClient error:", err)
+			return nil, err
+		}
+		r.rpcClients[options.GroupName] = p
+	}
+
+	resp, err = p.PublishWithContext(
+		ctx,
+		data,
+		key,
+	)
+	return resp, err
+}
+
 // Consumer 监听消费者
 func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f queueLib.ConsumerFunc, optionFuncs ...func(*queueLib.ConsumeOptions)) {
 	options := queueLib.GetDefaultConsumeOptions()
@@ -172,7 +241,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f queueLib.Co
 	r.mux.Lock()
 	defer r.mux.Unlock()
 	if c, ok = r.consumers[queueName]; !ok {
-		header := func(d rabbitmq.Delivery) rabbitmq.Action {
+		handler := func(d rabbitmq.Delivery) rabbitmq.Action {
 			m := new(message.Message)
 			m.SetValues(map[string]interface{}{
 				"body": string(d.Body),
@@ -184,13 +253,13 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f queueLib.Co
 			}
 			err = f(ctx, m)
 			if err != nil {
-				glog.Warning(ctx, "RabbitMQ Requeue msg:", m)
+				glog.Warning(ctx, fmt.Sprintf("RabbitMQ Requeue error:%s msg: %v", err.Error(), m))
 				return rabbitmq.NackRequeue
 			}
 			// rabbitmq.Ack, rabbitmq.NackDiscard, rabbitmq.NackRequeue
 			return rabbitmq.Ack
 		}
-		c, err = r.newConsumer(ctx, queueName, header, options)
+		c, err = r.newConsumer(ctx, queueName, handler, options)
 		if err != nil {
 			glog.Error(ctx, "rabbitmq newConsumer error:", err)
 			return

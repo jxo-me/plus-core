@@ -2,7 +2,10 @@ module github.com/jxo-me/plus-core/core/v2
 
 go 1.20
 
-replace github.com/jxo-me/plus-core/pkg/v2 => ../pkg
+replace (
+	github.com/jxo-me/plus-core/pkg/v2 => ../pkg
+	github.com/jxo-me/rabbitmq-go => ../../rabbitmq-go
+)
 
 require (
 	github.com/casbin/casbin/v2 v2.77.2
@@ -10,8 +13,8 @@ require (
 	github.com/gogf/gf/v2 v2.5.6
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.15
-	github.com/jxo-me/rabbitmq-go v1.0.5
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.16
+	github.com/jxo-me/rabbitmq-go v1.0.9
 	github.com/jxo-me/redislock v1.0.2
 )
 
@@ -28,6 +31,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/google/uuid v1.4.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/grokify/html-strip-tags-go v0.0.1 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect

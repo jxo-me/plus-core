@@ -41,3 +41,13 @@ func WithRabbitMqPublishOptionsAppID(appID string) func(*PublishOptions) {
 		options.AppID = appID
 	}
 }
+
+// WithRabbitMqPublishGroupName set group name address
+func WithRabbitMqPublishGroupName(name string) func(*PublishOptions) {
+	return func(options *PublishOptions) {
+		if name == "" {
+			return
+		}
+		options.GroupName = name
+	}
+}

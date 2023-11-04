@@ -35,6 +35,10 @@ func (e *Queue) Publish(ctx context.Context, msg message.IMessage, optionFuncs .
 	return e.queue.Publish(ctx, msg, optionFuncs...)
 }
 
+func (e *Queue) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.PublishOptions)) ([]byte, error) {
+	return e.queue.RpcRequest(ctx, key, data, optionFuncs...)
+}
+
 // Run 运行
 func (e *Queue) Run(ctx context.Context) {
 	e.queue.Run(ctx)
