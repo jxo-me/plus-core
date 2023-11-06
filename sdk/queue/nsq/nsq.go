@@ -85,7 +85,7 @@ func (e *NSQ) Consumer(ctx context.Context, name string, f queueLib.ConsumerFunc
 	}
 }
 
-func (e *NSQ) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.PublishOptions)) ([]byte, error) {
+func (e *NSQ) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.ClientOptions)) ([]byte, error) {
 	return nil, nil
 }
 
@@ -113,5 +113,5 @@ func (e nsqConsumerHandler) HandleMessage(msg *nsq.Message) error {
 		return err
 	}
 	m.SetValues(data)
-	return e.f(context.Background(), m)
+	return e.f(context.Background(), nil, m)
 }

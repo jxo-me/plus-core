@@ -142,7 +142,7 @@ func (r *RocketMQ) Publish(ctx context.Context, message messageLib.IMessage, opt
 	return err
 }
 
-func (r *RocketMQ) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.PublishOptions)) ([]byte, error) {
+func (r *RocketMQ) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.ClientOptions)) ([]byte, error) {
 	return nil, nil
 }
 
@@ -180,7 +180,7 @@ func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f queueLib.Co
 					m.SetRoutingKey(msgs[i].GetTags())
 					m.SetId(msgs[i].MsgId)
 					m.SetErrorCount(uint64(msgs[i].ReconsumeTimes))
-					err = f(ctx, m)
+					err = f(ctx, nil, m)
 					if err != nil {
 						glog.Warning(ctx, "RocketMQ Rollback msg:", m)
 						return consumer.Rollback, err

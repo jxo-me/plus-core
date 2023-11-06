@@ -75,19 +75,19 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 
 		glog.Info(ctx, fmt.Sprintf("task name: %s, use config group name: %s, Exchange: %s ExchangeType: %s QueueName: %s", spec.TaskName, gName, spec.Exchange, spec.ExchangeType, spec.QueueName))
 		for i := 0; i < spec.ConsumerNum; i++ {
+			var optFuncs []func(*queue.ConsumeOptions)
+			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()))
+			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsBindingExchangeName(spec.Exchange))
+			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsBindingExchangeType(spec.ExchangeType))
+			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsConcurrency(spec.CoroutineNum))
+			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)))
+			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsConsumerAutoAck(spec.AutoAck))
+			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsQOSPrefetch(spec.Prefetch))
+			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsExchangePassive(spec.Passive))
+			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsExchangeDeclare(spec.Declare))
+			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsExchangeDurable(spec.Durable))
 			// Consumer
-			q.Consumer(ctx, spec.QueueName, worker.Handle,
-				queue.WithRabbitMqConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()),
-				queue.WithRabbitMqConsumeOptionsBindingExchangeName(spec.Exchange),
-				queue.WithRabbitMqConsumeOptionsBindingExchangeType(spec.ExchangeType),
-				queue.WithRabbitMqConsumeOptionsConcurrency(spec.CoroutineNum),
-				queue.WithRabbitMqConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)),
-				queue.WithRabbitMqConsumeOptionsConsumerAutoAck(spec.AutoAck),
-				queue.WithRabbitMqConsumeOptionsQOSPrefetch(spec.Prefetch),
-				queue.WithRabbitMqConsumeOptionsExchangePassive(spec.Passive),
-				queue.WithRabbitMqConsumeOptionsExchangeDeclare(spec.Declare),
-				queue.WithRabbitMqConsumeOptionsExchangeDurable(spec.Durable),
-			)
+			q.Consumer(ctx, spec.QueueName, worker.Handle, optFuncs...)
 		}
 	}
 }

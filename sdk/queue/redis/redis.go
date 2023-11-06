@@ -60,7 +60,7 @@ func (r *Redis) Publish(ctx context.Context, message messageLib.IMessage, option
 	return err
 }
 
-func (r *Redis) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.PublishOptions)) ([]byte, error) {
+func (r *Redis) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.ClientOptions)) ([]byte, error) {
 	return nil, nil
 }
 
@@ -71,7 +71,7 @@ func (r *Redis) Consumer(ctx context.Context, name string, f queueLib.ConsumerFu
 		m.SetValues(msg.Values)
 		m.SetRoutingKey(msg.Stream)
 		m.SetId(msg.ID)
-		return f(ctx, m)
+		return f(ctx, nil, m)
 	})
 }
 

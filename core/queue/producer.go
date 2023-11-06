@@ -14,6 +14,9 @@ type PublishOptions struct {
 	// creating application id
 	AppID string
 
+	Mandatory bool
+	Immediate bool
+
 	// rocketmq
 	GroupName  string
 	RetryTimes int

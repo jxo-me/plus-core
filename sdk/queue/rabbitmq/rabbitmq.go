@@ -163,7 +163,7 @@ func (r *RabbitMQ) Publish(ctx context.Context, message messageLib.IMessage, opt
 	return err
 }
 
-func (r *RabbitMQ) newRpcClient(ctx context.Context, optionFuncs ...func(*rabbitmq.PublishOptions)) (*rabbitmq.RpcClient, error) {
+func (r *RabbitMQ) newRpcClient(ctx context.Context, optionFuncs ...func(*rabbitmq.ClientOptions)) (*rabbitmq.RpcClient, error) {
 	var err error
 	var conn *rabbitmq.Conn
 	conn, err = r.newConn(ctx)
@@ -173,45 +173,50 @@ func (r *RabbitMQ) newRpcClient(ctx context.Context, optionFuncs ...func(*rabbit
 
 	return rabbitmq.NewRpcClient(ctx,
 		conn,
-		rabbitmq.WithPublisherOptionsLogger(r.Logger),
+		rabbitmq.WithClientOptionsLogger(r.Logger),
 	)
 }
 
 // RpcRequest AMQP RPC Request
-func (r *RabbitMQ) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.PublishOptions)) ([]byte, error) {
-	options := &queueLib.PublishOptions{
-		ContentType: "application/json",
-		MessageID:   gctx.CtxId(ctx),
-	}
+func (r *RabbitMQ) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.ClientOptions)) ([]byte, error) {
+	options := queueLib.GetDefaultClientOptions(key)
 	for _, optionFunc := range optionFuncs {
-		optionFunc(options)
+		optionFunc(&options)
 	}
 	var (
 		p        *rabbitmq.RpcClient
 		ok       bool
 		err      error
-		optFuncs []func(*rabbitmq.PublishOptions)
+		optFuncs []func(*rabbitmq.ClientOptions)
 		resp     []byte
 	)
-	if options.Exchange != "" {
-		optFuncs = append(optFuncs, rabbitmq.WithPublishOptionsExchange(options.Exchange))
+	if options.PublishOptions.Mandatory {
+		optFuncs = append(optFuncs, rabbitmq.WithClientPublishOptionsMandatory)
 	}
-	if options.ContentType != "" {
-		optFuncs = append(optFuncs, rabbitmq.WithPublishOptionsContentType(options.ContentType))
+	if options.PublishOptions.Immediate {
+		optFuncs = append(optFuncs, rabbitmq.WithClientPublishOptionsImmediate)
 	}
-	if options.MessageID != "" {
-		optFuncs = append(optFuncs, rabbitmq.WithPublishOptionsMessageID(options.MessageID))
+	if options.ConsumeOptions.ConsumerName != "" {
+		optFuncs = append(optFuncs, rabbitmq.WithClientOptionsConsumerName(options.ConsumeOptions.ConsumerName))
 	}
-	if options.AppID != "" {
-		optFuncs = append(optFuncs, rabbitmq.WithPublishOptionsAppID(options.AppID))
+	if options.ConsumeOptions.ConsumerAutoAck {
+		optFuncs = append(optFuncs, rabbitmq.WithClientOptionsConsumerAutoAck(true))
 	}
-	if options.UserID != "" {
-		optFuncs = append(optFuncs, rabbitmq.WithPublishOptionsUserID(options.UserID))
+	if options.ConsumeOptions.Exclusive {
+		optFuncs = append(optFuncs, rabbitmq.WithClientOptionsConsumerExclusive)
 	}
-	if options.ReplyTo != "" {
-		optFuncs = append(optFuncs, rabbitmq.WithPublishOptionsReplyTo(options.ReplyTo))
+	if options.QueueOptions.Durable {
+		optFuncs = append(optFuncs, rabbitmq.WithClientOptionsQueueDurable)
 	}
-
+	if options.QueueOptions.AutoDelete {
+		optFuncs = append(optFuncs, rabbitmq.WithClientOptionsQueueAutoDelete)
+	}
+	if options.QueueOptions.Exclusive {
+		optFuncs = append(optFuncs, rabbitmq.WithClientOptionsQueueExclusive)
+	}
+	if options.QueueOptions.Args != nil {
+		optFuncs = append(optFuncs, rabbitmq.WithClientOptionsQueueArgs(options.QueueOptions.Args))
+	}
 	if p, ok = r.rpcClients[options.GroupName]; !ok {
 		p, err = r.newRpcClient(ctx, optFuncs...)
 		if err != nil {
@@ -241,7 +246,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f queueLib.Co
 	r.mux.Lock()
 	defer r.mux.Unlock()
 	if c, ok = r.consumers[queueName]; !ok {
-		handler := func(d rabbitmq.Delivery) rabbitmq.Action {
+		handler := func(ctx context.Context, rw *rabbitmq.ResponseWriter, d rabbitmq.Delivery) rabbitmq.Action {
 			m := new(message.Message)
 			m.SetValues(map[string]interface{}{
 				"body": string(d.Body),
@@ -251,7 +256,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f queueLib.Co
 			if d.Redelivered {
 				m.SetErrorCount(d.DeliveryTag)
 			}
-			err = f(ctx, m)
+			err = f(ctx, rw, m)
 			if err != nil {
 				glog.Warning(ctx, fmt.Sprintf("RabbitMQ Requeue error:%s msg: %v", err.Error(), m))
 				return rabbitmq.NackRequeue

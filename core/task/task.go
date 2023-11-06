@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/jxo-me/plus-core/core/v2/message"
 	"github.com/jxo-me/plus-core/core/v2/queue"
+	"io"
 )
 
 const (
@@ -13,7 +14,7 @@ const (
 
 // IHandler 任务MQ路由的回调接口/**/
 type IHandler interface {
-	Handle(ctx context.Context, msg message.IMessage) error
+	Handle(ctx context.Context, rw io.Writer, msg message.IMessage) error
 }
 
 type SubTask interface {
@@ -28,7 +29,7 @@ type TasksService interface {
 
 func WrapHandler(handler SubTask) queue.ConsumerFunc {
 	return queue.ConsumerFunc(
-		func(ctx context.Context, msg message.IMessage) error {
+		func(ctx context.Context, rw io.Writer, msg message.IMessage) error {
 			_, err := handler.Handle(ctx, msg)
 			if err != nil {
 				glog.Error(ctx, "task handler error", err.Error())
@@ -43,7 +44,7 @@ type CallbackFunc func(context.Context, interface{}) error
 
 func CallbackWrapHandler(handler SubTask, callback CallbackFunc) queue.ConsumerFunc {
 	return queue.ConsumerFunc(
-		func(ctx context.Context, msg message.IMessage) error {
+		func(ctx context.Context, rw io.Writer, msg message.IMessage) error {
 			data, err := handler.Handle(ctx, msg)
 			if err != nil {
 				glog.Error(ctx, "task handler error", err.Error())

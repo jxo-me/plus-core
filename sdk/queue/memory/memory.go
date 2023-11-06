@@ -89,7 +89,7 @@ func (m *Memory) Consumer(ctx context.Context, name string, f queueLib.ConsumerF
 	go func(out queue, gf queueLib.ConsumerFunc) {
 		var err error
 		for iMessage := range q {
-			err = gf(ctx, iMessage)
+			err = gf(ctx, nil, iMessage)
 			if err != nil {
 				out <- iMessage
 				err = nil
@@ -98,7 +98,7 @@ func (m *Memory) Consumer(ctx context.Context, name string, f queueLib.ConsumerF
 	}(q, f)
 }
 
-func (m *Memory) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.PublishOptions)) ([]byte, error) {
+func (m *Memory) RpcRequest(ctx context.Context, key string, data []byte, optionFuncs ...func(*queueLib.ClientOptions)) ([]byte, error) {
 	return nil, nil
 }
 
