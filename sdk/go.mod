@@ -18,18 +18,21 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
-	github.com/jxo-me/plus-core/core/v2 v2.0.17
+	github.com/jxo-me/plus-core/core/v2 v2.0.18
 	github.com/jxo-me/plus-core/pkg/v2 v2.0.16
 	github.com/jxo-me/rabbitmq-go v1.0.12
 	github.com/jxo-me/redislock v1.0.2
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/robinjoseph08/redisqueue/v2 v2.1.0
-	golang.org/x/text v0.13.0
+	github.com/zegl/goriak/v3 v3.2.4
+	golang.org/x/text v0.14.0
 )
 
 require (
 	github.com/BurntSushi/toml v1.2.0 // indirect
 	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
+	github.com/basho/backoff v0.0.0-20150307023525-2ff7c4694083 // indirect
+	github.com/basho/riak-go-client v0.0.0-20170327205844-5587c16e0b8b // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.8.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect

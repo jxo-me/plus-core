@@ -11,7 +11,7 @@ require (
 	github.com/gogf/gf/v2 v2.5.6
 	github.com/google/uuid v1.4.0
 	github.com/gorilla/websocket v1.5.0
-	github.com/jxo-me/plus-core/core/v2 v2.0.17
+	github.com/jxo-me/plus-core/core/v2 v2.0.18
 	github.com/jxo-me/plus-core/sdk/v2 v2.0.22
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
@@ -49,6 +49,6 @@ require (
 	golang.org/x/image v0.11.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -23,6 +23,7 @@ import (
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
 	"github.com/jxo-me/plus-core/sdk/v2/message"
 	"github.com/jxo-me/plus-core/sdk/v2/registry"
+	"github.com/zegl/goriak/v3"
 )
 
 type Application struct {
@@ -43,6 +44,7 @@ type Application struct {
 	taskServiceReg     reg.IRegistry[task.TasksService]
 	tusReg             reg.IRegistry[*tus.Uploader]
 	websocketReg       reg.IRegistry[*ws.Instance]
+	riakReg            reg.IRegistry[*goriak.Session]
 }
 
 // NewConfig 默认值
@@ -65,6 +67,7 @@ func NewConfig() *Application {
 		taskServiceReg:     new(registry.TaskServiceRegistry),
 		tusReg:             new(registry.TusRegistry),
 		websocketReg:       new(registry.WebSocketRegistry),
+		riakReg:            new(registry.RiakRegistry),
 	}
 }
 
@@ -131,6 +134,10 @@ func (a *Application) RabbitTaskRegister() reg.IRegistry[task.RabbitMqService] {
 
 func (a *Application) RocketTaskRegister() reg.IRegistry[task.RocketMqService] {
 	return a.rocketMqServiceReg
+}
+
+func (a *Application) RiakRegister() reg.IRegistry[*goriak.Session] {
+	return a.riakReg
 }
 
 func (a *Application) ServerRegistry() reg.IRegistry[*ghttp.Server] {

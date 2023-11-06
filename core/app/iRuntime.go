@@ -19,6 +19,7 @@ import (
 	"github.com/jxo-me/plus-core/core/v2/task"
 	"github.com/jxo-me/plus-core/pkg/v2/tus"
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
+	"github.com/zegl/goriak/v3"
 )
 
 type IRuntime interface {
@@ -35,6 +36,7 @@ type IRuntime interface {
 	QueueRegistry() reg.IRegistry[queue.IQueue]
 	RabbitTaskRegister() reg.IRegistry[task.RabbitMqService]
 	RocketTaskRegister() reg.IRegistry[task.RocketMqService]
+	RiakRegister() reg.IRegistry[*goriak.Session]
 	ServerRegistry() reg.IRegistry[*ghttp.Server]
 	TaskRegister() reg.IRegistry[task.TasksService]
 	TusUploaderRegister() reg.IRegistry[*tus.Uploader]
