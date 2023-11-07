@@ -14,7 +14,7 @@ require (
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
 	github.com/jxo-me/plus-core/pkg/v2 v2.0.16
-	github.com/jxo-me/rabbitmq-go v1.0.12
+	github.com/jxo-me/rabbitmq-go v1.0.13
 	github.com/jxo-me/redislock v1.0.2
 	github.com/zegl/goriak/v3 v3.2.4
 )
