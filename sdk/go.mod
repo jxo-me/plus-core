@@ -18,7 +18,7 @@ require (
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
 	github.com/jxo-me/plus-core/core/v2 v2.0.19
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.16
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.20
 	github.com/jxo-me/rabbitmq-go v1.0.13
 	github.com/jxo-me/redislock v1.0.2
 	github.com/nsqio/go-nsq v1.1.0
@@ -46,7 +46,7 @@ require (
 	github.com/golang/mock v1.4.4 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/grokify/html-strip-tags-go v0.0.1 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
