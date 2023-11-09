@@ -1,6 +1,9 @@
 package redis
 
 import (
+	"context"
+	"github.com/gogf/gf/v2/container/gvar"
+	"github.com/gogf/gf/v2/frame/g"
 	"time"
 
 	"github.com/go-redis/redis/v7"
@@ -37,41 +40,49 @@ func (r *Redis) connect() error {
 	return err
 }
 
-// Get from key
-func (r *Redis) Get(key string) (string, error) {
-	return r.client.Get(key).Result()
+// Get from a key
+func (r *Redis) Get(ctx context.Context, key string) (*gvar.Var, error) {
+	result, err := r.client.Get(key).Result()
+	if err != nil {
+		return nil, err
+	}
+	return g.NewVar(result), nil
 }
 
 // Set value with key and expire time
-func (r *Redis) Set(key string, val interface{}, expire int) error {
+func (r *Redis) Set(ctx context.Context, key string, val interface{}, expire int) error {
 	return r.client.Set(key, val, time.Duration(expire)*time.Second).Err()
 }
 
 // Del delete key in redis
-func (r *Redis) Del(key string) error {
+func (r *Redis) Del(ctx context.Context, key string) error {
 	return r.client.Del(key).Err()
 }
 
-// HashGet from key
-func (r *Redis) HashGet(hk, key string) (string, error) {
-	return r.client.HGet(hk, key).Result()
+// HashGet from a key
+func (r *Redis) HashGet(ctx context.Context, hk, key string) (*gvar.Var, error) {
+	result, err := r.client.HGet(hk, key).Result()
+	if err != nil {
+		return nil, err
+	}
+	return g.NewVar(result), nil
 }
 
 // HashDel delete key in specify redis's hashtable
-func (r *Redis) HashDel(hk, key string) error {
+func (r *Redis) HashDel(ctx context.Context, hk, key string) error {
 	return r.client.HDel(hk, key).Err()
 }
 
-func (r *Redis) Increase(key string) error {
+func (r *Redis) Increase(ctx context.Context, key string) error {
 	return r.client.Incr(key).Err()
 }
 
-func (r *Redis) Decrease(key string) error {
+func (r *Redis) Decrease(ctx context.Context, key string) error {
 	return r.client.Decr(key).Err()
 }
 
 // Expire Set ttl
-func (r *Redis) Expire(key string, dur time.Duration) error {
+func (r *Redis) Expire(ctx context.Context, key string, dur time.Duration) error {
 	return r.client.Expire(key, dur).Err()
 }
 
