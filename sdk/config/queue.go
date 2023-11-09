@@ -54,14 +54,6 @@ func (q *Queue) Init(ctx context.Context) error {
 	if nsq.String() != "" {
 		q.CfgList = append(q.CfgList, QueueNsq())
 	}
-	redis, err := s.Cfg().Get(ctx, "redis.default", "")
-	if err != nil {
-		return err
-	}
-	if redis.String() != "" {
-		q.CfgList = append(q.CfgList, QueueRedis())
-	}
-
 	for _, queueCfg := range q.CfgList {
 		err = queueCfg.Init(ctx)
 		if err != nil {

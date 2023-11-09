@@ -2,8 +2,8 @@ package config
 
 import (
 	"context"
-	"github.com/go-redis/redis/v7"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/redis/go-redis/v9"
 )
 
 var insRedis = cRedis{}
@@ -25,7 +25,7 @@ func (c *cRedis) GetClient() *redis.Client {
 // SetClient 设置redis客户端
 func (c *cRedis) SetClient(ctx context.Context, r *redis.Client) *cRedis {
 	if c.Client != nil && c.Client != r {
-		err := c.Client.Shutdown()
+		err := c.Client.Shutdown(ctx)
 		if err != nil {
 			glog.Warning(ctx, "cRedis Shutdown error:", err)
 		}

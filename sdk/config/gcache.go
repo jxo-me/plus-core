@@ -8,7 +8,7 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	cacheLib "github.com/jxo-me/plus-core/core/v2/cache"
 	redisLib "github.com/jxo-me/plus-core/sdk/v2/cache/gredis"
-	memory2 "github.com/jxo-me/plus-core/sdk/v2/cache/memory"
+	"github.com/jxo-me/plus-core/sdk/v2/cache/memory"
 )
 
 var insCache = Cache{}
@@ -46,7 +46,7 @@ func (e *Cache) Setup(ctx context.Context, s *Settings) (cacheLib.ICache, error)
 	r, err := redisLib.NewGredis(redis)
 	if err != nil {
 		glog.Warning(ctx, fmt.Sprintf("get redis cache options: %v error: %v", options, err))
-		return memory2.NewMemory(), nil
+		return memory.NewMemory(), nil
 	}
 	return r, nil
 }
