@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
 	lockerLib "github.com/jxo-me/plus-core/core/v2/locker"
 	"github.com/jxo-me/plus-core/sdk/v2/locker/redis"
@@ -26,7 +27,7 @@ func (e *Locker) Empty() bool {
 }
 
 // Setup 启用顺序 redis > 其他 > memory
-func (e *Locker) Setup(ctx context.Context, s *Settings) (lockerLib.ILocker, error) {
+func (e *Locker) Setup(ctx context.Context, s *gcfg.Config) (lockerLib.ILocker, error) {
 	client := g.Redis(gredis.DefaultGroupName)
 	if client != nil {
 		return redis.NewRedis(client), nil

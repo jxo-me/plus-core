@@ -161,6 +161,6 @@ func (a *Application) GetQueueMessage(id, routingKey string, value map[string]in
 	m := &message.Message{}
 	m.SetId(id)
 	m.SetRoutingKey(routingKey)
-	m.SetValues(value)
+	m.SetValue(value)
 	return m, nil
 }

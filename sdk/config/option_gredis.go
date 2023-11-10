@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"github.com/gogf/gf/v2/database/gredis"
+	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
 )
 
@@ -44,29 +45,29 @@ func (c *cGRedis) SetClient(ctx context.Context, r *gredis.Redis) *cGRedis {
 	return c
 }
 
-func (e *GRedisOptions) GetClientOptions(ctx context.Context, s *Settings) (*gredis.Config, error) {
-	address, err := s.Cfg().Get(ctx, "redis.default.address", "")
+func (e *GRedisOptions) GetClientOptions(ctx context.Context, s *gcfg.Config) (*gredis.Config, error) {
+	address, err := s.Get(ctx, "redis.default.address", "")
 	if err != nil {
 		return nil, err
 	}
-	db, err := s.Cfg().Get(ctx, "redis.default.db", "0")
+	db, err := s.Get(ctx, "redis.default.db", "0")
 	if err != nil {
 		return nil, err
 	}
-	pass, err := s.Cfg().Get(ctx, "redis.default.pass", "")
+	pass, err := s.Get(ctx, "redis.default.pass", "")
 	if err != nil {
 		return nil, err
 	}
 	// cert key ca
-	cert, err := s.Cfg().Get(ctx, "redis.default.cert", "")
+	cert, err := s.Get(ctx, "redis.default.cert", "")
 	if err != nil {
 		return nil, err
 	}
-	key, err := s.Cfg().Get(ctx, "redis.default.key", "")
+	key, err := s.Get(ctx, "redis.default.key", "")
 	if err != nil {
 		return nil, err
 	}
-	ca, err := s.Cfg().Get(ctx, "redis.default.ca", "")
+	ca, err := s.Get(ctx, "redis.default.ca", "")
 	if err != nil {
 		return nil, err
 	}

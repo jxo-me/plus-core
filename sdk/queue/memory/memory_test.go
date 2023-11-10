@@ -6,6 +6,7 @@ import (
 	messageLib "github.com/jxo-me/plus-core/core/v2/message"
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 	"github.com/jxo-me/plus-core/sdk/v2/message"
+	"io"
 	"log"
 	"sync"
 	"testing"
@@ -78,8 +79,8 @@ func TestMemory_Consumer(t *testing.T) {
 			fields{},
 			args{
 				name: "test",
-				f: func(ctx context.Context, msg messageLib.IMessage) error {
-					fmt.Println(msg.GetValues())
+				f: func(ctx context.Context, rw io.Writer, msg messageLib.IMessage) error {
+					fmt.Println(msg.GetValue())
 					return nil
 				},
 			},

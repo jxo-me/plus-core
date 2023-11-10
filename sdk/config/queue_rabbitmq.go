@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 	"github.com/jxo-me/plus-core/sdk/v2/queue/rabbitmq"
@@ -29,9 +30,9 @@ func (c *cQueueRabbit) String() string {
 	return RabbitmqQueueName
 }
 
-func (c *cQueueRabbit) Init(ctx context.Context) error {
+func (c *cQueueRabbit) Init(ctx context.Context, s *gcfg.Config) error {
 	var err error
-	conf, err := Setting().Cfg().Get(ctx, "settings.queue.rabbitmq", "")
+	conf, err := s.Get(ctx, "settings.queue.rabbitmq", "")
 	if err != nil {
 		return err
 	}

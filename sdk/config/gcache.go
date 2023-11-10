@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
 	cacheLib "github.com/jxo-me/plus-core/core/v2/cache"
 	redisLib "github.com/jxo-me/plus-core/sdk/v2/cache/gredis"
@@ -24,7 +25,7 @@ func CacheConfig() *Cache {
 }
 
 // Setup 构造cache 顺序 redis > 其他 > memory
-func (e *Cache) Setup(ctx context.Context, s *Settings) (cacheLib.ICache, error) {
+func (e *Cache) Setup(ctx context.Context, s *gcfg.Config) (cacheLib.ICache, error) {
 	redis := g.Redis(gredis.DefaultGroupName)
 	if redis != nil {
 		r, err := redisLib.NewGredis(redis)

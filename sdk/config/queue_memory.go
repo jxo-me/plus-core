@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/os/gcfg"
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 	"github.com/jxo-me/plus-core/sdk/v2/queue/memory"
 )
@@ -24,8 +25,8 @@ func (c *cQueueMemory) String() string {
 	return MemoryQueueName
 }
 
-func (c *cQueueMemory) Init(ctx context.Context) error {
-	poolSize, err := Setting().Cfg().Get(ctx, "settings.queue.memory.poolSize", 10000)
+func (c *cQueueMemory) Init(ctx context.Context, s *gcfg.Config) error {
+	poolSize, err := s.Get(ctx, "settings.queue.memory.poolSize", 10000)
 	if err != nil {
 		return err
 	}

@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/os/gcfg"
 	"time"
 
 	"github.com/nsqio/go-nsq"
@@ -83,7 +84,7 @@ type NSQOptions struct {
 	AuthSecret string `opt:"auth_secret"`
 }
 
-func (e *NSQOptions) GetNsqOptions(ctx context.Context, s *Settings) (*nsq.Config, error) {
+func (e *NSQOptions) GetNsqOptions(ctx context.Context, s *gcfg.Config) (*nsq.Config, error) {
 	cfg := nsq.NewConfig()
 	var err error
 	cfg.TlsConfig, err = getTLS(e.Tls)

@@ -68,7 +68,7 @@ func (e *NSQ) newConsumer(topic string, h nsq.Handler) (err error) {
 
 // Publish 消息入生产者
 func (e *NSQ) Publish(ctx context.Context, message messageLib.IMessage, optionFuncs ...func(*queueLib.PublishOptions)) error {
-	rb, err := json.Marshal(message.GetValues())
+	rb, err := json.Marshal(message.GetValue())
 	if err != nil {
 		return err
 	}
@@ -112,6 +112,6 @@ func (e nsqConsumerHandler) HandleMessage(msg *nsq.Message) error {
 	if err != nil {
 		return err
 	}
-	m.SetValues(data)
+	m.SetValue(data)
 	return e.f(context.Background(), nil, m)
 }

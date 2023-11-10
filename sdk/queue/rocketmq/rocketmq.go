@@ -9,7 +9,6 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/producer"
 	"github.com/apache/rocketmq-client-go/v2/rlog"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/gogf/gf/v2/util/gconv"
 	messageLib "github.com/jxo-me/plus-core/core/v2/message"
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 	"github.com/jxo-me/plus-core/sdk/v2/message"
@@ -129,7 +128,7 @@ func (r *RocketMQ) Publish(ctx context.Context, message messageLib.IMessage, opt
 		r.producers[options.GroupName] = p
 	}
 	// encode message
-	rb, err := json.Marshal(message.GetValues())
+	rb, err := json.Marshal(message.GetValue())
 	if err != nil {
 		return err
 	}
@@ -173,10 +172,7 @@ func (r *RocketMQ) Consumer(ctx context.Context, topicName string, f queueLib.Co
 				if len(msgs[i].Body) > 0 {
 					glog.Debugf(ctx, "rocketmq consumed: %v\n", msgs[i])
 					m := new(message.Message)
-					m.SetValues(gconv.Map(msgs[i].Body))
-					m.SetValues(map[string]interface{}{
-						"body": string(msgs[i].Body),
-					})
+					m.SetValue(msgs[i].Body)
 					m.SetRoutingKey(msgs[i].GetTags())
 					m.SetId(msgs[i].MsgId)
 					m.SetErrorCount(uint64(msgs[i].ReconsumeTimes))

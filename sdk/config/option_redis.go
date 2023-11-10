@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/redis/go-redis/v9"
 )
@@ -45,45 +46,45 @@ type RedisConnectOptions struct {
 	MaxRetries int    `yaml:"max_retries" json:"max_retries"`
 }
 
-func (e *RedisConnectOptions) GetRedisOptions(ctx context.Context, s *Settings) (*redis.Options, error) {
-	address, err := s.Cfg().Get(ctx, "redis.default.address", "")
+func (e *RedisConnectOptions) GetRedisOptions(ctx context.Context, s *gcfg.Config) (*redis.Options, error) {
+	address, err := s.Get(ctx, "redis.default.address", "")
 	if err != nil {
 		return nil, err
 	}
-	db, err := s.Cfg().Get(ctx, "redis.default.db", "0")
+	db, err := s.Get(ctx, "redis.default.db", "0")
 	if err != nil {
 		return nil, err
 	}
-	network, err := s.Cfg().Get(ctx, "redis.default.network", "tcp")
+	network, err := s.Get(ctx, "redis.default.network", "tcp")
 	if err != nil {
 		return nil, err
 	}
-	pass, err := s.Cfg().Get(ctx, "redis.default.pass", "")
+	pass, err := s.Get(ctx, "redis.default.pass", "")
 	if err != nil {
 		return nil, err
 	}
-	username, err := s.Cfg().Get(ctx, "redis.default.username", "")
+	username, err := s.Get(ctx, "redis.default.username", "")
 	if err != nil {
 		return nil, err
 	}
-	poolSize, err := s.Cfg().Get(ctx, "redis.default.pool_size", "10")
+	poolSize, err := s.Get(ctx, "redis.default.pool_size", "10")
 	if err != nil {
 		return nil, err
 	}
-	maxRetries, err := s.Cfg().Get(ctx, "redis.default.max_retries", "0")
+	maxRetries, err := s.Get(ctx, "redis.default.max_retries", "0")
 	if err != nil {
 		return nil, err
 	}
 	// cert key ca
-	cert, err := s.Cfg().Get(ctx, "redis.default.cert", "")
+	cert, err := s.Get(ctx, "redis.default.cert", "")
 	if err != nil {
 		return nil, err
 	}
-	key, err := s.Cfg().Get(ctx, "redis.default.key", "")
+	key, err := s.Get(ctx, "redis.default.key", "")
 	if err != nil {
 		return nil, err
 	}
-	ca, err := s.Cfg().Get(ctx, "redis.default.ca", "")
+	ca, err := s.Get(ctx, "redis.default.ca", "")
 	if err != nil {
 		return nil, err
 	}

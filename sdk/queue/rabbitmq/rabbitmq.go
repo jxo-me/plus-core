@@ -125,7 +125,7 @@ func (r *RabbitMQ) newProducer(ctx context.Context) (*rabbitmq.Publisher, error)
 // Publish 消息入生产者
 func (r *RabbitMQ) Publish(ctx context.Context, message messageLib.IMessage, optionFuncs ...func(*queueLib.PublishOptions)) error {
 	// exchange exchangeType routingKey
-	rb, err := queue.Marshal(message.GetValues())
+	rb, err := queue.Marshal(message.GetValue())
 	if err != nil {
 		return err
 	}
@@ -235,7 +235,7 @@ func (r *RabbitMQ) RpcRequest(ctx context.Context, key string, data []byte, opti
 }
 
 // Consumer 监听消费者
-func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f queueLib.ConsumerFunc, optionFuncs ...func(*queueLib.ConsumeOptions)) {
+func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, consumerFunc queueLib.ConsumerFunc, optionFuncs ...func(*queueLib.ConsumeOptions)) {
 	options := queueLib.GetDefaultConsumeOptions()
 	for _, optionFunc := range optionFuncs {
 		optionFunc(&options)
@@ -248,15 +248,13 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, f queueLib.Co
 	if c, ok = r.consumers[queueName]; !ok {
 		handler := func(ctx context.Context, rw *rabbitmq.ResponseWriter, d rabbitmq.Delivery) rabbitmq.Action {
 			m := new(message.Message)
-			m.SetValues(map[string]interface{}{
-				"body": string(d.Body),
-			})
+			m.SetValue(d.Body)
 			m.SetRoutingKey(d.RoutingKey)
 			m.SetId(d.MessageId)
 			if d.Redelivered {
 				m.SetErrorCount(d.DeliveryTag)
 			}
-			err = f(ctx, rw, m)
+			err = consumerFunc(ctx, rw, m)
 			if err != nil {
 				glog.Warning(ctx, fmt.Sprintf("RabbitMQ Requeue error:%s msg: %v", err.Error(), m))
 				return rabbitmq.NackRequeue

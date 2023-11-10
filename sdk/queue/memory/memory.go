@@ -44,7 +44,7 @@ func (m *Memory) Publish(ctx context.Context, msg messageLib.IMessage, optionFun
 	memoryMessage := new(message.Message)
 	memoryMessage.SetId(msg.GetId())
 	memoryMessage.SetRoutingKey(msg.GetRoutingKey())
-	memoryMessage.SetValues(msg.GetValues())
+	memoryMessage.SetValue(msg.GetValue())
 	v, ok := m.queue.Load(msg.GetRoutingKey())
 
 	// TODO: 错误超出5次将放弃
