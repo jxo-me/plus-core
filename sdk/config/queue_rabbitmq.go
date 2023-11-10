@@ -3,8 +3,8 @@ package config
 import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/v2/app"
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 	"github.com/jxo-me/plus-core/sdk/v2/queue/rabbitmq"
 	rabbitmqGo "github.com/jxo-me/rabbitmq-go"
@@ -30,7 +30,8 @@ func (c *cQueueRabbit) String() string {
 	return RabbitmqQueueName
 }
 
-func (c *cQueueRabbit) Init(ctx context.Context, s *gcfg.Config) error {
+func (c *cQueueRabbit) Init(ctx context.Context, app app.IRuntime) error {
+	s := app.ConfigRegister().Get(DefaultGroupName)
 	var err error
 	conf, err := s.Get(ctx, "settings.queue.rabbitmq", "")
 	if err != nil {

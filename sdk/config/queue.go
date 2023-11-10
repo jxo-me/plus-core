@@ -2,8 +2,8 @@ package config
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/v2/app"
 	"github.com/jxo-me/plus-core/core/v2/boot"
 )
 
@@ -25,7 +25,8 @@ func (q *Queue) String() string {
 	return QueueCfgName
 }
 
-func (q *Queue) Init(ctx context.Context, s *gcfg.Config) error {
+func (q *Queue) Init(ctx context.Context, app app.IRuntime) error {
+	s := app.ConfigRegister().Get(DefaultGroupName)
 	rabbit, err := s.Get(ctx, "settings.queue.rabbitmq", "")
 	if err != nil {
 		return err
@@ -55,7 +56,7 @@ func (q *Queue) Init(ctx context.Context, s *gcfg.Config) error {
 		q.CfgList = append(q.CfgList, QueueNsq())
 	}
 	for _, queueCfg := range q.CfgList {
-		err = queueCfg.Init(ctx, s)
+		err = queueCfg.Init(ctx, app)
 		if err != nil {
 			glog.Error(ctx, "Queue config init error:", err)
 			return err

@@ -2,7 +2,7 @@ package config
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/os/gcfg"
+	"github.com/jxo-me/plus-core/core/v2/app"
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 	nsq2 "github.com/jxo-me/plus-core/sdk/v2/queue/nsq"
 	"github.com/nsqio/go-nsq"
@@ -30,9 +30,9 @@ func (c *cQueueNsq) String() string {
 	return NsqQueueName
 }
 
-func (c *cQueueNsq) Init(ctx context.Context, s *gcfg.Config) error {
+func (c *cQueueNsq) Init(ctx context.Context, app app.IRuntime) error {
 	var err error
-	c.Cfg, err = c.GetNsqOptions(ctx, s)
+	c.Cfg, err = c.GetNsqOptions(ctx, app)
 	if err != nil {
 		return err
 	}

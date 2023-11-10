@@ -2,8 +2,8 @@ package config
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/v2/app"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -46,7 +46,8 @@ type RedisConnectOptions struct {
 	MaxRetries int    `yaml:"max_retries" json:"max_retries"`
 }
 
-func (e *RedisConnectOptions) GetRedisOptions(ctx context.Context, s *gcfg.Config) (*redis.Options, error) {
+func (e *RedisConnectOptions) GetRedisOptions(ctx context.Context, app app.IRuntime) (*redis.Options, error) {
+	s := app.ConfigRegister().Get(DefaultGroupName)
 	address, err := s.Get(ctx, "redis.default.address", "")
 	if err != nil {
 		return nil, err

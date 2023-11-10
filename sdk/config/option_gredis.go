@@ -3,8 +3,8 @@ package config
 import (
 	"context"
 	"github.com/gogf/gf/v2/database/gredis"
-	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/v2/app"
 )
 
 var (
@@ -45,7 +45,8 @@ func (c *cGRedis) SetClient(ctx context.Context, r *gredis.Redis) *cGRedis {
 	return c
 }
 
-func (e *GRedisOptions) GetClientOptions(ctx context.Context, s *gcfg.Config) (*gredis.Config, error) {
+func (e *GRedisOptions) GetClientOptions(ctx context.Context, app app.IRuntime) (*gredis.Config, error) {
+	s := app.ConfigRegister().Get(DefaultGroupName)
 	address, err := s.Get(ctx, "redis.default.address", "")
 	if err != nil {
 		return nil, err

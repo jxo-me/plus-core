@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/jxo-me/plus-core/core/v2/app"
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 	"github.com/jxo-me/plus-core/sdk/v2/queue/rocketmq"
 )
@@ -39,8 +39,9 @@ func (c *cQueueRocket) String() string {
 	return RocketQueueName
 }
 
-func (c *cQueueRocket) Init(ctx context.Context, s *gcfg.Config) error {
+func (c *cQueueRocket) Init(ctx context.Context, app app.IRuntime) error {
 	var err error
+	s := app.ConfigRegister().Get(DefaultGroupName)
 	conf, err := s.Get(ctx, "settings.queue.rabbitmq", "")
 	if err != nil {
 		return err
