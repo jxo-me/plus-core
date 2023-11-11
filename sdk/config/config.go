@@ -1,23 +1,26 @@
 package config
 
-import (
-	"context"
-	"fmt"
-	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jxo-me/plus-core/core/v2/boot"
-	"github.com/jxo-me/plus-core/sdk/v2"
-)
+import "github.com/jxo-me/plus-core/pkg/v2/security"
 
-func runCallback(ctx context.Context, callbacks []boot.Initialize) {
-	for i := range callbacks {
-		err := callbacks[i].Init(ctx, sdk.Runtime)
-		if err != nil {
-			glog.Error(ctx, fmt.Sprintf("runCallback %s error: %v", callbacks[i].String(), err))
-		}
-	}
+type Crypto struct {
+	Enable    bool                      `json:"enable" yaml:"enable"`
+	Algorithm string                    `json:"algorithm" yaml:"algorithm"`
+	Rc4       security.Rc4CipherConfig  `json:"rc4" yaml:"rc4"`
+	Rsa       security.RsaCiphersConfig `json:"rsa" yaml:"rsa"`
+	Aes       security.AesCipherConfig  `json:"aes" yaml:"aes"`
 }
 
-// Bootstrap 载入启动配置文件
-func Bootstrap(ctx context.Context, fs ...boot.Initialize) {
-	runCallback(ctx, fs)
+type Metrics struct {
+	Enable          bool      `json:"enable" yaml:"enable"`
+	Path            string    `json:"path" yaml:"path"`
+	SlowTime        int32     `json:"slowTime" yaml:"slowTime"`
+	RequestDuration []float64 `json:"requestDuration" yaml:"requestDuration"`
+}
+
+type Jwt struct {
+	Secret      string `yaml:"secret" json:"secret"`
+	SigningKey  string `yaml:"signingKey" json:"signing_key"`
+	Timeout     int64  `yaml:"timeout" json:"timeout"`
+	MaxRefresh  int64  `yaml:"maxRefresh" json:"max_refresh"`
+	IdentityKey string `yaml:"identityKey" json:"identity_key"`
 }
