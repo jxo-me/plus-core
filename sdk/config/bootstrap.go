@@ -8,23 +8,21 @@ import (
 	"github.com/jxo-me/plus-core/core/v2/boot"
 )
 
-type BootFunc func(ctx context.Context, app app.IRuntime) error
-
 type Bootstrap struct {
 	ctx    context.Context
 	app    app.IRuntime
-	before []BootFunc
+	before []boot.BootFunc
 	boots  []boot.Initialize
-	after  []BootFunc
+	after  []boot.BootFunc
 }
 
 func NewBoot(ctx context.Context, app app.IRuntime) *Bootstrap {
 	return &Bootstrap{
 		ctx:    ctx,
 		app:    app,
-		before: make([]BootFunc, 0),
+		before: make([]boot.BootFunc, 0),
 		boots:  make([]boot.Initialize, 0),
-		after:  make([]BootFunc, 0),
+		after:  make([]boot.BootFunc, 0),
 	}
 }
 
@@ -55,17 +53,17 @@ func (b *Bootstrap) runBootstrap() error {
 	return err
 }
 
-func (b *Bootstrap) Before(before ...BootFunc) *Bootstrap {
+func (b *Bootstrap) Before(before ...boot.BootFunc) boot.IBootstrap {
 	b.before = before
 	return b
 }
 
-func (b *Bootstrap) Process(boots ...boot.Initialize) *Bootstrap {
+func (b *Bootstrap) Process(boots ...boot.Initialize) boot.IBootstrap {
 	b.boots = boots
 	return b
 }
 
-func (b *Bootstrap) After(after ...BootFunc) *Bootstrap {
+func (b *Bootstrap) After(after ...boot.BootFunc) boot.IBootstrap {
 	b.after = after
 	return b
 }

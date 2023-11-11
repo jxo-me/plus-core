@@ -6,6 +6,8 @@ import (
 	"github.com/jxo-me/plus-core/core/v2/queue"
 )
 
+type BootFunc func(ctx context.Context, app app.IRuntime) error
+
 type Initialize interface {
 	String() string
 	Init(ctx context.Context, app app.IRuntime) error
@@ -17,5 +19,8 @@ type QueueInitialize interface {
 }
 
 type IBootstrap interface {
-	Bootstrap(ctx context.Context, fs ...Initialize)
+	Before(before ...BootFunc) IBootstrap
+	Process(boots ...Initialize) IBootstrap
+	After(after ...BootFunc) IBootstrap
+	Run() error
 }
