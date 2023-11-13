@@ -8,7 +8,10 @@ import (
 )
 
 const (
-	DefaultGroupName = "default" // Default configuration group name.
+	DefaultGroupName  = "default" // Default configuration group name.
+	MemoryQueueName   = "memory"
+	RabbitmqQueueName = "rabbitmq"
+	RocketQueueName   = "rocketmq"
 )
 
 type Tls struct {

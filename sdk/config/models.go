@@ -12,11 +12,11 @@ import (
 )
 
 type Config struct {
-	Database *map[string]*gdb.ConfigNode `json:"database,omitempty"`
-	Redis    map[string]*gredis.Config   `json:"redis,omitempty"`
-	Server   *ghttp.ServerConfig         `json:"server,omitempty"`
-	Settings *SettingOptions             `json:"settings,omitempty"`
-	Bot      *BotGroups                  `json:"bot,omitempty"`
+	Database map[string]*gdb.ConfigNode `json:"database,omitempty"`
+	Redis    map[string]*gredis.Config  `json:"redis,omitempty"`
+	Server   *ghttp.ServerConfig        `json:"server,omitempty"`
+	Settings *SettingOptions            `json:"settings,omitempty"`
+	Bot      *BotGroups                 `json:"bot,omitempty"`
 }
 
 type CryptoOptions struct {

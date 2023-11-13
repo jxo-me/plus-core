@@ -38,7 +38,7 @@ func (b *Bootstrap) runBootstrap() error {
 	for i := range b.boots {
 		err = b.boots[i].Init(b.ctx, b.app)
 		if err != nil {
-			glog.Error(b.ctx, fmt.Sprintf("run bootstrap %s error: %v", b.boots[i].String(), err))
+			glog.Error(b.ctx, fmt.Sprintf("run bootstrap name: %s error: %v", b.boots[i].String(), err))
 			return err
 		}
 	}

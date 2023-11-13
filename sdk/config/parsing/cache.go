@@ -11,7 +11,7 @@ import (
 	redisLib2 "github.com/redis/go-redis/v9"
 )
 
-func ParseRedis(cfg *gredis.Config) (cacheLib.ICache, error) {
+func ParseRedisCache(cfg *gredis.Config) (cacheLib.ICache, error) {
 	opt := redisLib2.Options{
 		Network:  "tcp",
 		Addr:     cfg.Address,
@@ -23,7 +23,7 @@ func ParseRedis(cfg *gredis.Config) (cacheLib.ICache, error) {
 	return redis2.NewRedis(nil, &opt)
 }
 
-func ParseGredis(cfg *gredis.Config) (cacheLib.ICache, error) {
+func ParseGredisCache(cfg *gredis.Config) (cacheLib.ICache, error) {
 	redis := g.Redis(gredis.DefaultGroupName)
 	r, err := redisLib.NewGredis(redis)
 	if err != nil {
@@ -33,6 +33,6 @@ func ParseGredis(cfg *gredis.Config) (cacheLib.ICache, error) {
 	return r, nil
 }
 
-func ParseMemory(cfg *config.MemoryOptions) (cacheLib.ICache, error) {
+func ParseMemoryCache(cfg *config.MemoryOptions) (cacheLib.ICache, error) {
 	return memory.NewMemory(), nil
 }
