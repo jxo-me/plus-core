@@ -1,13 +1,14 @@
 package config
 
 import (
+	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/jxo-me/plus-core/pkg/v2/security"
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
 	"github.com/jxo-me/rabbitmq-go"
-	"github.com/nsqio/go-nsq"
+	"time"
 )
 
 type Config struct {
@@ -77,11 +78,11 @@ type QueueGroups struct {
 	Memory   *MemoryOptions              `json:"memory,omitempty"`
 	Rabbitmq map[string]*RabbitmqOptions `json:"rabbitmq,omitempty"`
 	Rocketmq map[string]*RocketmqOptions `json:"rocketmq,omitempty"`
-	Nsq      *nsq.Config                 `json:"nsq"`
+	Nsq      *NSQOptions                 `json:"nsq"`
 }
 
 type MemoryOptions struct {
-	PoolSize int64 `json:"poolSize,omitempty"`
+	PoolSize uint `json:"poolSize,omitempty"`
 }
 
 type RabbitmqOptions struct {
@@ -99,11 +100,23 @@ type RabbitmqOptions struct {
 }
 
 type RocketmqOptions struct {
-	Urls      []string `json:"urls,omitempty"`
-	LogPath   string   `json:"logPath,omitempty"`
-	LogFile   string   `json:"logFile,omitempty"`
-	LogLevel  string   `json:"logLevel,omitempty"`
-	LogStdout bool     `json:"logStdout,omitempty"`
+	Urls []string `json:"urls,omitempty"`
+	*primitive.Credentials
+	LogPath   string `json:"logPath,omitempty"`
+	LogFile   string `json:"logFile,omitempty"`
+	LogLevel  string `json:"logLevel,omitempty"`
+	LogStdout bool   `json:"logStdout,omitempty"`
+}
+
+type NSQOptions struct {
+	DialTimeout time.Duration `opt:"dial_timeout" default:"1s"`
+
+	// Deadlines for network reads and writes
+	ReadTimeout  time.Duration `opt:"read_timeout" min:"100ms" max:"5m" default:"60s"`
+	WriteTimeout time.Duration `opt:"write_timeout" min:"100ms" max:"5m" default:"1s"`
+	// Addresses is the local address to use when dialing an nsqd.
+	Addresses     []string `opt:"addresses"`
+	ChannelPrefix string
 }
 
 type System struct {
