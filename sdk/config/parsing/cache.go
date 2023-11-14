@@ -2,7 +2,6 @@ package parsing
 
 import (
 	"github.com/gogf/gf/v2/database/gredis"
-	"github.com/gogf/gf/v2/frame/g"
 	cacheLib "github.com/jxo-me/plus-core/core/v2/cache"
 	redisLib "github.com/jxo-me/plus-core/sdk/v2/cache/gredis"
 	"github.com/jxo-me/plus-core/sdk/v2/cache/memory"
@@ -24,7 +23,10 @@ func ParseRedisCache(cfg *gredis.Config) (cacheLib.ICache, error) {
 }
 
 func ParseGredisCache(cfg *gredis.Config) (cacheLib.ICache, error) {
-	redis := g.Redis(gredis.DefaultGroupName)
+	redis, err := gredis.New(cfg)
+	if err != nil {
+		return nil, err
+	}
 	r, err := redisLib.NewGredis(redis)
 	if err != nil {
 		return nil, err
