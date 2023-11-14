@@ -67,6 +67,18 @@ func (e *Cache) HashGet(ctx context.Context, hk, key string) (*gvar.Var, error) 
 	return e.store.HashGet(ctx, hk, e.getPrefixKey(key))
 }
 
+func (e *Cache) HashSet(ctx context.Context, key string, fields map[string]interface{}) (int64, error) {
+	return e.store.HashSet(ctx, key, fields)
+}
+
+func (e *Cache) HashLen(ctx context.Context, key string) (int64, error) {
+	return e.store.HashLen(ctx, key)
+}
+
+func (e *Cache) HashGetAll(ctx context.Context, key string) (*gvar.Var, error) {
+	return e.store.HashGetAll(ctx, key)
+}
+
 // HashDel delete one key:value pair in hashtable cache
 func (e *Cache) HashDel(ctx context.Context, hk, key string) error {
 	return e.store.HashDel(ctx, hk, e.getPrefixKey(key))

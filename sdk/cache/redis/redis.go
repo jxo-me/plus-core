@@ -68,6 +68,25 @@ func (r *Redis) HashGet(ctx context.Context, hk, key string) (*gvar.Var, error) 
 	return g.NewVar(result), nil
 }
 
+func (r *Redis) HashSet(ctx context.Context, key string, fields map[string]interface{}) (int64, error) {
+	var s []interface{}
+	for k, v := range fields {
+		s = append(s, k, v)
+	}
+	v, err := r.client.HSet(ctx, key, s...).Result()
+	return v, err
+}
+
+func (r *Redis) HashLen(ctx context.Context, key string) (int64, error) {
+	v, err := r.client.HLen(ctx, key).Result()
+	return v, err
+}
+
+func (r *Redis) HashGetAll(ctx context.Context, key string) (*gvar.Var, error) {
+	v, err := r.client.HGetAll(ctx, key).Result()
+	return g.NewVar(v), err
+}
+
 // HashDel delete key in specify redis's hashtable
 func (r *Redis) HashDel(ctx context.Context, hk, key string) error {
 	return r.client.HDel(context.TODO(), hk, key).Err()

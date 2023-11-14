@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/gogf/gf/v2/container/gvar"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gcache"
+	"strings"
 	"time"
 )
 
@@ -57,6 +59,59 @@ func (m *Memory) HashGet(ctx context.Context, hk, key string) (*gvar.Var, error)
 		return nil, err
 	}
 	return v, err
+}
+
+func (m *Memory) HashSet(ctx context.Context, key string, fields map[string]interface{}) (int64, error) {
+	var n int64
+	var err error
+	for k, v := range fields {
+		err = m.setItem(ctx, fmt.Sprintf("%s:%s", key, k), v, -1)
+		if err != nil {
+			continue
+		}
+		n++
+	}
+
+	return n, err
+}
+
+func (m *Memory) HashLen(ctx context.Context, key string) (int64, error) {
+	var n int64
+	keys, err := m.cache.Keys(ctx)
+	if err != nil {
+		return 0, err
+	}
+	for _, mkey := range keys {
+		if s, ok := mkey.(string); ok {
+			if strings.Contains(s, fmt.Sprintf("%s:", key)) {
+				n++
+			}
+		}
+	}
+	return n, err
+}
+
+func (m *Memory) HashGetAll(ctx context.Context, key string) (*gvar.Var, error) {
+	var vals map[string]interface{}
+	keys, err := m.cache.Keys(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, mkey := range keys {
+		if s, ok := mkey.(string); ok {
+			if strings.Contains(s, fmt.Sprintf("%s:", key)) {
+				get, err := m.Get(ctx, s)
+				if err != nil {
+					return nil, err
+				}
+				list := strings.Split(s, ":")
+				if len(list) > 0 {
+					vals[list[1]] = get.Val()
+				}
+			}
+		}
+	}
+	return g.NewVar(vals), err
 }
 
 func (m *Memory) HashDel(ctx context.Context, hk, key string) error {
