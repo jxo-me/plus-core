@@ -12,16 +12,16 @@ import (
 var (
 	global = &Config{
 		Database: make(map[string]*gdb.ConfigNode),
-		Redis:    map[string]*gredis.Config{},
+		Redis:    make(map[string]*gredis.Config),
 		Server:   &ghttp.ServerConfig{},
 		Settings: &SettingOptions{
 			Queue: &QueueGroups{
-				Rocketmq: map[string]*RocketmqOptions{},
-				Rabbitmq: map[string]*RabbitmqOptions{},
+				Rocketmq: make(map[string]*RocketmqOptions),
+				Rabbitmq: make(map[string]*RabbitmqOptions),
 			},
-			Auth:        map[string]*JwtAuth{},
-			FailedLimit: map[string]*FailedLimitOptions{},
-			Uploads:     &UploadGroups{Tus: map[string]*TusOptions{}},
+			Auth:        make(map[string]*JwtAuth),
+			FailedLimit: make(map[string]*FailedLimitOptions),
+			Uploads:     &UploadGroups{Tus: make(map[string]*TusOptions)},
 		},
 		Bot: &BotGroups{},
 	}
@@ -34,16 +34,16 @@ func Global() *Config {
 
 	cfg := &Config{
 		Database: make(map[string]*gdb.ConfigNode),
-		Redis:    map[string]*gredis.Config{},
+		Redis:    make(map[string]*gredis.Config),
 		Server:   &ghttp.ServerConfig{},
 		Settings: &SettingOptions{
 			Queue: &QueueGroups{
-				Rocketmq: map[string]*RocketmqOptions{},
-				Rabbitmq: map[string]*RabbitmqOptions{},
+				Rocketmq: make(map[string]*RocketmqOptions),
+				Rabbitmq: make(map[string]*RabbitmqOptions),
 			},
-			Auth:        map[string]*JwtAuth{},
-			FailedLimit: map[string]*FailedLimitOptions{},
-			Uploads:     &UploadGroups{Tus: map[string]*TusOptions{}},
+			Auth:        make(map[string]*JwtAuth),
+			FailedLimit: make(map[string]*FailedLimitOptions),
+			Uploads:     &UploadGroups{Tus: make(map[string]*TusOptions)},
 		},
 		Bot: &BotGroups{},
 	}
@@ -56,7 +56,7 @@ func (c *Config) Load(ctx context.Context, cfg *gcfg.Config) error {
 	if err != nil {
 		return err
 	}
-	err = get.Scan(c)
+	err = get.Scan(global)
 	if err != nil {
 		return err
 	}

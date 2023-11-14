@@ -12,10 +12,10 @@ import (
 )
 
 type Config struct {
-	Database map[string]*gdb.ConfigNode `json:"database,omitempty"`
-	Redis    map[string]*gredis.Config  `json:"redis,omitempty"`
-	Server   *ghttp.ServerConfig        `json:"server,omitempty"`
-	Settings *SettingOptions            `json:"settings,omitempty"`
+	Database map[string]*gdb.ConfigNode `json:"database"`
+	Redis    map[string]*gredis.Config  `json:"redis"`
+	Server   *ghttp.ServerConfig        `json:"server"`
+	Settings *SettingOptions            `json:"settings"`
 	Bot      *BotGroups                 `json:"bot,omitempty"`
 }
 
