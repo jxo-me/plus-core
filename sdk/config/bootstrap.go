@@ -16,7 +16,7 @@ type Bootstrap struct {
 	after  []boot.BootFunc
 }
 
-func NewBoot(ctx context.Context, app app.IRuntime) *Bootstrap {
+func NewBootstrap(ctx context.Context, app app.IRuntime) *Bootstrap {
 	return &Bootstrap{
 		ctx:    ctx,
 		app:    app,
