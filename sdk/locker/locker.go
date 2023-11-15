@@ -1,9 +1,10 @@
 package locker
 
 import (
+	"context"
 	"fmt"
+	"github.com/bsm/redislock"
 	"github.com/jxo-me/plus-core/core/v2/locker"
-	"github.com/jxo-me/redislock"
 )
 
 // NewLocker 创建对应上下文分布式锁
@@ -28,6 +29,6 @@ func (e *Locker) getPrefixKey(key string) string {
 }
 
 // Lock 返回分布式锁对象
-func (e *Locker) Lock(key string, ttl int64, options ...redislock.Option) (*redislock.Mutex, error) {
-	return e.locker.Lock(e.getPrefixKey(key), ttl, options...)
+func (e *Locker) Lock(ctx context.Context, key string, ttl int64, options *redislock.Options) (*redislock.Lock, error) {
+	return e.locker.Lock(ctx, e.getPrefixKey(key), ttl, options)
 }

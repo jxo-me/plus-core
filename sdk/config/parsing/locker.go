@@ -1,13 +1,21 @@
 package parsing
 
 import (
-	"github.com/gogf/gf/v2/database/gredis"
-	"github.com/gogf/gf/v2/frame/g"
 	lockerLib "github.com/jxo-me/plus-core/core/v2/locker"
-	redis2 "github.com/jxo-me/plus-core/sdk/v2/locker/redis"
+	"github.com/jxo-me/plus-core/sdk/v2/config"
+	redisLocker "github.com/jxo-me/plus-core/sdk/v2/locker/redis"
+	redisLib "github.com/redis/go-redis/v9"
 )
 
-func ParseRedisLocker(cfg *gredis.Config) (lockerLib.ILocker, error) {
-	redis := g.Redis(gredis.DefaultGroupName)
-	return redis2.NewRedis(redis), nil
+func ParseRedisLocker(cfg *config.RedisOptions) (lockerLib.ILocker, error) {
+	opt := redisLib.Options{
+		Network:  "tcp",
+		Addr:     cfg.Address,
+		Username: cfg.User,
+		Password: cfg.Pass,
+		DB:       cfg.Db,
+		PoolSize: cfg.PoolSize,
+	}
+
+	return redisLocker.NewRedis(redisLib.NewClient(&opt)), nil
 }

@@ -10,6 +10,7 @@ replace (
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
+	github.com/bsm/redislock v0.9.4
 	github.com/casbin/casbin/v2 v2.77.2
 	github.com/gogf/gf-jwt/v2 v2.1.0
 	github.com/gogf/gf/v2 v2.5.6
@@ -17,10 +18,9 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
-	github.com/jxo-me/plus-core/core/v2 v2.0.22
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.21
+	github.com/jxo-me/plus-core/core/v2 v2.0.24
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.22
 	github.com/jxo-me/rabbitmq-go v1.0.13
-	github.com/jxo-me/redislock v1.0.2
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/redis/go-redis/v9 v9.3.0
 	github.com/zegl/goriak/v3 v3.2.4
@@ -48,8 +48,6 @@ require (
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/grokify/html-strip-tags-go v0.0.1 // indirect
-	github.com/hashicorp/errwrap v1.0.0 // indirect
-	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

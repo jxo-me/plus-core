@@ -10,7 +10,7 @@ import (
 	redisLib2 "github.com/redis/go-redis/v9"
 )
 
-func ParseRedisCache(cfg *gredis.Config) (cacheLib.ICache, error) {
+func ParseRedisCache(cfg *config.RedisOptions) (cacheLib.ICache, error) {
 	opt := redisLib2.Options{
 		Network:  "tcp",
 		Addr:     cfg.Address,
@@ -22,8 +22,8 @@ func ParseRedisCache(cfg *gredis.Config) (cacheLib.ICache, error) {
 	return redis2.NewRedis(nil, &opt)
 }
 
-func ParseGredisCache(cfg *gredis.Config) (cacheLib.ICache, error) {
-	redis, err := gredis.New(cfg)
+func ParseGredisCache(cfg *config.RedisOptions) (cacheLib.ICache, error) {
+	redis, err := gredis.New(&cfg.Config)
 	if err != nil {
 		return nil, err
 	}

@@ -1,8 +1,11 @@
 package locker
 
-import "github.com/jxo-me/redislock"
+import (
+	"context"
+	"github.com/bsm/redislock"
+)
 
 type ILocker interface {
 	String() string
-	Lock(key string, ttl int64, options ...redislock.Option) (*redislock.Mutex, error)
+	Lock(ctx context.Context, key string, ttl int64, options *redislock.Options) (*redislock.Lock, error)
 }

@@ -3,7 +3,6 @@ package config
 import (
 	"context"
 	"github.com/gogf/gf/v2/database/gdb"
-	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"sync"
@@ -12,7 +11,7 @@ import (
 var (
 	global = &Config{
 		Database: make(map[string]*gdb.ConfigNode),
-		Redis:    make(map[string]*gredis.Config),
+		Redis:    make(map[string]*RedisOptions),
 		Server:   &ghttp.ServerConfig{},
 		Settings: &SettingOptions{
 			Queue: &QueueGroups{
@@ -34,7 +33,7 @@ func Global() *Config {
 
 	cfg := &Config{
 		Database: make(map[string]*gdb.ConfigNode),
-		Redis:    make(map[string]*gredis.Config),
+		Redis:    make(map[string]*RedisOptions),
 		Server:   &ghttp.ServerConfig{},
 		Settings: &SettingOptions{
 			Queue: &QueueGroups{

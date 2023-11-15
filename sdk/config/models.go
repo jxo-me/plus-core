@@ -13,10 +13,19 @@ import (
 
 type Config struct {
 	Database map[string]*gdb.ConfigNode `json:"database"`
-	Redis    map[string]*gredis.Config  `json:"redis"`
+	Redis    map[string]*RedisOptions   `json:"redis"`
 	Server   *ghttp.ServerConfig        `json:"server"`
 	Settings *SettingOptions            `json:"settings"`
 	Bot      *BotGroups                 `json:"bot,omitempty"`
+}
+
+type RedisOptions struct {
+	gredis.Config
+	// Base number of socket connections.
+	// Default is 10 connections per every available CPU as reported by runtime.GOMAXPROCS.
+	// If there are not enough connections in the pool, new connections will be allocated in excess of PoolSize;
+	// you can limit it through MaxActiveConns
+	PoolSize int
 }
 
 type CryptoOptions struct {
