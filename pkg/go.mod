@@ -11,7 +11,7 @@ require (
 	github.com/gogf/gf/v2 v2.5.6
 	github.com/google/uuid v1.4.0
 	github.com/gorilla/websocket v1.5.1
-	github.com/jxo-me/plus-core/core/v2 v2.0.22
+	github.com/jxo-me/plus-core/core/v2 v2.0.24
 	github.com/jxo-me/plus-core/sdk/v2 v2.0.27
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
