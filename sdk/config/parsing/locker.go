@@ -1,6 +1,8 @@
 package parsing
 
 import (
+	"github.com/go-redsync/redsync/v4"
+	"github.com/go-redsync/redsync/v4/redis/goredis/v9"
 	lockerLib "github.com/jxo-me/plus-core/core/v2/locker"
 	"github.com/jxo-me/plus-core/sdk/v2/config"
 	redisLocker "github.com/jxo-me/plus-core/sdk/v2/locker/redis"
@@ -17,5 +19,5 @@ func ParseRedisLocker(cfg *config.RedisOptions) (lockerLib.ILocker, error) {
 		PoolSize: cfg.PoolSize,
 	}
 
-	return redisLocker.NewRedis(redisLib.NewClient(&opt)), nil
+	return redisLocker.NewRedis(redsync.New(goredis.NewPool(redisLib.NewClient(&opt)))), nil
 }
