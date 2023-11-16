@@ -3,7 +3,7 @@ package locker
 import (
 	"context"
 	"fmt"
-	"github.com/bsm/redislock"
+	"github.com/go-redsync/redsync/v4"
 	"github.com/jxo-me/plus-core/core/v2/locker"
 )
 
@@ -28,7 +28,7 @@ func (e *Locker) getPrefixKey(key string) string {
 	return fmt.Sprintf("%s:%s", e.prefix, key)
 }
 
-// Lock 返回分布式锁对象
-func (e *Locker) Lock(ctx context.Context, key string, ttl int64, options *redislock.Options) (*redislock.Lock, error) {
-	return e.locker.Lock(ctx, e.getPrefixKey(key), ttl, options)
+// Mutex 返回分布式互斥锁对象
+func (e *Locker) Mutex(ctx context.Context, key string, options ...redsync.Option) *redsync.Mutex {
+	return e.locker.Mutex(ctx, e.getPrefixKey(key), options...)
 }

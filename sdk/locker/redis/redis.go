@@ -2,30 +2,27 @@ package redis
 
 import (
 	"context"
-	"github.com/bsm/redislock"
-	"github.com/redis/go-redis/v9"
-	"time"
+	"github.com/go-redsync/redsync/v4"
 )
 
 // NewRedis 初始化locker
-func NewRedis(c *redis.Client) *Redis {
+func NewRedis(c *redsync.Redsync) *Redis {
 	return &Redis{
 		client: c,
 	}
 }
 
 type Redis struct {
-	client *redis.Client
-	mutex  *redislock.Client
+	client *redsync.Redsync
 }
 
 func (Redis) String() string {
 	return "redis"
 }
 
-func (r *Redis) Lock(ctx context.Context, key string, ttl int64, options *redislock.Options) (*redislock.Lock, error) {
-	if r.mutex == nil {
-		r.mutex = redislock.New(r.client)
-	}
-	return r.mutex.Obtain(ctx, key, time.Duration(ttl)*time.Second, options)
+func (r *Redis) Mutex(ctx context.Context, key string, options ...redsync.Option) *redsync.Mutex {
+	mutex := r.client.NewMutex(key,
+		options...,
+	)
+	return mutex
 }

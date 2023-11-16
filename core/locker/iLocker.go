@@ -2,10 +2,10 @@ package locker
 
 import (
 	"context"
-	"github.com/bsm/redislock"
+	"github.com/go-redsync/redsync/v4"
 )
 
 type ILocker interface {
 	String() string
-	Lock(ctx context.Context, key string, ttl int64, options *redislock.Options) (*redislock.Lock, error)
+	Mutex(ctx context.Context, key string, options ...redsync.Option) *redsync.Mutex
 }
