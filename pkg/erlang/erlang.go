@@ -20,12 +20,7 @@ func NewErlangNode(c *NodeConfig) (*Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	for _, s := range c.Nodes {
-		err = n.Connect(s)
-		if err != nil {
-			return nil, err
-		}
-	}
+
 	return &Node{srv: n}, nil
 }
 
