@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
+	"github.com/jxo-me/plus-core/pkg/v2/erlang"
 	"sync"
 )
 
@@ -22,7 +23,8 @@ var (
 			FailedLimit: make(map[string]*FailedLimitOptions),
 			Uploads:     &UploadGroups{Tus: make(map[string]*TusOptions)},
 		},
-		Bot: &BotGroups{},
+		Bot:    &BotGroups{},
+		Erlang: make(map[string]*erlang.NodeConfig),
 	}
 	globalMux sync.RWMutex
 )
@@ -44,7 +46,8 @@ func Global() *Config {
 			FailedLimit: make(map[string]*FailedLimitOptions),
 			Uploads:     &UploadGroups{Tus: make(map[string]*TusOptions)},
 		},
-		Bot: &BotGroups{},
+		Bot:    &BotGroups{},
+		Erlang: make(map[string]*erlang.NodeConfig),
 	}
 	*cfg = *global
 	return cfg

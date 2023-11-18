@@ -17,6 +17,7 @@ import (
 	"github.com/jxo-me/plus-core/core/v2/queue"
 	reg "github.com/jxo-me/plus-core/core/v2/registry"
 	"github.com/jxo-me/plus-core/core/v2/task"
+	"github.com/jxo-me/plus-core/pkg/v2/erlang"
 	"github.com/jxo-me/plus-core/pkg/v2/tus"
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
 	"github.com/zegl/goriak/v3"
@@ -28,6 +29,7 @@ type IRuntime interface {
 	CasBinRegistry() reg.IRegistry[*casbin.SyncedEnforcer]
 	ConfigRegister() reg.IRegistry[*gcfg.Config]
 	CronRegistry() reg.IRegistry[cron.ICron]
+	ErlangNodeRegistry() reg.IRegistry[*erlang.Node]
 	JwtRegister() reg.IRegistry[*jwt.GfJWTMiddleware]
 	LanguageRegister() reg.IRegistry[*gi18n.Manager]
 	LockerRegistry() reg.IRegistry[locker.ILocker]

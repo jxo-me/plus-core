@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/net/ghttp"
+	service "github.com/jxo-me/plus-core/pkg/v2/erlang"
 	"github.com/jxo-me/plus-core/pkg/v2/security"
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
 	"github.com/jxo-me/rabbitmq-go"
@@ -12,11 +13,12 @@ import (
 )
 
 type Config struct {
-	Database map[string]*gdb.ConfigNode `json:"database"`
-	Redis    map[string]*RedisOptions   `json:"redis"`
-	Server   *ghttp.ServerConfig        `json:"server"`
-	Settings *SettingOptions            `json:"settings"`
-	Bot      *BotGroups                 `json:"bot,omitempty"`
+	Database map[string]*gdb.ConfigNode     `json:"database"`
+	Redis    map[string]*RedisOptions       `json:"redis"`
+	Server   *ghttp.ServerConfig            `json:"server"`
+	Settings *SettingOptions                `json:"settings"`
+	Bot      *BotGroups                     `json:"bot,omitempty"`
+	Erlang   map[string]*service.NodeConfig `json:"erlang,omitempty"`
 }
 
 type RedisOptions struct {

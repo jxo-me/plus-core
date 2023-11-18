@@ -14,7 +14,7 @@ require (
 	github.com/gogf/gf/v2 v2.5.6
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.22
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.23
 	github.com/jxo-me/rabbitmq-go v1.0.13
 	github.com/zegl/goriak/v3 v3.2.4
 )
@@ -28,6 +28,7 @@ require (
 	github.com/bits-and-blooms/bitset v1.8.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/clbanning/mxj/v2 v2.7.0 // indirect
+	github.com/ergo-services/ergo v1.999.224 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect

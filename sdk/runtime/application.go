@@ -19,6 +19,7 @@ import (
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 	reg "github.com/jxo-me/plus-core/core/v2/registry"
 	"github.com/jxo-me/plus-core/core/v2/task"
+	"github.com/jxo-me/plus-core/pkg/v2/erlang"
 	"github.com/jxo-me/plus-core/pkg/v2/tus"
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
 	"github.com/jxo-me/plus-core/sdk/v2/message"
@@ -32,6 +33,7 @@ type Application struct {
 	casBinReg          reg.IRegistry[*casbin.SyncedEnforcer]
 	configReg          reg.IRegistry[*gcfg.Config]
 	crontabReg         reg.IRegistry[cron.ICron]
+	erlangReg          reg.IRegistry[*erlang.Node]
 	jwtReg             reg.IRegistry[*jwt.GfJWTMiddleware]
 	languageReg        reg.IRegistry[*gi18n.Manager]
 	lockerReg          reg.IRegistry[lockerLib.ILocker]
@@ -55,6 +57,7 @@ func NewConfig() *Application {
 		casBinReg:          new(registry.CasBinRegistry),
 		configReg:          new(registry.ConfigRegistry),
 		crontabReg:         new(registry.CrontabRegistry),
+		erlangReg:          new(registry.ErlangNodeRegistry),
 		jwtReg:             new(registry.JwtRegistry),
 		languageReg:        new(registry.LanguageRegistry),
 		lockerReg:          new(registry.LockerRegistry),
@@ -98,6 +101,10 @@ func (a *Application) Config(ctx context.Context, key string) *gvar.Var {
 
 func (a *Application) CronRegistry() reg.IRegistry[cron.ICron] {
 	return a.crontabReg
+}
+
+func (a *Application) ErlangNodeRegistry() reg.IRegistry[*erlang.Node] {
+	return a.erlangReg
 }
 
 func (a *Application) JwtRegister() reg.IRegistry[*jwt.GfJWTMiddleware] {
