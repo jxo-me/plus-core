@@ -10,14 +10,21 @@ type Node struct {
 }
 
 type NodeConfig struct {
-	NodeName string `yaml:"nodeName" json:"nodeName"`
-	Cookie   string `yaml:"cookie" json:"cookie"`
+	NodeName string   `yaml:"nodeName" json:"nodeName"`
+	Cookie   string   `yaml:"cookie" json:"cookie"`
+	Nodes    []string `yaml:"nodes" json:"nodes"`
 }
 
 func NewErlangNode(c *NodeConfig) (*Node, error) {
 	n, err := ergo.StartNode(c.NodeName, c.Cookie, node.Options{})
 	if err != nil {
 		return nil, err
+	}
+	for _, s := range c.Nodes {
+		err = n.Connect(s)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &Node{srv: n}, nil
 }
