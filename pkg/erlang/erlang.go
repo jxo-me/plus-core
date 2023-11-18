@@ -10,9 +10,10 @@ type Node struct {
 }
 
 type NodeConfig struct {
-	NodeName string   `yaml:"nodeName" json:"nodeName"`
-	Cookie   string   `yaml:"cookie" json:"cookie"`
-	Nodes    []string `yaml:"nodes" json:"nodes"`
+	NodeName   string   `yaml:"nodeName" json:"nodeName"`
+	Cookie     string   `yaml:"cookie" json:"cookie"`
+	ServerName string   `yaml:"serverName" json:"serverName"`
+	Nodes      []string `yaml:"nodes" json:"nodes"`
 }
 
 func NewErlangNode(c *NodeConfig) (*Node, error) {
