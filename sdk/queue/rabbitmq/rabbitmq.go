@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/gogf/gf/v2/util/gconv"
 	messageLib "github.com/jxo-me/plus-core/core/v2/message"
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 	"github.com/jxo-me/plus-core/sdk/v2/message"
@@ -247,7 +248,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, consumerFunc 
 	defer r.mux.Unlock()
 	if c, ok = r.consumers[queueName]; !ok {
 		handler := func(ctx context.Context, rw *rabbitmq.ResponseWriter, d rabbitmq.Delivery) rabbitmq.Action {
-			glog.Debug(ctx, fmt.Sprintf("rabbitmq handle raw message: %#v", d))
+			glog.Debug(ctx, fmt.Sprintf("rabbitmq handle raw message: %s", gconv.String(d)))
 			m := new(message.Message)
 			m.SetValue(d.Body)
 			m.SetRoutingKey(d.RoutingKey)
