@@ -31,7 +31,7 @@ func NewErlangNode(c *NodeConfig) (*Node, error) {
 		return nil, err
 	}
 
-	return &Node{srv: n}, nil
+	return &Node{srv: n, process: gmap.NewStrAnyMap(true)}, nil
 }
 
 func (s *Node) Start() error {
