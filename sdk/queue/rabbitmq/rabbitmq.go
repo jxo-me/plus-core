@@ -247,6 +247,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, consumerFunc 
 	defer r.mux.Unlock()
 	if c, ok = r.consumers[queueName]; !ok {
 		handler := func(ctx context.Context, rw *rabbitmq.ResponseWriter, d rabbitmq.Delivery) rabbitmq.Action {
+			glog.Debug(ctx, fmt.Sprintf("rabbitmq handle raw message: %#v", d))
 			m := new(message.Message)
 			m.SetValue(d.Body)
 			m.SetRoutingKey(d.RoutingKey)
