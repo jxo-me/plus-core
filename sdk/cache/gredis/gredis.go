@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/database/gredis"
+	"github.com/gogf/gf/v2/util/gconv"
 	"time"
 )
 
@@ -64,6 +65,20 @@ func (r *Gredis) HashSet(ctx context.Context, key string, fields map[string]inte
 	}
 	v, err := r.client.Do(ctx, "HSet", s...)
 	return v.Int64(), err
+}
+
+func (r *Gredis) HashMSet(ctx context.Context, key string, fields map[string]interface{}) error {
+	var s = []interface{}{key}
+	for k, v := range fields {
+		s = append(s, k, v)
+	}
+	_, err := r.client.Do(ctx, "HMSet", s...)
+	return err
+}
+
+func (r *Gredis) HashMGet(ctx context.Context, key string, fields ...string) (gvar.Vars, error) {
+	v, err := r.client.Do(ctx, "HMGet", append([]interface{}{key}, gconv.Interfaces(fields)...)...)
+	return v.Vars(), err
 }
 
 func (r *Gredis) HashLen(ctx context.Context, key string) (int64, error) {

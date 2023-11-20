@@ -75,6 +75,32 @@ func (m *Memory) HashSet(ctx context.Context, key string, fields map[string]inte
 	return n, err
 }
 
+func (m *Memory) HashMSet(ctx context.Context, key string, fields map[string]interface{}) error {
+	var n int64
+	var err error
+	for k, v := range fields {
+		err = m.setItem(ctx, fmt.Sprintf("%s:%s", key, k), v, -1)
+		if err != nil {
+			continue
+		}
+		n++
+	}
+	return err
+}
+
+func (m *Memory) HashMGet(ctx context.Context, key string, fields ...string) (gvar.Vars, error) {
+	var vars gvar.Vars
+	for _, hk := range fields {
+		v, err := m.getItem(ctx, fmt.Sprintf("%s:%s", hk, key))
+		if err != nil || v == nil {
+			return nil, err
+		}
+		vars = append(vars, v)
+	}
+
+	return vars, nil
+}
+
 func (m *Memory) HashLen(ctx context.Context, key string) (int64, error) {
 	var n int64
 	keys, err := m.cache.Keys(ctx)

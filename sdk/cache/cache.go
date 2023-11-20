@@ -71,6 +71,14 @@ func (e *Cache) HashSet(ctx context.Context, key string, fields map[string]inter
 	return e.store.HashSet(ctx, key, fields)
 }
 
+func (e *Cache) HashMSet(ctx context.Context, key string, fields map[string]interface{}) error {
+	return e.store.HashMSet(ctx, key, fields)
+}
+
+func (e *Cache) HashMGet(ctx context.Context, key string, fields ...string) (gvar.Vars, error) {
+	return e.store.HashMGet(ctx, key, fields...)
+}
+
 func (e *Cache) HashLen(ctx context.Context, key string) (int64, error) {
 	return e.store.HashLen(ctx, key)
 }

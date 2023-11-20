@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -42,7 +43,7 @@ func (r *Redis) connect() error {
 
 // Get from a key
 func (r *Redis) Get(ctx context.Context, key string) (*gvar.Var, error) {
-	result, err := r.client.Get(context.TODO(), key).Result()
+	result, err := r.client.Get(ctx, key).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -51,17 +52,17 @@ func (r *Redis) Get(ctx context.Context, key string) (*gvar.Var, error) {
 
 // Set value with key and expire time
 func (r *Redis) Set(ctx context.Context, key string, val interface{}, expire int) error {
-	return r.client.Set(context.TODO(), key, val, time.Duration(expire)*time.Second).Err()
+	return r.client.Set(ctx, key, val, time.Duration(expire)*time.Second).Err()
 }
 
 // Del delete key in redis
 func (r *Redis) Del(ctx context.Context, key string) error {
-	return r.client.Del(context.TODO(), key).Err()
+	return r.client.Del(ctx, key).Err()
 }
 
 // HashGet from a key
 func (r *Redis) HashGet(ctx context.Context, hk, key string) (*gvar.Var, error) {
-	result, err := r.client.HGet(context.TODO(), hk, key).Result()
+	result, err := r.client.HGet(ctx, hk, key).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -75,6 +76,25 @@ func (r *Redis) HashSet(ctx context.Context, key string, fields map[string]inter
 	}
 	v, err := r.client.HSet(ctx, key, s...).Result()
 	return v, err
+}
+
+func (r *Redis) HashMSet(ctx context.Context, key string, fields map[string]interface{}) error {
+	var s []interface{}
+	for k, v := range fields {
+		s = append(s, k, v)
+	}
+	_, err := r.client.HMSet(ctx, key, s...).Result()
+	return err
+}
+
+func (r *Redis) HashMGet(ctx context.Context, key string, fields ...string) (gvar.Vars, error) {
+	var vars gvar.Vars
+	v, err := r.client.HMGet(ctx, key, fields...).Result()
+	err = gconv.Structs(&v, &vars)
+	if err != nil {
+		return nil, err
+	}
+	return vars, err
 }
 
 func (r *Redis) HashLen(ctx context.Context, key string) (int64, error) {
