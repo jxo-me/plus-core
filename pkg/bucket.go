@@ -13,7 +13,7 @@ func (b *Bucket[T]) Index() int {
 	return b.index
 }
 
-func (b *Bucket[T]) Add(key string, item T) {
+func (b *Bucket[T]) Set(key string, item T) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	b.m[key] = item
