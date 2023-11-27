@@ -20,7 +20,7 @@ func IpRateLimit(opts ...ip.Option) ghttp.HandlerFunc {
 			}
 		}
 
-		limiter := rateLimit.GetLimiter(clientIp)
+		limiter := rateLimit.Get(clientIp)
 		if !limiter.Allow() {
 			// rejected
 			e := code.CodeLimitExceed
