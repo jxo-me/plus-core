@@ -4,7 +4,7 @@ import "sync"
 
 // Bucket 通用安全桶
 type Bucket[T any] struct {
-	Mu  sync.Mutex
+	Mu  sync.Locker
 	Idx int
 	M   map[string]T
 }
