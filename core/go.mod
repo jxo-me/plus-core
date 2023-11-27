@@ -14,7 +14,7 @@ require (
 	github.com/gogf/gf/v2 v2.5.7
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.33
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.35
 	github.com/jxo-me/rabbitmq-go v1.0.13
 	github.com/zegl/goriak/v3 v3.2.4
 )
