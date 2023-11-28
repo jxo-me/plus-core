@@ -75,6 +75,7 @@ type SettingOptions struct {
 	Websocket   *ws.Config                     `json:"websocket,omitempty"`
 	FailedLimit map[string]*FailedLimitOptions `json:"failedLimit,omitempty"`
 	Metrics     *MetricsOptions                `json:"metrics,omitempty"`
+	RateLimit   *RateLimitOptions              `json:"rateLimit,omitempty"`
 }
 
 type JwtAuth struct {
@@ -159,4 +160,14 @@ type TusOptions struct {
 	LogFile   string `json:"logFile,omitempty"`
 	LogLevel  string `json:"logLevel,omitempty"`
 	LogStdout bool   `json:"logStdout,omitempty"`
+}
+
+type RateLimitOptions struct {
+	Bucket int `json:"bucket" yaml:"bucket"`
+	// refilled at rate “r” tokens per second.
+	Limit int `json:"limit" yaml:"limit"`
+	// It implements a “token bucket” of size “b”
+	Burst int `json:"burst" yaml:"burst"`
+	// exclude ip list
+	Exclude []string `json:"exclude,omitempty" yaml:"exclude,omitempty"`
 }

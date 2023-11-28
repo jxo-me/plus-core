@@ -95,6 +95,7 @@ func (i *RateLimiter) Get(ip string) *rate.Limiter {
 	if !bucket.Has(ip) {
 		limiter := rate.NewLimiter(i.opts.limit, i.opts.burst)
 		bucket.Set(ip, limiter)
+		return limiter
 	}
 
 	return bucket.Get(ip)
