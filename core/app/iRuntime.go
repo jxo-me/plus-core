@@ -10,6 +10,7 @@ import (
 	"github.com/gogf/gf/v2/os/gcfg"
 	metrics "github.com/jxo-me/gf-metrics"
 	telebot "github.com/jxo-me/gfbot"
+	"github.com/jxo-me/plus-core/core/v2/bucket"
 	"github.com/jxo-me/plus-core/core/v2/cache"
 	"github.com/jxo-me/plus-core/core/v2/cron"
 	"github.com/jxo-me/plus-core/core/v2/locker"
@@ -40,6 +41,7 @@ type IRuntime interface {
 	RocketTaskRegister() reg.IRegistry[task.RocketMqService]
 	RiakRegister() reg.IRegistry[*goriak.Session]
 	ServerRegistry() reg.IRegistry[*ghttp.Server]
+	StateRegistry() reg.IRegistry[bucket.IState]
 	TaskRegister() reg.IRegistry[task.TasksService]
 	TusUploaderRegister() reg.IRegistry[*tus.Uploader]
 	WebSocketRegister() reg.IRegistry[*ws.Instance]

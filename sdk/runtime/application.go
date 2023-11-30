@@ -12,6 +12,7 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	metrics "github.com/jxo-me/gf-metrics"
 	telebot "github.com/jxo-me/gfbot"
+	"github.com/jxo-me/plus-core/core/v2/bucket"
 	cacheLib "github.com/jxo-me/plus-core/core/v2/cache"
 	"github.com/jxo-me/plus-core/core/v2/cron"
 	lockerLib "github.com/jxo-me/plus-core/core/v2/locker"
@@ -43,6 +44,7 @@ type Application struct {
 	rabbitMqServiceReg reg.IRegistry[task.RabbitMqService]
 	rocketMqServiceReg reg.IRegistry[task.RocketMqService]
 	serverReg          reg.IRegistry[*ghttp.Server]
+	stateReg           reg.IRegistry[bucket.IState]
 	taskServiceReg     reg.IRegistry[task.TasksService]
 	tusReg             reg.IRegistry[*tus.Uploader]
 	websocketReg       reg.IRegistry[*ws.Instance]
@@ -67,6 +69,7 @@ func NewConfig() *Application {
 		rabbitMqServiceReg: new(registry.RabbitMqServiceRegistry),
 		rocketMqServiceReg: new(registry.RocketMqServiceRegistry),
 		serverReg:          new(registry.ServerRegistry),
+		stateReg:           new(registry.StateRegistry),
 		taskServiceReg:     new(registry.TaskServiceRegistry),
 		tusReg:             new(registry.TusRegistry),
 		websocketReg:       new(registry.WebSocketRegistry),
@@ -149,6 +152,10 @@ func (a *Application) RiakRegister() reg.IRegistry[*goriak.Session] {
 
 func (a *Application) ServerRegistry() reg.IRegistry[*ghttp.Server] {
 	return a.serverReg
+}
+
+func (a *Application) StateRegistry() reg.IRegistry[bucket.IState] {
+	return a.stateReg
 }
 
 func (a *Application) TaskRegister() reg.IRegistry[task.TasksService] {
