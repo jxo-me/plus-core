@@ -50,3 +50,9 @@ func (b *Memory[T]) Has(ctx context.Context, key string) (bool, error) {
 	}
 	return false, nil
 }
+
+func (b *Memory[T]) All(ctx context.Context, key string) (map[string]T, error) {
+	b.Mu.Lock()
+	defer b.Mu.Unlock()
+	return b.M, nil
+}
