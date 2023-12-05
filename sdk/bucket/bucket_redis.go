@@ -85,12 +85,12 @@ func (b *Redis) Has(ctx context.Context, field string) (bool, error) {
 	return b.Store.HExists(ctx, b.Table, field).Result()
 }
 
-func (b *Redis) All(ctx context.Context, field string) (map[string]string, error) {
+func (b *Redis) All(ctx context.Context) (map[string]string, error) {
 	err := b.Lock(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer b.Unlock(ctx)
 
-	return b.Store.HGetAll(ctx, field).Result()
+	return b.Store.HGetAll(ctx, b.Table).Result()
 }

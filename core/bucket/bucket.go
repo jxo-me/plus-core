@@ -8,7 +8,7 @@ type IBucketStore interface {
 	Len(ctx context.Context) (int64, error)
 	Has(ctx context.Context, key string) (bool, error)
 	Del(ctx context.Context, key string) (int64, error)
-	All(ctx context.Context, key string) (map[string]string, error)
+	All(ctx context.Context) (map[string]string, error)
 }
 
 type IState interface {
