@@ -17,6 +17,7 @@ import (
 	messageLib "github.com/jxo-me/plus-core/core/v2/message"
 	"github.com/jxo-me/plus-core/core/v2/queue"
 	reg "github.com/jxo-me/plus-core/core/v2/registry"
+	"github.com/jxo-me/plus-core/core/v2/send"
 	"github.com/jxo-me/plus-core/core/v2/task"
 	"github.com/jxo-me/plus-core/pkg/v2/erlang"
 	"github.com/jxo-me/plus-core/pkg/v2/tus"
@@ -41,6 +42,7 @@ type IRuntime interface {
 	RocketTaskRegister() reg.IRegistry[task.RocketMqService]
 	RiakRegister() reg.IRegistry[*goriak.Session]
 	ServerRegistry() reg.IRegistry[*ghttp.Server]
+	SenderRegistry() reg.IRegistry[send.ISender[send.ISendMsg]]
 	StateRegistry() reg.IRegistry[bucket.IState]
 	TaskRegister() reg.IRegistry[task.TasksService]
 	TusUploaderRegister() reg.IRegistry[*tus.Uploader]

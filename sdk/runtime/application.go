@@ -19,6 +19,7 @@ import (
 	messageLib "github.com/jxo-me/plus-core/core/v2/message"
 	queueLib "github.com/jxo-me/plus-core/core/v2/queue"
 	reg "github.com/jxo-me/plus-core/core/v2/registry"
+	"github.com/jxo-me/plus-core/core/v2/send"
 	"github.com/jxo-me/plus-core/core/v2/task"
 	"github.com/jxo-me/plus-core/pkg/v2/erlang"
 	"github.com/jxo-me/plus-core/pkg/v2/tus"
@@ -44,6 +45,7 @@ type Application struct {
 	rabbitMqServiceReg reg.IRegistry[task.RabbitMqService]
 	rocketMqServiceReg reg.IRegistry[task.RocketMqService]
 	serverReg          reg.IRegistry[*ghttp.Server]
+	senderReg          reg.IRegistry[send.ISender[send.ISendMsg]]
 	stateReg           reg.IRegistry[bucket.IState]
 	taskServiceReg     reg.IRegistry[task.TasksService]
 	tusReg             reg.IRegistry[*tus.Uploader]
@@ -69,6 +71,7 @@ func NewConfig() *Application {
 		rabbitMqServiceReg: new(registry.RabbitMqServiceRegistry),
 		rocketMqServiceReg: new(registry.RocketMqServiceRegistry),
 		serverReg:          new(registry.ServerRegistry),
+		senderReg:          new(registry.SenderRegistry),
 		stateReg:           new(registry.StateRegistry),
 		taskServiceReg:     new(registry.TaskServiceRegistry),
 		tusReg:             new(registry.TusRegistry),
@@ -152,6 +155,10 @@ func (a *Application) RiakRegister() reg.IRegistry[*goriak.Session] {
 
 func (a *Application) ServerRegistry() reg.IRegistry[*ghttp.Server] {
 	return a.serverReg
+}
+
+func (a *Application) SenderRegistry() reg.IRegistry[send.ISender[send.ISendMsg]] {
+	return a.senderReg
 }
 
 func (a *Application) StateRegistry() reg.IRegistry[bucket.IState] {
