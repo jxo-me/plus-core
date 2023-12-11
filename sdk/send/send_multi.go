@@ -10,12 +10,12 @@ const (
 	Name = "MultiSend"
 )
 
-type MultiSend[T any] struct {
-	Clients []send.ISender[T]
+type MultiSend[T send.ISendMsg] struct {
+	clients []send.ISender[T]
 }
 
-func NewMulti(c ...send.ISender[any]) *MultiSend[any] {
-	return &MultiSend[any]{Clients: c}
+func NewMulti(c ...send.ISender[send.ISendMsg]) *MultiSend[send.ISendMsg] {
+	return &MultiSend[send.ISendMsg]{clients: c}
 }
 
 func (t *MultiSend[T]) String() string {
@@ -23,7 +23,7 @@ func (t *MultiSend[T]) String() string {
 }
 
 func (t *MultiSend[T]) Info(ctx context.Context, msg T) (err error) {
-	for _, client := range t.Clients {
+	for _, client := range t.clients {
 		err = client.Info(ctx, msg)
 		if err != nil {
 			return fmt.Errorf("%s send error:%s", client.String(), err)
@@ -33,7 +33,7 @@ func (t *MultiSend[T]) Info(ctx context.Context, msg T) (err error) {
 }
 
 func (t *MultiSend[T]) Warn(ctx context.Context, msg T) (err error) {
-	for _, client := range t.Clients {
+	for _, client := range t.clients {
 		err = client.Warn(ctx, msg)
 		if err != nil {
 			return fmt.Errorf("%s send error:%s", client.String(), err)
@@ -43,7 +43,7 @@ func (t *MultiSend[T]) Warn(ctx context.Context, msg T) (err error) {
 }
 
 func (t *MultiSend[T]) Error(ctx context.Context, msg T) (err error) {
-	for _, client := range t.Clients {
+	for _, client := range t.clients {
 		err = client.Error(ctx, msg)
 		if err != nil {
 			return fmt.Errorf("%s send error:%s", client.String(), err)
