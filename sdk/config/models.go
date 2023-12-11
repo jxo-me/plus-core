@@ -8,6 +8,7 @@ import (
 	service "github.com/jxo-me/plus-core/pkg/v2/erlang"
 	"github.com/jxo-me/plus-core/pkg/v2/security"
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
+	"github.com/jxo-me/plus-core/sdk/v2/send/telegram"
 	"github.com/jxo-me/rabbitmq-go"
 	"time"
 )
@@ -18,6 +19,7 @@ type Config struct {
 	Server   *ghttp.ServerConfig            `json:"server"`
 	Settings *SettingOptions                `json:"settings"`
 	Bot      *BotGroups                     `json:"bot,omitempty"`
+	Telegram *telegram.SendConf             `json:"telegram,omitempty"`
 	Erlang   map[string]*service.NodeConfig `json:"erlang,omitempty"`
 }
 

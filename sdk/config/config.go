@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/jxo-me/plus-core/pkg/v2/erlang"
+	"github.com/jxo-me/plus-core/sdk/v2/send/telegram"
 	"sync"
 )
 
@@ -24,8 +25,9 @@ var (
 			Uploads:     &UploadGroups{Tus: make(map[string]*TusOptions)},
 			RateLimit:   &RateLimitOptions{},
 		},
-		Bot:    &BotGroups{},
-		Erlang: make(map[string]*erlang.NodeConfig),
+		Bot:      &BotGroups{},
+		Telegram: &telegram.SendConf{},
+		Erlang:   make(map[string]*erlang.NodeConfig),
 	}
 	globalMux sync.RWMutex
 )
@@ -48,8 +50,9 @@ func Global() *Config {
 			Uploads:     &UploadGroups{Tus: make(map[string]*TusOptions)},
 			RateLimit:   &RateLimitOptions{},
 		},
-		Bot:    &BotGroups{},
-		Erlang: make(map[string]*erlang.NodeConfig),
+		Bot:      &BotGroups{},
+		Telegram: &telegram.SendConf{},
+		Erlang:   make(map[string]*erlang.NodeConfig),
 	}
 	*cfg = *global
 	return cfg
