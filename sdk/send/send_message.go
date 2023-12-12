@@ -15,29 +15,18 @@ type Message struct {
 }
 
 func (msg *Message) Format(level string) string {
-	if msg.User != "" {
-		msg.User = fmt.Sprintf("# Operator: %s", msg.User)
-	}
-	if msg.Title != "" && level != "" {
-		msg.Title = fmt.Sprintf("[%s]%s: %s", msg.SrvName, level, msg.Title)
-	}
 	if msg.Template == "" {
 		msg.Template = DefaultTpl
 	}
-
-	return fmt.Sprintf(msg.Template, msg.GetTitle(), msg.GetTime(), msg.GetContent(), msg.GetMsg(), msg.GetUser())
+	return fmt.Sprintf(msg.Template, msg.GetTitle(level), msg.GetTime(), msg.GetContent(), msg.GetMsg(), msg.GetUser())
 }
 
-func (msg *Message) SetTemplate(tpl string) {
-	msg.Template = tpl
-}
-
-func (msg *Message) GetTitle() string {
-	return msg.Title
+func (msg *Message) GetTitle(level string) string {
+	return fmt.Sprintf("[%s]%s: %s", msg.SrvName, level, msg.Title)
 }
 
 func (msg *Message) GetUser() string {
-	return msg.User
+	return fmt.Sprintf("# Operator: %s", msg.User)
 }
 
 func (msg *Message) GetTime() string {
