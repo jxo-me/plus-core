@@ -18,7 +18,7 @@ func (msg *Message) Format(level string) string {
 	if msg.User != "" {
 		msg.User = fmt.Sprintf("# Operator: %s", msg.User)
 	}
-	if msg.Title != "" {
+	if msg.Title != "" && level != "" {
 		msg.Title = fmt.Sprintf("[%s]%s: %s", msg.SrvName, level, msg.Title)
 	}
 	if msg.Template == "" {
