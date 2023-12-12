@@ -2,23 +2,34 @@ package send
 
 import "fmt"
 
+const DefaultTpl = "<b>%s</b> \n\n# Time: %s\n# Content: %s\n# Message: %s \n%s"
+
 type Message struct {
-	SrvName string `json:"srv_name"`
-	User    string `json:"user_id"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-	Time    string `json:"time"`
-	Msg     string `json:"msg"`
+	Template string `json:"template"`
+	SrvName  string `json:"srv_name"`
+	User     string `json:"user_id"`
+	Title    string `json:"title"`
+	Content  string `json:"content"`
+	Time     string `json:"time"`
+	Msg      string `json:"msg"`
 }
 
 func (msg *Message) Format(level string) string {
-	var operator = ""
 	if msg.User != "" {
-		operator = fmt.Sprintf("# Operator: %s", msg.User)
+		msg.User = fmt.Sprintf("# Operator: %s", msg.User)
 	}
-	msg.Title = fmt.Sprintf("[%s]%s: %s", msg.SrvName, level, msg.Title)
-	return fmt.Sprintf("<b>%s</b> \n\n# Time: %s\n# Content: %s\n# Message: %s \n%s",
-		msg.Title, msg.Time, msg.Content, msg.Msg, operator)
+	if msg.Title != "" {
+		msg.Title = fmt.Sprintf("[%s]%s: %s", msg.SrvName, level, msg.Title)
+	}
+	if msg.Template == "" {
+		msg.Template = DefaultTpl
+	}
+
+	return fmt.Sprintf(msg.Template, msg.GetTitle(), msg.GetTime(), msg.GetContent(), msg.GetMsg(), msg.GetUser())
+}
+
+func (msg *Message) SetTemplate(tpl string) {
+	msg.Template = tpl
 }
 
 func (msg *Message) GetTitle() string {

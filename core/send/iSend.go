@@ -3,6 +3,7 @@ package send
 import "context"
 
 type ISendMsg interface {
+	SetTemplate(tpl string)
 	Format(level string) string
 	GetTitle() string
 	GetUser() string
