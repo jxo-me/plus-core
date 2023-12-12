@@ -4,6 +4,11 @@ import "context"
 
 type ISendMsg interface {
 	Format(level string) string
+	GetTitle() string
+	GetUser() string
+	GetTime() string
+	GetContent() string
+	GetMsg() string
 }
 
 type ISender[T any] interface {
