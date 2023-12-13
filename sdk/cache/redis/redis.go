@@ -109,20 +109,20 @@ func (r *Redis) HashGetAll(ctx context.Context, key string) (*gvar.Var, error) {
 
 // HashDel delete key in specify redis's hashtable
 func (r *Redis) HashDel(ctx context.Context, hk, key string) error {
-	return r.client.HDel(context.TODO(), hk, key).Err()
+	return r.client.HDel(ctx, hk, key).Err()
 }
 
-func (r *Redis) Increase(ctx context.Context, key string) error {
-	return r.client.Incr(context.TODO(), key).Err()
+func (r *Redis) Increase(ctx context.Context, key string) (int64, error) {
+	return r.client.Incr(ctx, key).Result()
 }
 
-func (r *Redis) Decrease(ctx context.Context, key string) error {
-	return r.client.Decr(context.TODO(), key).Err()
+func (r *Redis) Decrease(ctx context.Context, key string) (int64, error) {
+	return r.client.Decr(ctx, key).Result()
 }
 
 // Expire Set ttl
 func (r *Redis) Expire(ctx context.Context, key string, dur time.Duration) error {
-	return r.client.Expire(context.TODO(), key, dur).Err()
+	return r.client.Expire(ctx, key, dur).Err()
 }
 
 // GetClient 暴露原生client

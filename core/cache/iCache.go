@@ -18,7 +18,7 @@ type ICache interface {
 	HashGetAll(ctx context.Context, key string) (*gvar.Var, error)
 	HashMSet(ctx context.Context, key string, fields map[string]interface{}) error
 	HashMGet(ctx context.Context, key string, fields ...string) (gvar.Vars, error)
-	Increase(ctx context.Context, key string) error
-	Decrease(ctx context.Context, key string) error
+	Increase(ctx context.Context, key string) (int64, error)
+	Decrease(ctx context.Context, key string) (int64, error)
 	Expire(ctx context.Context, key string, dur time.Duration) error
 }

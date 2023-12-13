@@ -144,12 +144,34 @@ func (m *Memory) HashDel(ctx context.Context, hk, key string) error {
 	return m.del(ctx, fmt.Sprintf("%s:%s", hk, key))
 }
 
-func (m *Memory) Increase(ctx context.Context, key string) error {
-	return m.calculate(ctx, key, 1)
+func (m *Memory) Increase(ctx context.Context, key string) (int64, error) {
+	err := m.calculate(ctx, key, 1)
+	if err != nil {
+		return 0, err
+	}
+	v, err := m.getItem(ctx, key)
+	if err != nil {
+		return 0, err
+	}
+	if v == nil {
+		return 0, fmt.Errorf("%s not exist", key)
+	}
+	return v.Int64(), nil
 }
 
-func (m *Memory) Decrease(ctx context.Context, key string) error {
-	return m.calculate(ctx, key, -1)
+func (m *Memory) Decrease(ctx context.Context, key string) (int64, error) {
+	err := m.calculate(ctx, key, -1)
+	if err != nil {
+		return 0, err
+	}
+	v, err := m.getItem(ctx, key)
+	if err != nil {
+		return 0, err
+	}
+	if v == nil {
+		return 0, fmt.Errorf("%s not exist", key)
+	}
+	return v.Int64(), nil
 }
 
 func (m *Memory) calculate(ctx context.Context, key string, num int) error {

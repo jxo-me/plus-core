@@ -93,11 +93,11 @@ func (e *Cache) HashDel(ctx context.Context, hk, key string) error {
 }
 
 // Increase value
-func (e *Cache) Increase(ctx context.Context, key string) error {
+func (e *Cache) Increase(ctx context.Context, key string) (int64, error) {
 	return e.store.Increase(ctx, e.getPrefixKey(key))
 }
 
-func (e *Cache) Decrease(ctx context.Context, key string) error {
+func (e *Cache) Decrease(ctx context.Context, key string) (int64, error) {
 	return e.store.Decrease(ctx, e.getPrefixKey(key))
 }
 

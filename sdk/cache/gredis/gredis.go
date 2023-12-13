@@ -98,14 +98,14 @@ func (r *Gredis) HashDel(ctx context.Context, hk, key string) error {
 }
 
 // Increase get Increase
-func (r *Gredis) Increase(ctx context.Context, key string) error {
-	_, err := r.client.Do(ctx, "INCR", key)
-	return err
+func (r *Gredis) Increase(ctx context.Context, key string) (int64, error) {
+	v, err := r.client.Do(ctx, "INCR", key)
+	return v.Int64(), err
 }
 
-func (r *Gredis) Decrease(ctx context.Context, key string) error {
-	_, err := r.client.Do(ctx, "DECR", key)
-	return err
+func (r *Gredis) Decrease(ctx context.Context, key string) (int64, error) {
+	v, err := r.client.Do(ctx, "DECR", key)
+	return v.Int64(), err
 }
 
 // Expire Set ttl
