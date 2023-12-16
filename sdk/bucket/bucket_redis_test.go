@@ -47,7 +47,7 @@ func TestSet(t *testing.T) {
 	}
 	for i, test := range tests {
 		key := fmt.Sprintf("%s:%d", test.Table, i)
-		r := NewRedis(test.Table, sync.NewMutex(key, redsync.WithRetryDelay(60*time.Second)), client)
+		r := NewRedis(test.Table, sync.NewMutex(key, redsync.WithRetryDelay(60*time.Second)), client, false)
 		ctx := context.Background()
 		set, err := r.Set(ctx, test.Key, test.Val)
 		if err != nil {
@@ -96,7 +96,7 @@ func TestGet(t *testing.T) {
 	}
 	for i, test := range tests {
 		key := fmt.Sprintf("%s:%d", test.Table, i)
-		r := NewRedis(test.Table, sync.NewMutex(key, redsync.WithRetryDelay(60*time.Second)), client)
+		r := NewRedis(test.Table, sync.NewMutex(key, redsync.WithRetryDelay(60*time.Second)), client, false)
 		ctx := context.Background()
 		val, err := r.Get(ctx, test.Key)
 		if err != nil {
@@ -140,7 +140,7 @@ func TestHas(t *testing.T) {
 	}
 	for i, test := range tests {
 		key := fmt.Sprintf("%s:%d", test.Table, i)
-		r := NewRedis(test.Table, sync.NewMutex(key, redsync.WithRetryDelay(60*time.Second)), client)
+		r := NewRedis(test.Table, sync.NewMutex(key, redsync.WithRetryDelay(60*time.Second)), client, false)
 		ctx := context.Background()
 		val, err := r.Has(ctx, test.Key)
 		if err != nil {
@@ -177,7 +177,7 @@ func TestDel(t *testing.T) {
 	}
 	for i, test := range tests {
 		key := fmt.Sprintf("%s:%d", test.Table, i)
-		r := NewRedis(test.Table, sync.NewMutex(key, redsync.WithRetryDelay(60*time.Second)), client)
+		r := NewRedis(test.Table, sync.NewMutex(key, redsync.WithRetryDelay(60*time.Second)), client, false)
 		ctx := context.Background()
 		val, err := r.Del(ctx, test.Key)
 		if err != nil {
@@ -214,7 +214,7 @@ func TestLen(t *testing.T) {
 	}
 	for i, test := range tests {
 		key := fmt.Sprintf("%s:%d", test.Table, i)
-		r := NewRedis(test.Table, sync.NewMutex(key, redsync.WithRetryDelay(60*time.Second)), client)
+		r := NewRedis(test.Table, sync.NewMutex(key, redsync.WithRetryDelay(60*time.Second)), client, false)
 		ctx := context.Background()
 		val, err := r.Len(ctx)
 		if err != nil {

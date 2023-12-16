@@ -11,13 +11,15 @@ type Redis struct {
 	Mu    *redsync.Mutex
 	Table string
 	Store *redis.Client
+	Safe  bool
 }
 
-func NewRedis(table string, mutex *redsync.Mutex, client *redis.Client) *Redis {
+func NewRedis(table string, mutex *redsync.Mutex, client *redis.Client, safe bool) *Redis {
 	return &Redis{
 		Mu:    mutex,
 		Table: table,
 		Store: client,
+		Safe:  safe,
 	}
 }
 
@@ -37,60 +39,72 @@ func (b *Redis) Unlock(ctx context.Context) {
 }
 
 func (b *Redis) Set(ctx context.Context, field string, value string) (int64, error) {
-	err := b.Lock(ctx)
-	if err != nil {
-		return 0, err
+	if b.Safe {
+		err := b.Lock(ctx)
+		if err != nil {
+			return 0, err
+		}
+		defer b.Unlock(ctx)
 	}
-	defer b.Unlock(ctx)
 
 	return b.Store.HSet(ctx, b.Table, field, value).Result()
 }
 
 func (b *Redis) Del(ctx context.Context, field string) (int64, error) {
-	err := b.Lock(ctx)
-	if err != nil {
-		return 0, err
+	if b.Safe {
+		err := b.Lock(ctx)
+		if err != nil {
+			return 0, err
+		}
+		defer b.Unlock(ctx)
 	}
-	defer b.Unlock(ctx)
 
 	return b.Store.HDel(ctx, b.Table, field).Result()
 }
 
 func (b *Redis) Get(ctx context.Context, field string) (string, error) {
-	err := b.Lock(ctx)
-	if err != nil {
-		return "", err
+	if b.Safe {
+		err := b.Lock(ctx)
+		if err != nil {
+			return "", err
+		}
+		defer b.Unlock(ctx)
 	}
-	defer b.Unlock(ctx)
 
 	return b.Store.HGet(ctx, b.Table, field).Result()
 }
 
 func (b *Redis) Len(ctx context.Context) (int64, error) {
-	err := b.Lock(ctx)
-	if err != nil {
-		return 0, err
+	if b.Safe {
+		err := b.Lock(ctx)
+		if err != nil {
+			return 0, err
+		}
+		defer b.Unlock(ctx)
 	}
-	defer b.Unlock(ctx)
+
 	return b.Store.HLen(ctx, b.Table).Result()
 }
 
 func (b *Redis) Has(ctx context.Context, field string) (bool, error) {
-	err := b.Lock(ctx)
-	if err != nil {
-		return false, err
+	if b.Safe {
+		err := b.Lock(ctx)
+		if err != nil {
+			return false, err
+		}
+		defer b.Unlock(ctx)
 	}
-	defer b.Unlock(ctx)
 
 	return b.Store.HExists(ctx, b.Table, field).Result()
 }
 
 func (b *Redis) All(ctx context.Context) (map[string]string, error) {
-	err := b.Lock(ctx)
-	if err != nil {
-		return nil, err
+	if b.Safe {
+		err := b.Lock(ctx)
+		if err != nil {
+			return nil, err
+		}
+		defer b.Unlock(ctx)
 	}
-	defer b.Unlock(ctx)
-
 	return b.Store.HGetAll(ctx, b.Table).Result()
 }
