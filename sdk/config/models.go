@@ -29,7 +29,7 @@ type RedisOptions struct {
 	// Default is 10 connections per every available CPU as reported by runtime.GOMAXPROCS.
 	// If there are not enough connections in the pool, new connections will be allocated in excess of PoolSize;
 	// you can limit it through MaxActiveConns
-	PoolSize int
+	PoolSize int ` yaml:"poolSize" json:"poolSize"`
 }
 
 type CryptoOptions struct {
