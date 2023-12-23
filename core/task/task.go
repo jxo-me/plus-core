@@ -23,7 +23,7 @@ type SubTask interface {
 }
 
 type RouteTask interface {
-	MatchRoute() bool
+	MatchRoute(key string) bool
 	Handle(ctx context.Context, msg message.IMessage) (interface{}, error)
 }
 
