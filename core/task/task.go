@@ -22,6 +22,11 @@ type SubTask interface {
 	Handle(ctx context.Context, msg message.IMessage) (interface{}, error)
 }
 
+type RouteTask interface {
+	MatchRoute() bool
+	Handle(ctx context.Context, msg message.IMessage) (interface{}, error)
+}
+
 type TasksService interface {
 	IService
 	AddServices(services ...IService) TasksService

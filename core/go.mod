@@ -8,10 +8,10 @@ replace (
 )
 
 require (
-	github.com/casbin/casbin/v2 v2.79.0
+	github.com/casbin/casbin/v2 v2.80.0
 	github.com/go-redsync/redsync/v4 v4.11.0
 	github.com/gogf/gf-jwt/v2 v2.1.0
-	github.com/gogf/gf/v2 v2.5.7
+	github.com/gogf/gf/v2 v2.6.1
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
 	github.com/jxo-me/plus-core/pkg/v2 v2.0.42
@@ -35,7 +35,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/uuid v1.4.0 // indirect
+	github.com/google/uuid v1.5.0 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/grokify/html-strip-tags-go v0.0.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
