@@ -252,6 +252,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, consumerFunc 
 			m := new(message.Message)
 			m.SetValue(d.Body)
 			m.SetRoutingKey(d.RoutingKey)
+			m.SetExchange(d.Exchange)
 			m.SetId(d.MessageId)
 			if d.Redelivered {
 				m.SetErrorCount(d.DeliveryTag)

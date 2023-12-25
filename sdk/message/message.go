@@ -3,6 +3,7 @@ package message
 type Message struct {
 	Id         string
 	RoutingKey string
+	Exchange   string
 	Values     any
 	GroupId    string
 	ErrorCount uint64
@@ -10,6 +11,10 @@ type Message struct {
 
 func (m *Message) GetId() string {
 	return m.Id
+}
+
+func (m *Message) GetExchange() string {
+	return m.Exchange
 }
 
 func (m *Message) GetRoutingKey() string {
@@ -22,6 +27,10 @@ func (m *Message) GetValue() any {
 
 func (m *Message) SetId(id string) {
 	m.Id = id
+}
+
+func (m *Message) SetExchange(exchange string) {
+	m.Exchange = exchange
 }
 
 func (m *Message) SetRoutingKey(routingKey string) {
