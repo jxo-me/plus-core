@@ -346,7 +346,7 @@ func (e *Export) processorRaw(ctx context.Context, name string, r *RawStruct) (e
 				}
 				BodyRow := make([]interface{}, 0)
 				// fix: default json tag name to custom tag name
-				mapObj := gconv.Map(item, gconv.MapOption{Tags: []string{e.options.TagName}})
+				mapObj := gconv.Map(item, gconv.MapOption{Tags: []string{e.options.TagName}, OmitEmpty: true})
 				for _, v := range r.FieldList {
 					col := excelize.Cell{StyleID: e.bodyStyleId, Value: mapObj[v]}
 					if r.StatusEnums[v] != nil {
@@ -369,7 +369,7 @@ func (e *Export) processorRaw(ctx context.Context, name string, r *RawStruct) (e
 			}
 			BodyRow := make([]interface{}, 0)
 			// fix default json tag to custom tag
-			mapObj := gconv.Map(r.Obj, gconv.MapOption{Tags: []string{e.options.TagName}})
+			mapObj := gconv.Map(r.Obj, gconv.MapOption{Tags: []string{e.options.TagName}, OmitEmpty: true})
 			for _, v := range r.FieldList {
 				col := excelize.Cell{StyleID: e.bodyStyleId, Value: mapObj[v]}
 				if r.StatusEnums[v] != nil {
@@ -621,7 +621,7 @@ func (e *Export) exportList(ctx context.Context, list []any) error {
 		}
 		BodyRow := make([]interface{}, 0)
 		// fix: default json tag name to custom tag name
-		mapObj := gconv.Map(item, gconv.MapOption{Tags: []string{e.options.TagName}})
+		mapObj := gconv.Map(item, gconv.MapOption{Tags: []string{e.options.TagName}, OmitEmpty: true})
 
 		for k, v := range e.fieldList {
 			col := excelize.Cell{StyleID: e.bodyStyleId, Value: mapObj[v]}
