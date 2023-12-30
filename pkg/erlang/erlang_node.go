@@ -58,7 +58,7 @@ func (s *Node) Spawn(name string, opts gen.ProcessOptions, object gen.ProcessBeh
 	v := s.process.GetOrSetFuncLock(name, func() interface{} {
 		p, err = s.srv.Spawn(name, opts, object, args...)
 		if err != nil {
-			return nil
+			return err
 		}
 		return p
 	})
