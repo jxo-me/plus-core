@@ -73,6 +73,9 @@ func (s *Node) Spawn(name string, opts gen.ProcessOptions, object gen.ProcessBeh
 			}
 			return p, nil
 		}
+		if e, ok := v.(error); ok {
+			return nil, e
+		}
 	}
 
 	return nil, err
