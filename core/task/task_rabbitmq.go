@@ -52,5 +52,6 @@ type RabbitMqTask interface {
 
 type RabbitMqService interface {
 	IService
+	IServiceAppend
 	AddTasks(task ...RabbitMqTask) RabbitMqService
 }

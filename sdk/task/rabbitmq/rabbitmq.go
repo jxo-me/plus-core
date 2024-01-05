@@ -38,6 +38,68 @@ func (t *tRabbitMq) AddTasks(tasks ...task.RabbitMqTask) task.RabbitMqService {
 	return t
 }
 
+func (t *tRabbitMq) Consumer(ctx context.Context, gName string, q queue.IQueue, spec *task.RabbitMqSpec, handle queue.ConsumerFunc) {
+	glog.Info(ctx, fmt.Sprintf("task name: %s, use config group name: %s, Exchange: %s ExchangeType: %s QueueName: %s", spec.TaskName, gName, spec.Exchange, spec.ExchangeType, spec.QueueName))
+	for i := 0; i < spec.ConsumerNum; i++ {
+		var optFuncs []func(*queue.ConsumeOptions)
+		optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()))
+		optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsBindingExchangeName(spec.Exchange))
+		optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsBindingExchangeType(spec.ExchangeType))
+		optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsConcurrency(spec.CoroutineNum))
+		optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)))
+		optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsConsumerAutoAck(spec.AutoAck))
+		optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsQOSPrefetch(spec.Prefetch))
+		optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsExchangePassive(spec.Passive))
+		optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsExchangeDeclare(spec.Declare))
+		optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsExchangeDurable(spec.Durable))
+		// Consumer
+		q.Consumer(ctx, spec.QueueName, handle, optFuncs...)
+	}
+}
+
+func (t *tRabbitMq) AppendStart(ctx context.Context, Routers []task.RabbitMqTask) {
+	var q queue.IQueue
+	glog.Info(ctx, "RabbitMq task start ...")
+	gName := config.DefaultGroupName
+	// register task
+	for _, worker := range Routers {
+		spec := worker.GetSpec(ctx)
+		if spec == nil {
+			glog.Warning(ctx, "get tRabbitMq spec is nil ignore...")
+			continue
+		}
+		if spec.Group != "" {
+			gName = spec.Group
+			if cQueue, ok := t.Queue[gName]; ok {
+				t.Queue[gName] = cQueue
+				q = cQueue
+			} else {
+				// get custom queue
+				cQueue = sdk.Runtime.QueueRegistry().Get(config.GetQueueName(config.RabbitmqQueueName, gName)) // get rabbitmq instance
+				if cQueue != nil {
+					t.Queue[gName] = cQueue
+					q = cQueue
+				} else {
+					glog.Warning(ctx, fmt.Sprintf("task name: %s, get queue %s config group is nil, use default config group. Exchange: %s ExchangeType: %s QueueName: %s", spec.TaskName, gName, spec.Exchange, spec.ExchangeType, spec.QueueName))
+				}
+			}
+		} else {
+			// use default queue
+			if dQueue, ok := t.Queue[gName]; ok {
+				q = dQueue
+			} else {
+				dQueue = sdk.Runtime.QueueRegistry().Get(config.GetQueueName(config.RabbitmqQueueName, gName)) // get rabbitmq instance
+				if dQueue == nil {
+					panic(gerror.New("sdk.Runtime.GetRabbitQueue default group is nil!"))
+				}
+				t.Queue[gName] = dQueue
+				q = dQueue
+			}
+		}
+		t.Consumer(ctx, gName, q, spec, worker.Handle)
+	}
+}
+
 func (t *tRabbitMq) Start(ctx context.Context) {
 	var q queue.IQueue
 	glog.Info(ctx, "RabbitMq task start ...")
@@ -72,22 +134,6 @@ func (t *tRabbitMq) Start(ctx context.Context) {
 			}
 			// use default queue
 		}
-
-		glog.Info(ctx, fmt.Sprintf("task name: %s, use config group name: %s, Exchange: %s ExchangeType: %s QueueName: %s", spec.TaskName, gName, spec.Exchange, spec.ExchangeType, spec.QueueName))
-		for i := 0; i < spec.ConsumerNum; i++ {
-			var optFuncs []func(*queue.ConsumeOptions)
-			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsBindingRoutingKeys(spec.GetRoutingKeys()))
-			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsBindingExchangeName(spec.Exchange))
-			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsBindingExchangeType(spec.ExchangeType))
-			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsConcurrency(spec.CoroutineNum))
-			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsConsumerName(fmt.Sprintf("%s.%02d", spec.TaskName, i+1)))
-			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsConsumerAutoAck(spec.AutoAck))
-			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsQOSPrefetch(spec.Prefetch))
-			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsExchangePassive(spec.Passive))
-			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsExchangeDeclare(spec.Declare))
-			optFuncs = append(optFuncs, queue.WithRabbitMqConsumeOptionsExchangeDurable(spec.Durable))
-			// Consumer
-			q.Consumer(ctx, spec.QueueName, worker.Handle, optFuncs...)
-		}
+		t.Consumer(ctx, gName, q, spec, worker.Handle)
 	}
 }
