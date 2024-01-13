@@ -63,31 +63,31 @@ func (r *RabbitMQ) String() string {
 func (r *RabbitMQ) newConn(ctx context.Context, isNew bool) (*rabbitmq.Conn, error) {
 	var err error
 	if !isNew {
-		conn, err := rabbitmq.NewConn(
-			ctx,
-			r.Url,
-			rabbitmq.WithConnectionOptionsLogger(r.Logger),
-			rabbitmq.WithConnectionOptionsConfig(r.Config),
-			rabbitmq.WithConnectionOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
-		)
-		if err != nil {
-			return nil, err
+		if r.conn == nil {
+			r.conn, err = rabbitmq.NewConn(
+				ctx,
+				r.Url,
+				rabbitmq.WithConnectionOptionsLogger(r.Logger),
+				rabbitmq.WithConnectionOptionsConfig(r.Config),
+				rabbitmq.WithConnectionOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
+			)
+			if err != nil {
+				return nil, err
+			}
 		}
-		return conn, nil
+		return r.conn, nil
 	}
-	if r.conn == nil {
-		r.conn, err = rabbitmq.NewConn(
-			ctx,
-			r.Url,
-			rabbitmq.WithConnectionOptionsLogger(r.Logger),
-			rabbitmq.WithConnectionOptionsConfig(r.Config),
-			rabbitmq.WithConnectionOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
-		)
-		if err != nil {
-			return nil, err
-		}
+	conn, err := rabbitmq.NewConn(
+		ctx,
+		r.Url,
+		rabbitmq.WithConnectionOptionsLogger(r.Logger),
+		rabbitmq.WithConnectionOptionsConfig(r.Config),
+		rabbitmq.WithConnectionOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
+	)
+	if err != nil {
+		return nil, err
 	}
-	return r.conn, nil
+	return conn, nil
 }
 
 func (r *RabbitMQ) newConsumer(ctx context.Context, queueName string, handler rabbitmq.Handler, options queueLib.ConsumeOptions) (*rabbitmq.Consumer, error) {
