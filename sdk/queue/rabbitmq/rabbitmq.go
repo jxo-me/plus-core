@@ -60,8 +60,21 @@ func (r *RabbitMQ) String() string {
 	return "rabbitmq"
 }
 
-func (r *RabbitMQ) newConn(ctx context.Context) (*rabbitmq.Conn, error) {
+func (r *RabbitMQ) newConn(ctx context.Context, isNew bool) (*rabbitmq.Conn, error) {
 	var err error
+	if !isNew {
+		conn, err := rabbitmq.NewConn(
+			ctx,
+			r.Url,
+			rabbitmq.WithConnectionOptionsLogger(r.Logger),
+			rabbitmq.WithConnectionOptionsConfig(r.Config),
+			rabbitmq.WithConnectionOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return conn, nil
+	}
 	if r.conn == nil {
 		r.conn, err = rabbitmq.NewConn(
 			ctx,
@@ -80,7 +93,7 @@ func (r *RabbitMQ) newConn(ctx context.Context) (*rabbitmq.Conn, error) {
 func (r *RabbitMQ) newConsumer(ctx context.Context, queueName string, handler rabbitmq.Handler, options queueLib.ConsumeOptions) (*rabbitmq.Consumer, error) {
 	var err error
 	var conn *rabbitmq.Conn
-	conn, err = r.newConn(ctx)
+	conn, err = r.newConn(ctx, true)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +127,7 @@ func (r *RabbitMQ) newConsumer(ctx context.Context, queueName string, handler ra
 func (r *RabbitMQ) newProducer(ctx context.Context) (*rabbitmq.Publisher, error) {
 	var err error
 	var conn *rabbitmq.Conn
-	conn, err = r.newConn(ctx)
+	conn, err = r.newConn(ctx, false)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +182,7 @@ func (r *RabbitMQ) Publish(ctx context.Context, message messageLib.IMessage, opt
 func (r *RabbitMQ) newRpcClient(ctx context.Context, optionFuncs ...func(*rabbitmq.ClientOptions)) (*rabbitmq.RpcClient, error) {
 	var err error
 	var conn *rabbitmq.Conn
-	conn, err = r.newConn(ctx)
+	conn, err = r.newConn(ctx, false)
 	if err != nil {
 		return nil, err
 	}
