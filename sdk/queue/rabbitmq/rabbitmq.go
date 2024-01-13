@@ -31,6 +31,7 @@ func NewRabbitMQ(
 		consumers:         map[string]*rabbitmq.Consumer{},
 		rpcClients:        map[string]*rabbitmq.RpcClient{},
 		Logger:            logger,
+		cList:             make([]*rabbitmq.Consumer, 0),
 	}
 	if cfg != nil {
 		r.Config = *cfg
@@ -52,6 +53,7 @@ type RabbitMQ struct {
 	PublisherOptions  *rabbitmq.PublisherOptions
 	Logger            rabbitmq.Logger
 	conn              *rabbitmq.Conn
+	cList             []*rabbitmq.Consumer
 }
 
 func (r *RabbitMQ) String() string {
@@ -243,35 +245,36 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, consumerFunc 
 	}
 	var c *rabbitmq.Consumer
 	var err error
-	var ok bool
+	//var ok bool
 	r.mux.Lock()
 	defer r.mux.Unlock()
-	if c, ok = r.consumers[queueName]; !ok {
-		handler := func(ctx context.Context, rw *rabbitmq.ResponseWriter, d rabbitmq.Delivery) rabbitmq.Action {
-			//glog.Debug(ctx, fmt.Sprintf("rabbitmq handle raw message: %s", gconv.String(d)))
-			m := new(message.Message)
-			m.SetValue(d.Body)
-			m.SetRoutingKey(d.RoutingKey)
-			m.SetExchange(d.Exchange)
-			m.SetId(d.MessageId)
-			if d.Redelivered {
-				m.SetErrorCount(d.DeliveryTag)
-			}
-			err = consumerFunc(ctx, rw, m)
-			if err != nil {
-				glog.Warning(ctx, fmt.Sprintf("RabbitMQ Requeue error:%s msg: %v", err.Error(), gconv.String(m)))
-				return rabbitmq.NackRequeue
-			}
-			// rabbitmq.Ack, rabbitmq.NackDiscard, rabbitmq.NackRequeue
-			return rabbitmq.Ack
+	//if c, ok = r.consumers[queueName]; !ok {
+	handler := func(ctx context.Context, rw *rabbitmq.ResponseWriter, d rabbitmq.Delivery) rabbitmq.Action {
+		//glog.Debug(ctx, fmt.Sprintf("rabbitmq handle raw message: %s", gconv.String(d)))
+		m := new(message.Message)
+		m.SetValue(d.Body)
+		m.SetRoutingKey(d.RoutingKey)
+		m.SetExchange(d.Exchange)
+		m.SetId(d.MessageId)
+		if d.Redelivered {
+			m.SetErrorCount(d.DeliveryTag)
 		}
-		c, err = r.newConsumer(ctx, queueName, handler, options)
+		err = consumerFunc(ctx, rw, m)
 		if err != nil {
-			glog.Error(ctx, "rabbitmq newConsumer error:", err)
-			return
+			glog.Warning(ctx, fmt.Sprintf("RabbitMQ Requeue error:%s msg: %v", err.Error(), gconv.String(m)))
+			return rabbitmq.NackRequeue
 		}
-		r.consumers[queueName] = c
+		// rabbitmq.Ack, rabbitmq.NackDiscard, rabbitmq.NackRequeue
+		return rabbitmq.Ack
 	}
+	c, err = r.newConsumer(ctx, queueName, handler, options)
+	if err != nil {
+		glog.Error(ctx, "rabbitmq newConsumer error:", err)
+		return
+	}
+	r.cList = append(r.cList, c)
+	//r.consumers[queueName] = c
+	//}
 
 }
 
