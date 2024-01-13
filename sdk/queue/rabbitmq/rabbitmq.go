@@ -12,7 +12,6 @@ import (
 	"github.com/jxo-me/plus-core/sdk/v2/queue"
 	"github.com/jxo-me/rabbitmq-go"
 	"sync"
-	"time"
 )
 
 func NewRabbitMQ(
@@ -22,81 +21,49 @@ func NewRabbitMQ(
 	cfg *rabbitmq.Config,
 	logger rabbitmq.Logger,
 ) (*RabbitMQ, error) {
-	//var err error
-	//var consumer rabbitmq.Consumer
+	p, err := NewConnectionPool(ctx, dsn, 100, reconnectInterval, logger, cfg)
+	if err != nil {
+		return nil, err
+	}
 	r := &RabbitMQ{
-		Url:               dsn,
-		ReconnectInterval: reconnectInterval,
-		producers:         map[string]*rabbitmq.Publisher{},
-		consumers:         map[string]*rabbitmq.Consumer{},
-		rpcClients:        map[string]*rabbitmq.RpcClient{},
-		Logger:            logger,
-		cList:             make([]*rabbitmq.Consumer, 0),
+		producers:  map[string]*rabbitmq.Publisher{},
+		consumers:  make([]*rabbitmq.Consumer, 0),
+		rpcClients: map[string]*rabbitmq.RpcClient{},
+		Logger:     logger,
+		pool:       p,
 	}
-	if cfg != nil {
-		r.Config = *cfg
-	}
+
 	return r, nil
 }
 
 // RabbitMQ cache implement
 type RabbitMQ struct {
-	Url               string
-	ReconnectInterval int
-	Handler           []rabbitmq.Handler
-	Config            rabbitmq.Config
-	mux               sync.RWMutex
-	consumers         map[string]*rabbitmq.Consumer
-	ConsumerOptions   *rabbitmq.ConsumerOptions
-	producers         map[string]*rabbitmq.Publisher
-	rpcClients        map[string]*rabbitmq.RpcClient
-	PublisherOptions  *rabbitmq.PublisherOptions
-	Logger            rabbitmq.Logger
-	conn              *rabbitmq.Conn
-	cList             []*rabbitmq.Consumer
+	Handler          []rabbitmq.Handler
+	mux              sync.RWMutex
+	consumers        []*rabbitmq.Consumer
+	ConsumerOptions  *rabbitmq.ConsumerOptions
+	producers        map[string]*rabbitmq.Publisher
+	rpcClients       map[string]*rabbitmq.RpcClient
+	PublisherOptions *rabbitmq.PublisherOptions
+	Logger           rabbitmq.Logger
+	pool             *ConnectionPool
 }
 
 func (r *RabbitMQ) String() string {
 	return "rabbitmq"
 }
 
-func (r *RabbitMQ) newConn(ctx context.Context, isNew bool) (*rabbitmq.Conn, error) {
-	var err error
-	if !isNew {
-		if r.conn == nil {
-			r.conn, err = rabbitmq.NewConn(
-				ctx,
-				r.Url,
-				rabbitmq.WithConnectionOptionsLogger(r.Logger),
-				rabbitmq.WithConnectionOptionsConfig(r.Config),
-				rabbitmq.WithConnectionOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
-			)
-			if err != nil {
-				return nil, err
-			}
-		}
-		return r.conn, nil
-	}
-	conn, err := rabbitmq.NewConn(
-		ctx,
-		r.Url,
-		rabbitmq.WithConnectionOptionsLogger(r.Logger),
-		rabbitmq.WithConnectionOptionsConfig(r.Config),
-		rabbitmq.WithConnectionOptionsReconnectInterval(time.Duration(r.ReconnectInterval)*time.Second),
-	)
-	if err != nil {
-		return nil, err
-	}
-	return conn, nil
-}
-
 func (r *RabbitMQ) newConsumer(ctx context.Context, queueName string, handler rabbitmq.Handler, options queueLib.ConsumeOptions) (*rabbitmq.Consumer, error) {
 	var err error
 	var conn *rabbitmq.Conn
-	conn, err = r.newConn(ctx, true)
+	conn, err = r.pool.GetConnection(ctx)
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		// 将连接释放回连接池
+		r.pool.ReleaseConnection(conn)
+	}()
 	var optionFuncs []func(*rabbitmq.ConsumerOptions)
 	if options.BindingExchange.Declare {
 		optionFuncs = append(optionFuncs, rabbitmq.WithConsumerOptionsExchangeDeclare)
@@ -127,11 +94,14 @@ func (r *RabbitMQ) newConsumer(ctx context.Context, queueName string, handler ra
 func (r *RabbitMQ) newProducer(ctx context.Context) (*rabbitmq.Publisher, error) {
 	var err error
 	var conn *rabbitmq.Conn
-	conn, err = r.newConn(ctx, false)
+	conn, err = r.pool.GetConnection(ctx)
 	if err != nil {
 		return nil, err
 	}
-
+	defer func() {
+		// 将连接释放回连接池
+		r.pool.ReleaseConnection(conn)
+	}()
 	return rabbitmq.NewPublisher(ctx,
 		conn,
 		rabbitmq.WithPublisherOptionsLogger(r.Logger),
@@ -182,11 +152,14 @@ func (r *RabbitMQ) Publish(ctx context.Context, message messageLib.IMessage, opt
 func (r *RabbitMQ) newRpcClient(ctx context.Context, optionFuncs ...func(*rabbitmq.ClientOptions)) (*rabbitmq.RpcClient, error) {
 	var err error
 	var conn *rabbitmq.Conn
-	conn, err = r.newConn(ctx, false)
+	conn, err = r.pool.GetConnection(ctx)
 	if err != nil {
 		return nil, err
 	}
-
+	defer func() {
+		// 将连接释放回连接池
+		r.pool.ReleaseConnection(conn)
+	}()
 	return rabbitmq.NewRpcClient(ctx,
 		conn,
 		rabbitmq.WithClientOptionsLogger(r.Logger),
@@ -285,7 +258,7 @@ func (r *RabbitMQ) Consumer(ctx context.Context, queueName string, consumerFunc 
 		glog.Error(ctx, "rabbitmq newConsumer error:", err)
 		return
 	}
-	r.cList = append(r.cList, c)
+	r.consumers = append(r.consumers, c)
 	//r.consumers[queueName] = c
 	//}
 
@@ -302,8 +275,8 @@ func (r *RabbitMQ) Shutdown(ctx context.Context) {
 	for _, pushConsumer := range r.consumers {
 		pushConsumer.Close(ctx)
 	}
-	if r.conn != nil {
-		err := r.conn.Close(ctx)
+	if r.pool != nil {
+		err := r.pool.Close(ctx)
 		if err != nil {
 			glog.Warning(ctx, "rabbitmq conn close error:", err.Error())
 		}
