@@ -17,11 +17,12 @@ import (
 func NewRabbitMQ(
 	ctx context.Context,
 	dsn string,
+	maxConnections int,
 	reconnectInterval int,
 	cfg *rabbitmq.Config,
 	logger rabbitmq.Logger,
 ) (*RabbitMQ, error) {
-	p, err := NewConnectionPool(ctx, dsn, 100, reconnectInterval, logger, cfg)
+	p, err := NewConnectionPool(ctx, dsn, maxConnections, reconnectInterval, logger, cfg)
 	if err != nil {
 		return nil, err
 	}

@@ -27,6 +27,7 @@ func ParseRabbitMQ(ctx context.Context, cfg *config.RabbitmqOptions) (queueLib.I
 	q, err := rabbitmq.NewRabbitMQ(
 		ctx,
 		cfg.DSN,
+		cfg.MaxConnections,
 		cfg.ReconnectInterval,
 		cfg.Cfg,
 		logger,

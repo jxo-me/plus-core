@@ -107,6 +107,7 @@ type RabbitmqOptions struct {
 	FrameSize         int64            `json:"frameSize,omitempty"`
 	Heartbeat         int64            `json:"heartbeat,omitempty"`
 	ReconnectInterval int              `json:"reconnectInterval,omitempty"`
+	MaxConnections    int              `json:"maxConnections,omitempty"`
 	Cfg               *rabbitmq.Config `json:"cfg" yaml:"cfg"`
 	LogPath           string           `json:"logPath,omitempty"`
 	LogFile           string           `json:"logFile,omitempty"`
