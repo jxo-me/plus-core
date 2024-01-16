@@ -14,6 +14,7 @@ type ICache interface {
 	HashGet(ctx context.Context, hk, key string) (*gvar.Var, error)
 	HashDel(ctx context.Context, hk, key string) error
 	HashSet(ctx context.Context, key string, fields map[string]interface{}) (int64, error)
+	HashVals(ctx context.Context, key string) (gvar.Vars, error)
 	HashLen(ctx context.Context, key string) (int64, error)
 	HashGetAll(ctx context.Context, key string) (*gvar.Var, error)
 	HashMSet(ctx context.Context, key string, fields map[string]interface{}) error

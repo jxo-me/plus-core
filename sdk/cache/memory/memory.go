@@ -101,6 +101,15 @@ func (m *Memory) HashMGet(ctx context.Context, key string, fields ...string) (gv
 	return vars, nil
 }
 
+func (m *Memory) HashVals(ctx context.Context, key string) (gvar.Vars, error) {
+	v, err := m.getItem(ctx, key)
+	if err != nil || v == nil {
+		return nil, err
+	}
+
+	return gvar.Vars{v}, err
+}
+
 func (m *Memory) HashLen(ctx context.Context, key string) (int64, error) {
 	var n int64
 	keys, err := m.cache.Keys(ctx)

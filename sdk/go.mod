@@ -22,7 +22,7 @@ require (
 	github.com/jxo-me/plus-core/pkg/v2 v2.0.46
 	github.com/jxo-me/rabbitmq-go v1.0.13
 	github.com/nsqio/go-nsq v1.1.0
-	github.com/redis/go-redis/v9 v9.3.1
+	github.com/redis/go-redis/v9 v9.4.0
 	github.com/zegl/goriak/v3 v3.2.4
 	golang.org/x/text v0.14.0
 )

@@ -81,6 +81,11 @@ func (r *Gredis) HashMGet(ctx context.Context, key string, fields ...string) (gv
 	return v.Vars(), err
 }
 
+func (r *Gredis) HashVals(ctx context.Context, key string) (gvar.Vars, error) {
+	v, err := r.client.Do(ctx, "HVals", key)
+	return v.Vars(), err
+}
+
 func (r *Gredis) HashLen(ctx context.Context, key string) (int64, error) {
 	v, err := r.client.Do(ctx, "HLen", key)
 	return v.Int64(), err

@@ -79,6 +79,10 @@ func (e *Cache) HashMGet(ctx context.Context, key string, fields ...string) (gva
 	return e.store.HashMGet(ctx, key, fields...)
 }
 
+func (e *Cache) HashVals(ctx context.Context, key string) (gvar.Vars, error) {
+	return e.store.HashVals(ctx, key)
+}
+
 func (e *Cache) HashLen(ctx context.Context, key string) (int64, error) {
 	return e.store.HashLen(ctx, key)
 }

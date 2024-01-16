@@ -97,6 +97,16 @@ func (r *Redis) HashMGet(ctx context.Context, key string, fields ...string) (gva
 	return vars, err
 }
 
+func (r *Redis) HashVals(ctx context.Context, key string) (gvar.Vars, error) {
+	var vars gvar.Vars
+	v, err := r.client.HVals(ctx, key).Result()
+	err = gconv.Structs(&v, &vars)
+	if err != nil {
+		return nil, err
+	}
+	return vars, err
+}
+
 func (r *Redis) HashLen(ctx context.Context, key string) (int64, error) {
 	v, err := r.client.HLen(ctx, key).Result()
 	return v, err
