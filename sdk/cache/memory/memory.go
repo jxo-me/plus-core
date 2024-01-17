@@ -163,6 +163,12 @@ func (m *Memory) ListRPop(ctx context.Context, key string, count ...int) (*gvar.
 	return gvar.New(key), nil
 }
 
+func (m *Memory) ListRange(ctx context.Context, key string, start, stop int64) (gvar.Vars, error) {
+	// todo impl
+	var vars gvar.Vars
+	return vars, nil
+}
+
 func (m *Memory) Increase(ctx context.Context, key string) (int64, error) {
 	err := m.calculate(ctx, key, 1)
 	if err != nil {

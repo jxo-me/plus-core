@@ -109,6 +109,11 @@ func (r *Gredis) ListPush(ctx context.Context, key string, values ...interface{}
 	return v.Int64(), err
 }
 
+func (r *Gredis) ListRange(ctx context.Context, key string, start, stop int64) (gvar.Vars, error) {
+	v, err := r.client.Do(ctx, "LRange", key, start, stop)
+	return v.Vars(), err
+}
+
 func (r *Gredis) ListRPop(ctx context.Context, key string, count ...int) (*gvar.Var, error) {
 	if len(count) > 0 {
 		return r.client.Do(ctx, "RPop", key, count[0])

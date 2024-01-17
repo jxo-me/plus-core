@@ -127,6 +127,16 @@ func (r *Redis) ListPush(ctx context.Context, key string, values ...interface{})
 	return v, err
 }
 
+func (r *Redis) ListRange(ctx context.Context, key string, start, stop int64) (gvar.Vars, error) {
+	var vars gvar.Vars
+	v, err := r.client.LRange(ctx, key, start, stop).Result()
+	err = gconv.Structs(&v, &vars)
+	if err != nil {
+		return nil, err
+	}
+	return vars, err
+}
+
 func (r *Redis) ListRPop(ctx context.Context, key string, count ...int) (*gvar.Var, error) {
 	if len(count) > 0 {
 		v, err := r.client.RPopCount(ctx, key, count[0]).Result()
