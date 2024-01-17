@@ -153,7 +153,7 @@ func (m *Memory) HashDel(ctx context.Context, hk, key string) error {
 	return m.del(ctx, fmt.Sprintf("%s:%s", hk, key))
 }
 
-func (m *Memory) ListPush(ctx context.Context, key string, values ...interface{}) (int64, error) {
+func (m *Memory) ListLPush(ctx context.Context, key string, values ...interface{}) (int64, error) {
 	// todo impl
 	return 0, nil
 }

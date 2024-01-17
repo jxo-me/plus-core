@@ -104,7 +104,7 @@ func (r *Gredis) HashDel(ctx context.Context, hk, key string) error {
 	return err
 }
 
-func (r *Gredis) ListPush(ctx context.Context, key string, values ...interface{}) (int64, error) {
+func (r *Gredis) ListLPush(ctx context.Context, key string, values ...interface{}) (int64, error) {
 	v, err := r.client.Do(ctx, "LPush", append([]interface{}{key}, values...)...)
 	return v.Int64(), err
 }

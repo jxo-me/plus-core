@@ -122,7 +122,7 @@ func (r *Redis) HashDel(ctx context.Context, hk, key string) error {
 	return r.client.HDel(ctx, hk, key).Err()
 }
 
-func (r *Redis) ListPush(ctx context.Context, key string, values ...interface{}) (int64, error) {
+func (r *Redis) ListLPush(ctx context.Context, key string, values ...interface{}) (int64, error) {
 	v, err := r.client.LPush(ctx, key, values).Result()
 	return v, err
 }

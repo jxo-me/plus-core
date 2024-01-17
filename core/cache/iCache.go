@@ -19,7 +19,7 @@ type ICache interface {
 	HashGetAll(ctx context.Context, key string) (*gvar.Var, error)
 	HashMSet(ctx context.Context, key string, fields map[string]interface{}) error
 	HashMGet(ctx context.Context, key string, fields ...string) (gvar.Vars, error)
-	ListPush(ctx context.Context, key string, values ...interface{}) (int64, error)
+	ListLPush(ctx context.Context, key string, values ...interface{}) (int64, error)
 	ListRange(ctx context.Context, key string, start, stop int64) (gvar.Vars, error)
 	ListRPop(ctx context.Context, key string, count ...int) (*gvar.Var, error)
 	Increase(ctx context.Context, key string) (int64, error)
