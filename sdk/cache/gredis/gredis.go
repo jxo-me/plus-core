@@ -99,7 +99,21 @@ func (r *Gredis) HashGetAll(ctx context.Context, key string) (*gvar.Var, error) 
 // HashDel delete key in specify redis's hashtable
 func (r *Gredis) HashDel(ctx context.Context, hk, key string) error {
 	_, err := r.client.Do(ctx, "HDEL", hk, key)
+	r.client.LPush(ctx, key)
+	r.client.RPop(ctx, key)
 	return err
+}
+
+func (r *Gredis) ListPush(ctx context.Context, key string, values ...interface{}) (int64, error) {
+	v, err := r.client.Do(ctx, "LPush", append([]interface{}{key}, values...)...)
+	return v.Int64(), err
+}
+
+func (r *Gredis) ListRPop(ctx context.Context, key string, count ...int) (*gvar.Var, error) {
+	if len(count) > 0 {
+		return r.client.Do(ctx, "RPop", key, count[0])
+	}
+	return r.client.Do(ctx, "RPop", key)
 }
 
 // Increase get Increase

@@ -96,6 +96,14 @@ func (e *Cache) HashDel(ctx context.Context, hk, key string) error {
 	return e.store.HashDel(ctx, hk, e.getPrefixKey(key))
 }
 
+func (e *Cache) ListPush(ctx context.Context, key string, values ...interface{}) (int64, error) {
+	return e.store.ListPush(ctx, key, values...)
+}
+
+func (e *Cache) ListRPop(ctx context.Context, key string, count ...int) (*gvar.Var, error) {
+	return e.store.ListRPop(ctx, key, count...)
+}
+
 // Increase value
 func (e *Cache) Increase(ctx context.Context, key string) (int64, error) {
 	return e.store.Increase(ctx, e.getPrefixKey(key))

@@ -153,6 +153,16 @@ func (m *Memory) HashDel(ctx context.Context, hk, key string) error {
 	return m.del(ctx, fmt.Sprintf("%s:%s", hk, key))
 }
 
+func (m *Memory) ListPush(ctx context.Context, key string, values ...interface{}) (int64, error) {
+	// todo impl
+	return 0, nil
+}
+
+func (m *Memory) ListRPop(ctx context.Context, key string, count ...int) (*gvar.Var, error) {
+	// todo impl
+	return gvar.New(key), nil
+}
+
 func (m *Memory) Increase(ctx context.Context, key string) (int64, error) {
 	err := m.calculate(ctx, key, 1)
 	if err != nil {

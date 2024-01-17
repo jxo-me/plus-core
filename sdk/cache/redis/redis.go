@@ -122,6 +122,20 @@ func (r *Redis) HashDel(ctx context.Context, hk, key string) error {
 	return r.client.HDel(ctx, hk, key).Err()
 }
 
+func (r *Redis) ListPush(ctx context.Context, key string, values ...interface{}) (int64, error) {
+	v, err := r.client.LPush(ctx, key, values).Result()
+	return v, err
+}
+
+func (r *Redis) ListRPop(ctx context.Context, key string, count ...int) (*gvar.Var, error) {
+	if len(count) > 0 {
+		v, err := r.client.RPopCount(ctx, key, count[0]).Result()
+		return gvar.New(v), err
+	}
+	v, err := r.client.RPop(ctx, key).Result()
+	return gvar.New(v), err
+}
+
 func (r *Redis) Increase(ctx context.Context, key string) (int64, error) {
 	return r.client.Incr(ctx, key).Result()
 }
