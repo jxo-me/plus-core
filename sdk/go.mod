@@ -10,19 +10,19 @@ replace (
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
-	github.com/casbin/casbin/v2 v2.81.0
-	github.com/go-redsync/redsync/v4 v4.11.0
+	github.com/casbin/casbin/v2 v2.82.0
+	github.com/go-redsync/redsync/v4 v4.12.1
 	github.com/gogf/gf-jwt/v2 v2.1.0
-	github.com/gogf/gf/v2 v2.6.1
-	github.com/google/uuid v1.5.0
+	github.com/gogf/gf/v2 v2.6.3
+	github.com/google/uuid v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
-	github.com/jxo-me/plus-core/core/v2 v2.0.45
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.46
+	github.com/jxo-me/plus-core/core/v2 v2.0.49
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.47
 	github.com/jxo-me/rabbitmq-go v1.0.13
 	github.com/nsqio/go-nsq v1.1.0
-	github.com/redis/go-redis/v9 v9.4.0
+	github.com/redis/go-redis/v9 v9.5.1
 	github.com/zegl/goriak/v3 v3.2.4
 	golang.org/x/text v0.14.0
 )

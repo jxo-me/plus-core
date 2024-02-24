@@ -9,11 +9,11 @@ replace (
 
 require (
 	github.com/ergo-services/ergo v1.999.224
-	github.com/gogf/gf/v2 v2.6.1
-	github.com/google/uuid v1.5.0
+	github.com/gogf/gf/v2 v2.6.3
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.1
-	github.com/jxo-me/plus-core/core/v2 v2.0.45
-	github.com/jxo-me/plus-core/sdk/v2 v2.0.67
+	github.com/jxo-me/plus-core/core/v2 v2.0.49
+	github.com/jxo-me/plus-core/sdk/v2 v2.0.72
 	github.com/mojocn/base64Captcha v1.3.6
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/stretchr/testify v1.8.4
