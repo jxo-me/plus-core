@@ -9,15 +9,15 @@ replace (
 
 require (
 	github.com/ergo-services/ergo v1.999.224
-	github.com/gogf/gf/v2 v2.6.3
+	github.com/gogf/gf/v2 v2.6.4
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.1
-	github.com/jxo-me/plus-core/core/v2 v2.0.49
-	github.com/jxo-me/plus-core/sdk/v2 v2.0.72
+	github.com/jxo-me/plus-core/core/v2 v2.0.50
+	github.com/jxo-me/plus-core/sdk/v2 v2.0.73
 	github.com/mojocn/base64Captcha v1.3.6
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
-	github.com/stretchr/testify v1.8.4
-	github.com/xuri/excelize/v2 v2.8.0
+	github.com/stretchr/testify v1.9.0
+	github.com/xuri/excelize/v2 v2.8.1
 	golang.org/x/time v0.5.0
 	gopkg.in/Acconut/lockfile.v1 v1.1.0
 )
@@ -42,15 +42,15 @@ require (
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
-	github.com/xuri/efp v0.0.0-20230802181842-ad255f2331ca // indirect
-	github.com/xuri/nfp v0.0.0-20230819163627-dc951e3ffe1a // indirect
+	github.com/xuri/efp v0.0.0-20231025114914-d1ff6096ae53 // indirect
+	github.com/xuri/nfp v0.0.0-20230919160717-d98342af3f05 // indirect
 	go.opentelemetry.io/otel v1.14.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.14.0 // indirect
 	go.opentelemetry.io/otel/trace v1.14.0 // indirect
-	golang.org/x/crypto v0.15.0 // indirect
-	golang.org/x/image v0.13.0 // indirect
-	golang.org/x/net v0.18.0 // indirect
-	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/crypto v0.20.0 // indirect
+	golang.org/x/image v0.14.0 // indirect
+	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

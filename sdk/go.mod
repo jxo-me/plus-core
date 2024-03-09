@@ -13,13 +13,13 @@ require (
 	github.com/casbin/casbin/v2 v2.82.0
 	github.com/go-redsync/redsync/v4 v4.12.1
 	github.com/gogf/gf-jwt/v2 v2.1.0
-	github.com/gogf/gf/v2 v2.6.3
+	github.com/gogf/gf/v2 v2.6.4
 	github.com/google/uuid v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
-	github.com/jxo-me/plus-core/core/v2 v2.0.49
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.47
+	github.com/jxo-me/plus-core/core/v2 v2.0.50
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.48
 	github.com/jxo-me/rabbitmq-go v1.0.13
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/redis/go-redis/v9 v9.5.1
@@ -75,18 +75,18 @@ require (
 	github.com/tidwall/gjson v1.13.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
-	github.com/xuri/efp v0.0.0-20230802181842-ad255f2331ca // indirect
-	github.com/xuri/excelize/v2 v2.8.0 // indirect
-	github.com/xuri/nfp v0.0.0-20230819163627-dc951e3ffe1a // indirect
+	github.com/xuri/efp v0.0.0-20231025114914-d1ff6096ae53 // indirect
+	github.com/xuri/excelize/v2 v2.8.1 // indirect
+	github.com/xuri/nfp v0.0.0-20230919160717-d98342af3f05 // indirect
 	go.opentelemetry.io/otel v1.14.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.14.0 // indirect
 	go.opentelemetry.io/otel/trace v1.14.0 // indirect
 	go.uber.org/atomic v1.5.1 // indirect
-	golang.org/x/crypto v0.15.0 // indirect
+	golang.org/x/crypto v0.20.0 // indirect
 	golang.org/x/lint v0.0.0-20190930215403-16217165b5de // indirect
-	golang.org/x/net v0.18.0 // indirect
-	golang.org/x/sys v0.14.0 // indirect
-	golang.org/x/term v0.14.0 // indirect
+	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/sys v0.17.0 // indirect
+	golang.org/x/term v0.17.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
