@@ -82,6 +82,9 @@ func (s *OpenId) decode(str string) (string, error) {
 	cryptKey := s.KeyA + s.md5Str(s.KeyA+keyC)
 	cryptKeyLen := len(cryptKey)
 	str1 := ""
+	if len(str) <= 4 {
+		return "", fmt.Errorf("invalid openid: %s", str)
+	}
 	base, err := s.base64Decode(str[4:])
 	if err != nil {
 		return "", err
@@ -89,7 +92,7 @@ func (s *OpenId) decode(str string) (string, error) {
 	str1 = string(base)
 	str1Len := len(str1)
 	result := s.core(cryptKey, cryptKeyLen, str1, str1Len)
-	if len(result) < 26 {
+	if len(result) <= 26 {
 		return "", fmt.Errorf("invalid openid: %s", str)
 	}
 	return result[26:], nil
