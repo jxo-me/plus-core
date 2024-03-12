@@ -89,6 +89,9 @@ func (s *OpenId) decode(str string) (string, error) {
 	str1 = string(base)
 	str1Len := len(str1)
 	result := s.core(cryptKey, cryptKeyLen, str1, str1Len)
+	if len(result) < 26 {
+		return "", fmt.Errorf("invalid openid: %s", str)
+	}
 	return result[26:], nil
 }
 
