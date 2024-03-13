@@ -78,6 +78,9 @@ func (s *OpenId) Decode(OpenID string) (string, error) {
 }
 
 func (s *OpenId) decode(str string) (string, error) {
+	if len(str) <= s.KeyLen {
+		return "", fmt.Errorf("invalid openid: %s", str)
+	}
 	keyC := str[:s.KeyLen]
 	cryptKey := s.KeyA + s.md5Str(s.KeyA+keyC)
 	cryptKeyLen := len(cryptKey)
