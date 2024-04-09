@@ -8,13 +8,13 @@ replace (
 )
 
 require (
-	github.com/casbin/casbin/v2 v2.82.0
+	github.com/casbin/casbin/v2 v2.87.1
 	github.com/go-redsync/redsync/v4 v4.12.1
 	github.com/gogf/gf-jwt/v2 v2.1.0
-	github.com/gogf/gf/v2 v2.6.4
+	github.com/gogf/gf/v2 v2.7.0
 	github.com/jxo-me/gf-metrics v0.1.4
 	github.com/jxo-me/gfbot v0.1.16
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.48
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.49
 	github.com/jxo-me/rabbitmq-go v1.0.13
 	github.com/zegl/goriak/v3 v3.2.4
 )
