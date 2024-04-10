@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/casbin/casbin/v2"
 	jwt "github.com/gogf/gf-jwt/v2"
+	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/i18n/gi18n"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -36,6 +37,7 @@ type Application struct {
 	configReg          reg.IRegistry[*gcfg.Config]
 	crontabReg         reg.IRegistry[cron.ICron]
 	erlangReg          reg.IRegistry[*erlang.Node]
+	grpcReg            reg.IRegistry[*grpcx.GrpcServer]
 	jwtReg             reg.IRegistry[*jwt.GfJWTMiddleware]
 	languageReg        reg.IRegistry[*gi18n.Manager]
 	lockerReg          reg.IRegistry[lockerLib.ILocker]
@@ -62,6 +64,7 @@ func NewConfig() *Application {
 		configReg:          new(registry.ConfigRegistry),
 		crontabReg:         new(registry.CrontabRegistry),
 		erlangReg:          new(registry.ErlangNodeRegistry),
+		grpcReg:            new(registry.GrpcRegistry),
 		jwtReg:             new(registry.JwtRegistry),
 		languageReg:        new(registry.LanguageRegistry),
 		lockerReg:          new(registry.LockerRegistry),
@@ -111,6 +114,10 @@ func (a *Application) CronRegistry() reg.IRegistry[cron.ICron] {
 
 func (a *Application) ErlangNodeRegistry() reg.IRegistry[*erlang.Node] {
 	return a.erlangReg
+}
+
+func (a *Application) GrpcRegistry() reg.IRegistry[*grpcx.GrpcServer] {
+	return a.grpcReg
 }
 
 func (a *Application) JwtRegister() reg.IRegistry[*jwt.GfJWTMiddleware] {

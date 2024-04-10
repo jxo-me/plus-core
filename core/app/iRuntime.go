@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/casbin/casbin/v2"
 	jwt "github.com/gogf/gf-jwt/v2"
+	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/i18n/gi18n"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -32,6 +33,7 @@ type IRuntime interface {
 	ConfigRegister() reg.IRegistry[*gcfg.Config]
 	CronRegistry() reg.IRegistry[cron.ICron]
 	ErlangNodeRegistry() reg.IRegistry[*erlang.Node]
+	GrpcRegistry() reg.IRegistry[*grpcx.GrpcServer]
 	JwtRegister() reg.IRegistry[*jwt.GfJWTMiddleware]
 	LanguageRegister() reg.IRegistry[*gi18n.Manager]
 	LockerRegistry() reg.IRegistry[locker.ILocker]
