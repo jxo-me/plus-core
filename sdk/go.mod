@@ -13,17 +13,17 @@ replace (
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/casbin/casbin/v2 v2.87.1
-	github.com/go-redsync/redsync/v4 v4.12.1
+	github.com/go-redsync/redsync/v4 v4.13.0
 	github.com/gogf/gf-jwt/v2 v2.1.0
 	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.7.0
 	github.com/gogf/gf/v2 v2.7.0
 	github.com/google/uuid v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.4
-	github.com/jxo-me/gfbot v0.1.16
-	github.com/jxo-me/plus-core/core/v2 v2.0.53
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.51
-	github.com/jxo-me/rabbitmq-go v1.0.13
+	github.com/jxo-me/gfbot v0.1.17
+	github.com/jxo-me/plus-core/core/v2 v2.0.54
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.52
+	github.com/jxo-me/rabbitmq-go v1.0.15
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/zegl/goriak/v3 v3.2.4
@@ -67,7 +67,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.19.0 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.52.2 // indirect
+	github.com/prometheus/common v0.52.3 // indirect
 	github.com/prometheus/procfs v0.13.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.9.0 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
@@ -90,7 +90,7 @@ require (
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240401170217-c3f982113cda // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be // indirect
 	google.golang.org/grpc v1.63.2 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect

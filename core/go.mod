@@ -1,6 +1,6 @@
 module github.com/jxo-me/plus-core/core/v2
 
-go 1.21
+go 1.22
 
 toolchain go1.22.1
 
@@ -11,14 +11,14 @@ replace (
 
 require (
 	github.com/casbin/casbin/v2 v2.87.1
-	github.com/go-redsync/redsync/v4 v4.12.1
+	github.com/go-redsync/redsync/v4 v4.13.0
 	github.com/gogf/gf-jwt/v2 v2.1.0
 	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.7.0
 	github.com/gogf/gf/v2 v2.7.0
 	github.com/jxo-me/gf-metrics v0.1.4
-	github.com/jxo-me/gfbot v0.1.16
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.51
-	github.com/jxo-me/rabbitmq-go v1.0.13
+	github.com/jxo-me/gfbot v0.1.17
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.52
+	github.com/jxo-me/rabbitmq-go v1.0.15
 	github.com/zegl/goriak/v3 v3.2.4
 )
 
@@ -52,7 +52,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.19.0 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.52.2 // indirect
+	github.com/prometheus/common v0.52.3 // indirect
 	github.com/prometheus/procfs v0.13.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.9.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
@@ -63,7 +63,7 @@ require (
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240401170217-c3f982113cda // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be // indirect
 	google.golang.org/grpc v1.63.2 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
