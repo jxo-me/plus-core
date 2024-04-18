@@ -31,21 +31,21 @@ func (b *Bootstrap) runBootstrap() error {
 	for _, beforeFunc := range b.before {
 		err = beforeFunc(b.ctx, b.app)
 		if err != nil {
-			glog.Error(b.ctx, fmt.Sprintf("run bootstrap before error: %v", err))
+			glog.Error(b.ctx, fmt.Sprintf("run bootstrap beforeFunc error: %v", err))
 			return err
 		}
 	}
 	for i := range b.boots {
 		err = b.boots[i].Init(b.ctx, b.app)
 		if err != nil {
-			glog.Error(b.ctx, fmt.Sprintf("run bootstrap init name: %s error: %v", b.boots[i].String(), err))
+			glog.Error(b.ctx, fmt.Sprintf("run bootstrap initFunc name: %s error: %v", b.boots[i].String(), err))
 			return err
 		}
 	}
 	for _, afterFunc := range b.after {
 		err = afterFunc(b.ctx, b.app)
 		if err != nil {
-			glog.Error(b.ctx, fmt.Sprintf("run bootstrap after error: %v", err))
+			glog.Error(b.ctx, fmt.Sprintf("run bootstrap afterFunc error: %v", err))
 			return err
 		}
 	}
