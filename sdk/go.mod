@@ -13,8 +13,8 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.6
 	github.com/jxo-me/gfbot v0.1.17
-	github.com/jxo-me/plus-core/core/v2 v2.0.61
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.59
+	github.com/jxo-me/plus-core/core/v2 v2.0.62
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.60
 	github.com/jxo-me/rabbitmq-go v1.0.15
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/redis/go-redis/v9 v9.5.1
@@ -77,10 +77,10 @@ require (
 	go.opentelemetry.io/otel/sdk v1.14.0 // indirect
 	go.opentelemetry.io/otel/trace v1.14.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	golang.org/x/crypto v0.20.0 // indirect
+	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/term v0.17.0 // indirect
+	golang.org/x/term v0.18.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230525234030-28d5490b6b19 // indirect
 	google.golang.org/grpc v1.57.2 // indirect
