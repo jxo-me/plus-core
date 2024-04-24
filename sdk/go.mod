@@ -2,16 +2,10 @@ module github.com/jxo-me/plus-core/sdk/v2
 
 go 1.20
 
-replace (
-	github.com/jxo-me/plus-core/core/v2 => ../core
-	github.com/jxo-me/plus-core/pkg/v2 => ../pkg
-	github.com/jxo-me/rabbitmq-go => ../../rabbitmq-go
-)
-
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/casbin/casbin/v2 v2.87.1
-	github.com/go-redsync/redsync/v4 v4.13.0
+	github.com/go-redsync/redsync/v4 v4.12.1
 	github.com/gogf/gf-jwt/v2 v2.1.0
 	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.7.0
 	github.com/gogf/gf/v2 v2.7.0
@@ -19,8 +13,8 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.6
 	github.com/jxo-me/gfbot v0.1.17
-	github.com/jxo-me/plus-core/core/v2 v2.0.60
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.58
+	github.com/jxo-me/plus-core/core/v2 v2.0.61
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.59
 	github.com/jxo-me/rabbitmq-go v1.0.15
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/redis/go-redis/v9 v9.5.1
