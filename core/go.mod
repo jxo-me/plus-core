@@ -2,6 +2,11 @@ module github.com/jxo-me/plus-core/core/v2
 
 go 1.20
 
+replace (
+	github.com/jxo-me/plus-core/pkg/v2 => ../pkg
+	github.com/jxo-me/rabbitmq-go => ../../rabbitmq-go
+)
+
 require (
 	github.com/casbin/casbin/v2 v2.87.1
 	github.com/go-redsync/redsync/v4 v4.13.0

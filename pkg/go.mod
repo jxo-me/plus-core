@@ -2,6 +2,11 @@ module github.com/jxo-me/plus-core/pkg/v2
 
 go 1.20
 
+replace (
+	github.com/jxo-me/plus-core/core/v2 => ../core
+	github.com/jxo-me/plus-core/sdk/v2 => ../sdk
+)
+
 require (
 	github.com/ergo-services/ergo v1.999.224
 	github.com/gogf/gf/v2 v2.7.0

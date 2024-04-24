@@ -2,6 +2,12 @@ module github.com/jxo-me/plus-core/sdk/v2
 
 go 1.20
 
+replace (
+	github.com/jxo-me/plus-core/core/v2 => ../core
+	github.com/jxo-me/plus-core/pkg/v2 => ../pkg
+	github.com/jxo-me/rabbitmq-go => ../../rabbitmq-go
+)
+
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/casbin/casbin/v2 v2.87.1
