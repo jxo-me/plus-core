@@ -10,7 +10,7 @@ require (
 	github.com/gogf/gf/v2 v2.7.0
 	github.com/jxo-me/gf-metrics v0.1.6
 	github.com/jxo-me/gfbot v0.1.17
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.50
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.58
 	github.com/jxo-me/rabbitmq-go v1.0.15
 	github.com/zegl/goriak/v3 v3.2.4
 )

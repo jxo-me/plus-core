@@ -7,8 +7,8 @@ require (
 	github.com/gogf/gf/v2 v2.7.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.1
-	github.com/jxo-me/plus-core/core/v2 v2.0.52
-	github.com/jxo-me/plus-core/sdk/v2 v2.0.77
+	github.com/jxo-me/plus-core/core/v2 v2.0.60
+	github.com/jxo-me/plus-core/sdk/v2 v2.0.85
 	github.com/mojocn/base64Captcha v1.3.6
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/stretchr/testify v1.9.0
@@ -21,7 +21,7 @@ require (
 	github.com/BurntSushi/toml v1.2.0 // indirect
 	github.com/clbanning/mxj/v2 v2.7.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/fatih/color v1.15.0 // indirect
+	github.com/fatih/color v1.16.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -45,7 +45,7 @@ require (
 	golang.org/x/crypto v0.20.0 // indirect
 	golang.org/x/image v0.14.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
-	golang.org/x/sys v0.17.0 // indirect
+	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
