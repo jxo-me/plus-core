@@ -22,5 +22,6 @@ type IBootstrap interface {
 	Before(before ...BootFunc) IBootstrap
 	Process(boots ...Initialize) IBootstrap
 	After(after ...BootFunc) IBootstrap
+	Runner(runs ...BootFunc) IBootstrap
 	Run() error
 }

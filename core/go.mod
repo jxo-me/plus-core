@@ -1,16 +1,18 @@
 module github.com/jxo-me/plus-core/core/v2
 
-go 1.20
+go 1.22
+
+toolchain go1.22.4
 
 require (
-	github.com/casbin/casbin/v2 v2.95.0
+	github.com/casbin/casbin/v2 v2.96.0
 	github.com/go-redsync/redsync/v4 v4.13.0
 	github.com/gogf/gf-jwt/v2 v2.1.0
 	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.7.1
 	github.com/gogf/gf/v2 v2.7.1
 	github.com/jxo-me/gf-metrics v0.1.6
 	github.com/jxo-me/gfbot v0.1.17
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.61
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.62
 	github.com/jxo-me/rabbitmq-go v1.0.15
 	github.com/lesismal/arpc v1.2.15
 	github.com/zegl/goriak/v3 v3.2.4
@@ -34,7 +36,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gorilla/websocket v1.5.1 // indirect
+	github.com/gorilla/websocket v1.5.2 // indirect
 	github.com/grokify/html-strip-tags-go v0.1.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
