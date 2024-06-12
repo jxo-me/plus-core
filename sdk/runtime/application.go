@@ -27,10 +27,13 @@ import (
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
 	"github.com/jxo-me/plus-core/sdk/v2/message"
 	"github.com/jxo-me/plus-core/sdk/v2/registry"
+	"github.com/lesismal/arpc"
 	"github.com/zegl/goriak/v3"
 )
 
 type Application struct {
+	arpcServerReg            reg.IRegistry[*arpc.Server]
+	arpcClientReg            reg.IRegistry[*arpc.Client]
 	botReg             reg.IRegistry[*telebot.Bot]
 	cacheReg           reg.IRegistry[cacheLib.ICache]
 	casBinReg          reg.IRegistry[*casbin.SyncedEnforcer]
@@ -58,6 +61,8 @@ type Application struct {
 // NewConfig 默认值
 func NewConfig() *Application {
 	return &Application{
+		arpcServerReg:      new(registry.ArpcServerRegistry),
+		arpcClientReg:      new(registry.ArpcClientRegistry),
 		botReg:             new(registry.BotRegistry),
 		cacheReg:           new(registry.CacheRegistry),
 		casBinReg:          new(registry.CasBinRegistry),
@@ -81,6 +86,14 @@ func NewConfig() *Application {
 		websocketReg:       new(registry.WebSocketRegistry),
 		riakReg:            new(registry.RiakRegistry),
 	}
+}
+
+func (a *Application) ArpcServerRegistry() reg.IRegistry[*arpc.Server] {
+	return a.arpcServerReg
+}
+
+func (a *Application) ArpcClientRegistry() reg.IRegistry[*arpc.Client] {
+	return a.arpcClientReg
 }
 
 func (a *Application) BotRegistry() reg.IRegistry[*telebot.Bot] {

@@ -4,26 +4,27 @@ go 1.20
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
-	github.com/casbin/casbin/v2 v2.87.1
-	github.com/go-redsync/redsync/v4 v4.12.1
+	github.com/casbin/casbin/v2 v2.95.0
+	github.com/go-redsync/redsync/v4 v4.13.0
 	github.com/gogf/gf-jwt/v2 v2.1.0
-	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.7.0
-	github.com/gogf/gf/v2 v2.7.0
+	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.7.1
+	github.com/gogf/gf/v2 v2.7.1
 	github.com/google/uuid v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.6
 	github.com/jxo-me/gfbot v0.1.17
-	github.com/jxo-me/plus-core/core/v2 v2.0.62
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.60
+	github.com/jxo-me/plus-core/core/v2 v2.0.63
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.61
 	github.com/jxo-me/rabbitmq-go v1.0.15
+	github.com/lesismal/arpc v1.2.15
 	github.com/nsqio/go-nsq v1.1.0
-	github.com/redis/go-redis/v9 v9.5.1
+	github.com/redis/go-redis/v9 v9.5.3
 	github.com/zegl/goriak/v3 v3.2.4
-	golang.org/x/text v0.14.0
+	golang.org/x/text v0.16.0
 )
 
 require (
-	github.com/BurntSushi/toml v1.2.0 // indirect
+	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/basho/backoff v0.0.0-20150307023525-2ff7c4694083 // indirect
 	github.com/basho/riak-go-client v0.0.0-20170327205844-5587c16e0b8b // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -38,13 +39,13 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/gogf/gf/contrib/registry/file/v2 v2.7.0 // indirect
+	github.com/gogf/gf/contrib/registry/file/v2 v2.7.1 // indirect
 	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect
 	github.com/golang/mock v1.4.4 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
-	github.com/grokify/html-strip-tags-go v0.0.1 // indirect
+	github.com/grokify/html-strip-tags-go v0.1.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
@@ -77,13 +78,13 @@ require (
 	go.opentelemetry.io/otel/sdk v1.14.0 // indirect
 	go.opentelemetry.io/otel/trace v1.14.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	golang.org/x/crypto v0.21.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/crypto v0.22.0 // indirect
+	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/term v0.18.0 // indirect
+	golang.org/x/term v0.19.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230525234030-28d5490b6b19 // indirect
-	google.golang.org/grpc v1.57.2 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d // indirect
+	google.golang.org/grpc v1.59.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

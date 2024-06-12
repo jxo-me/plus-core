@@ -23,10 +23,13 @@ import (
 	"github.com/jxo-me/plus-core/pkg/v2/erlang"
 	"github.com/jxo-me/plus-core/pkg/v2/tus"
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
+	"github.com/lesismal/arpc"
 	"github.com/zegl/goriak/v3"
 )
 
 type IRuntime interface {
+	ArpcServerRegistry() reg.IRegistry[*arpc.Server]
+	ArpcClientRegistry() reg.IRegistry[*arpc.Client]
 	BotRegistry() reg.IRegistry[*telebot.Bot]
 	CacheRegistry() reg.IRegistry[cache.ICache]
 	CasBinRegistry() reg.IRegistry[*casbin.SyncedEnforcer]
