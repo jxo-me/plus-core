@@ -1,8 +1,8 @@
 module github.com/jxo-me/plus-core/core/v2
 
-go 1.22
+go 1.23.0
 
-toolchain go1.22.4
+toolchain go1.24.1
 
 require (
 	github.com/casbin/casbin/v2 v2.103.0
