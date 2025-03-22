@@ -15,8 +15,8 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.6
 	github.com/jxo-me/gfbot v0.1.19
-	github.com/jxo-me/plus-core/core/v2 v2.0.69
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.67
+	github.com/jxo-me/plus-core/core/v2 v2.0.71
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.69
 	github.com/jxo-me/rabbitmq-go v1.0.15
 	github.com/lesismal/arpc v1.2.16
 	github.com/nsqio/go-nsq v1.1.0
@@ -37,7 +37,6 @@ require (
 	github.com/clbanning/mxj/v2 v2.7.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
-	github.com/ergo-services/ergo v1.999.224 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect

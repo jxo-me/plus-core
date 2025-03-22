@@ -22,7 +22,6 @@ import (
 	reg "github.com/jxo-me/plus-core/core/v2/registry"
 	"github.com/jxo-me/plus-core/core/v2/send"
 	"github.com/jxo-me/plus-core/core/v2/task"
-	"github.com/jxo-me/plus-core/pkg/v2/erlang"
 	"github.com/jxo-me/plus-core/pkg/v2/tus"
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
 	"github.com/jxo-me/plus-core/sdk/v2/message"
@@ -32,14 +31,13 @@ import (
 )
 
 type Application struct {
-	arpcServerReg            reg.IRegistry[*arpc.Server]
-	arpcClientReg            reg.IRegistry[*arpc.Client]
+	arpcServerReg      reg.IRegistry[*arpc.Server]
+	arpcClientReg      reg.IRegistry[*arpc.Client]
 	botReg             reg.IRegistry[*telebot.Bot]
 	cacheReg           reg.IRegistry[cacheLib.ICache]
 	casBinReg          reg.IRegistry[*casbin.SyncedEnforcer]
 	configReg          reg.IRegistry[*gcfg.Config]
 	crontabReg         reg.IRegistry[cron.ICron]
-	erlangReg          reg.IRegistry[*erlang.Node]
 	grpcReg            reg.IRegistry[*grpcx.GrpcServer]
 	jwtReg             reg.IRegistry[*jwt.GfJWTMiddleware]
 	languageReg        reg.IRegistry[*gi18n.Manager]
@@ -68,7 +66,6 @@ func NewConfig() *Application {
 		casBinReg:          new(registry.CasBinRegistry),
 		configReg:          new(registry.ConfigRegistry),
 		crontabReg:         new(registry.CrontabRegistry),
-		erlangReg:          new(registry.ErlangNodeRegistry),
 		grpcReg:            new(registry.GrpcRegistry),
 		jwtReg:             new(registry.JwtRegistry),
 		languageReg:        new(registry.LanguageRegistry),
@@ -123,10 +120,6 @@ func (a *Application) Config(ctx context.Context, key string) *gvar.Var {
 
 func (a *Application) CronRegistry() reg.IRegistry[cron.ICron] {
 	return a.crontabReg
-}
-
-func (a *Application) ErlangNodeRegistry() reg.IRegistry[*erlang.Node] {
-	return a.erlangReg
 }
 
 func (a *Application) GrpcRegistry() reg.IRegistry[*grpcx.GrpcServer] {
