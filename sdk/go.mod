@@ -6,11 +6,11 @@ toolchain go1.24.1
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
-	github.com/casbin/casbin/v2 v2.103.0
+	github.com/casbin/casbin/v2 v2.104.0
 	github.com/go-redsync/redsync/v4 v4.13.0
 	github.com/gogf/gf-jwt/v2 v2.1.0
-	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.8.3
-	github.com/gogf/gf/v2 v2.8.3
+	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.9.0
+	github.com/gogf/gf/v2 v2.9.0
 	github.com/google/uuid v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.6
@@ -20,7 +20,7 @@ require (
 	github.com/jxo-me/rabbitmq-go v1.0.15
 	github.com/lesismal/arpc v1.2.16
 	github.com/nsqio/go-nsq v1.1.0
-	github.com/redis/go-redis/v9 v9.7.1
+	github.com/redis/go-redis/v9 v9.7.3
 	github.com/zegl/goriak/v3 v3.2.4
 	golang.org/x/text v0.23.0
 )
@@ -42,7 +42,7 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/gogf/gf/contrib/registry/file/v2 v2.8.3 // indirect
+	github.com/gogf/gf/contrib/registry/file/v2 v2.9.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect
 	github.com/golang/mock v1.4.4 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -77,10 +77,10 @@ require (
 	github.com/xuri/efp v0.0.0-20240408161823-9ad904a10d6d // indirect
 	github.com/xuri/excelize/v2 v2.9.0 // indirect
 	github.com/xuri/nfp v0.0.0-20240318013403-ab9948c2c4a7 // indirect
-	go.opentelemetry.io/otel v1.24.0 // indirect
-	go.opentelemetry.io/otel/metric v1.24.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.24.0 // indirect
-	go.opentelemetry.io/otel/trace v1.24.0 // indirect
+	go.opentelemetry.io/otel v1.32.0 // indirect
+	go.opentelemetry.io/otel/metric v1.32.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.32.0 // indirect
+	go.opentelemetry.io/otel/trace v1.32.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	golang.org/x/crypto v0.30.0 // indirect
 	golang.org/x/net v0.32.0 // indirect
