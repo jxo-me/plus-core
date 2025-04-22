@@ -108,7 +108,7 @@ func (b *Bootstrap) runRunners() {
 		go func(f boot.BootFunc) {
 			defer runnerWg.Done()
 			if err := f(b.ctx, b.app); err != nil {
-				glog.Error(b.ctx, fmt.Sprintf("runFunc error: %v", err))
+				glog.Warning(b.ctx, fmt.Sprintf("runFunc error: %v", err))
 				b.cancel()
 			}
 		}(fn)
