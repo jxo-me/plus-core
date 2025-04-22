@@ -24,6 +24,7 @@ import (
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
 	"github.com/lesismal/arpc"
 	"github.com/zegl/goriak/v3"
+	"google.golang.org/grpc"
 )
 
 type IRuntime interface {
@@ -35,6 +36,7 @@ type IRuntime interface {
 	ConfigRegister() reg.IRegistry[*gcfg.Config]
 	CronRegistry() reg.IRegistry[cron.ICron]
 	GrpcRegistry() reg.IRegistry[*grpcx.GrpcServer]
+	GrpcConnRegistry() reg.IRegistry[*grpc.ClientConn]
 	JwtRegister() reg.IRegistry[*jwt.GfJWTMiddleware]
 	LanguageRegister() reg.IRegistry[*gi18n.Manager]
 	LockerRegistry() reg.IRegistry[locker.ILocker]
