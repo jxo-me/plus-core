@@ -28,6 +28,7 @@ import (
 	"github.com/jxo-me/plus-core/sdk/v2/registry"
 	"github.com/lesismal/arpc"
 	"github.com/zegl/goriak/v3"
+	"google.golang.org/grpc"
 )
 
 type Application struct {
@@ -39,6 +40,7 @@ type Application struct {
 	configReg          reg.IRegistry[*gcfg.Config]
 	crontabReg         reg.IRegistry[cron.ICron]
 	grpcReg            reg.IRegistry[*grpcx.GrpcServer]
+	grpcConnReg        reg.IRegistry[*grpc.ClientConn]
 	jwtReg             reg.IRegistry[*jwt.GfJWTMiddleware]
 	languageReg        reg.IRegistry[*gi18n.Manager]
 	lockerReg          reg.IRegistry[lockerLib.ILocker]
@@ -67,6 +69,7 @@ func NewConfig() *Application {
 		configReg:          new(registry.ConfigRegistry),
 		crontabReg:         new(registry.CrontabRegistry),
 		grpcReg:            new(registry.GrpcRegistry),
+		grpcConnReg:        new(registry.GrpcConnRegistry),
 		jwtReg:             new(registry.JwtRegistry),
 		languageReg:        new(registry.LanguageRegistry),
 		lockerReg:          new(registry.LockerRegistry),
@@ -124,6 +127,10 @@ func (a *Application) CronRegistry() reg.IRegistry[cron.ICron] {
 
 func (a *Application) GrpcRegistry() reg.IRegistry[*grpcx.GrpcServer] {
 	return a.grpcReg
+}
+
+func (a *Application) GrpcConnRegistry() reg.IRegistry[*grpc.ClientConn] {
+	return a.grpcConnReg
 }
 
 func (a *Application) JwtRegister() reg.IRegistry[*jwt.GfJWTMiddleware] {
