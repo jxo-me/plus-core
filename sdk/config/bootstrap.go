@@ -12,81 +12,25 @@ import (
 	"syscall"
 )
 
+var runnerWg sync.WaitGroup
+
 type Bootstrap struct {
 	ctx    context.Context
-	cancel      context.CancelFunc
+	cancel context.CancelFunc
 	app    app.IRuntime
 	before []boot.BootFunc
 	boots  []boot.Initialize
-	runs  []boot.BootFunc
+	runs   []boot.BootFunc
 	after  []boot.BootFunc
 }
 
 func NewBootstrap(ctx context.Context, app app.IRuntime) *Bootstrap {
-	ctx, cancel := context.WithCancel(ctx)
+	c, cancel := context.WithCancel(ctx)
 	return &Bootstrap{
-		ctx:    ctx,
+		ctx:    c,
 		cancel: cancel,
 		app:    app,
-		before: make([]boot.BootFunc, 0),
-		boots:  make([]boot.Initialize, 0),
-		runs:  make([]boot.BootFunc, 0),
-		after:  make([]boot.BootFunc, 0),
 	}
-}
-
-func (b *Bootstrap) runBootstrap() error {
-	var err error
-	// Execute before hooks
-	for _, beforeFunc := range b.before {
-		err = beforeFunc(b.ctx, b.app)
-		if err != nil {
-			glog.Error(b.ctx, fmt.Sprintf("run bootstrap beforeFunc error: %v", err))
-			return err
-		}
-	}
-
-	// Execute boot hooks
-	for i := range b.boots {
-		err = b.boots[i].Init(b.ctx, b.app)
-		if err != nil {
-			glog.Error(b.ctx, fmt.Sprintf("run bootstrap initFunc name: %s error: %v", b.boots[i].String(), err))
-			return err
-		}
-	}
-
-	// Wait group to wait for all run hooks to complete
-	var wg sync.WaitGroup
-	// Execute run hooks
-	for _, runFunc := range b.runs {
-		wg.Add(1)
-		go func(fuc boot.BootFunc) {
-			defer wg.Done()
-			if err = fuc(b.ctx, b.app); err != nil {
-				glog.Error(b.ctx, fmt.Sprintf("run bootstrap runFunc error: %v", err))
-				b.cancel()
-			}
-		}(runFunc)
-	}
-
-	// Wait for all run hooks to complete or context to be canceled
-	go func() {
-		wg.Wait()
-		b.cancel()
-	}()
-
-	// Wait for context to be canceled (e.g., by a signal)
-	<-b.ctx.Done()
-
-	// Execute after hooks
-	for _, hook := range b.after {
-		if err = hook(b.ctx, b.app); err != nil {
-			glog.Error(b.ctx, fmt.Sprintf("run bootstrap afterFunc error: %v", err))
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (b *Bootstrap) Before(before ...boot.BootFunc) boot.IBootstrap {
@@ -99,31 +43,88 @@ func (b *Bootstrap) Process(boots ...boot.Initialize) boot.IBootstrap {
 	return b
 }
 
-func (b *Bootstrap) After(after ...boot.BootFunc) boot.IBootstrap {
-	b.after = after
-	return b
-}
-
 func (b *Bootstrap) Runner(runs ...boot.BootFunc) boot.IBootstrap {
 	b.runs = runs
 	return b
 }
 
-func (b *Bootstrap) Run() error {
-	// Handle system signals
-	b.handleSignal()
-	// bootstrap start
-	return b.runBootstrap()
+func (b *Bootstrap) After(after ...boot.BootFunc) boot.IBootstrap {
+	b.after = after
+	return b
 }
 
-// handleSignal sets up signal handling to gracefully shut down the application
-func (b *Bootstrap) handleSignal() {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+func (b *Bootstrap) Run() error {
+	// 捕捉系统信号
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
-	go func() {
-		sig := <-sigs
-		fmt.Printf("plus app received signal: %v, shutting down...\n", sig)
+	// 启动逻辑
+	if err := b.runStartup(); err != nil {
+		return err
+	}
+
+	// 等待退出信号
+	select {
+	case sig := <-sigChan:
+		glog.Infof(b.ctx, "Received signal: %v, shutting down...", sig)
 		b.cancel()
-	}()
+	case <-b.ctx.Done():
+		glog.Info(b.ctx, "Context canceled, exiting...")
+	}
+
+	// 等待 Runner() 的 goroutine 完成
+	b.waitForRunners()
+
+	// 执行 After() 收尾逻辑
+	return b.runAfter()
+}
+
+func (b *Bootstrap) runStartup() error {
+	// 1. Before
+	for _, fn := range b.before {
+		if err := fn(b.ctx, b.app); err != nil {
+			glog.Error(b.ctx, fmt.Sprintf("beforeFunc error: %v", err))
+			return err
+		}
+	}
+
+	// 2. Init
+	for _, boot := range b.boots {
+		if err := boot.Init(b.ctx, b.app); err != nil {
+			glog.Error(b.ctx, fmt.Sprintf("initFunc [%s] error: %v", boot.String(), err))
+			return err
+		}
+	}
+
+	// 3. Run
+	b.runRunners()
+
+	return nil
+}
+
+func (b *Bootstrap) runRunners() {
+	for _, fn := range b.runs {
+		runnerWg.Add(1)
+		go func(f boot.BootFunc) {
+			defer runnerWg.Done()
+			if err := f(b.ctx, b.app); err != nil {
+				glog.Error(b.ctx, fmt.Sprintf("runFunc error: %v", err))
+				b.cancel()
+			}
+		}(fn)
+	}
+}
+
+func (b *Bootstrap) waitForRunners() {
+	runnerWg.Wait()
+}
+
+func (b *Bootstrap) runAfter() error {
+	for _, fn := range b.after {
+		if err := fn(context.Background(), b.app); err != nil {
+			glog.Error(b.ctx, fmt.Sprintf("afterFunc error: %v", err))
+			return err
+		}
+	}
+	return nil
 }
