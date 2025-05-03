@@ -20,6 +20,7 @@ import (
 	reg "github.com/jxo-me/plus-core/core/v2/registry"
 	"github.com/jxo-me/plus-core/core/v2/send"
 	"github.com/jxo-me/plus-core/core/v2/task"
+	"github.com/jxo-me/plus-core/pkg/v2/security/auth"
 	"github.com/jxo-me/plus-core/pkg/v2/tus"
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
 	"github.com/lesismal/arpc"
@@ -55,4 +56,5 @@ type IRuntime interface {
 	Lang(ctx context.Context, langKey string) string
 	Config(ctx context.Context, key string) *gvar.Var
 	GetQueueMessage(id, routingKey string, value map[string]interface{}) (messageLib.IMessage, error)
+	VerifyRegistry() reg.IRegistry[*auth.Verifier]
 }

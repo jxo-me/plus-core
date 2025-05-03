@@ -15,12 +15,12 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.6
 	github.com/jxo-me/gfbot v0.1.19
-	github.com/jxo-me/plus-core/core/v2 v2.0.71
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.69
+	github.com/jxo-me/plus-core/core/v2 v2.0.72
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.71
 	github.com/jxo-me/rabbitmq-go v1.0.15
 	github.com/lesismal/arpc v1.2.16
 	github.com/nsqio/go-nsq v1.1.0
-	github.com/redis/go-redis/v9 v9.7.3
+	github.com/redis/go-redis/v9 v9.8.0
 	github.com/zegl/goriak/v3 v3.2.4
 	golang.org/x/text v0.24.0
 	google.golang.org/grpc v1.72.0

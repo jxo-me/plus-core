@@ -8,8 +8,8 @@ require (
 	github.com/gogf/gf/v2 v2.9.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
-	github.com/jxo-me/plus-core/core/v2 v2.0.71
-	github.com/jxo-me/plus-core/sdk/v2 v2.0.97
+	github.com/jxo-me/plus-core/core/v2 v2.0.72
+	github.com/jxo-me/plus-core/sdk/v2 v2.0.100
 	github.com/mojocn/base64Captcha v1.3.8
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/stretchr/testify v1.10.0

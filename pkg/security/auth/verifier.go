@@ -8,7 +8,6 @@ import (
 	"github.com/jxo-me/plus-core/core/v2/logger"
 	"github.com/jxo-me/plus-core/pkg/v2/security"
 	"io"
-	"time"
 )
 
 type Verifier struct {
@@ -30,26 +29,31 @@ func NewVerifier(config *Config) *Verifier {
 }
 
 func (v *Verifier) VerifyRequest(r *ghttp.Request) error {
-	key := r.Header.Get("X-API-Key")
-	sig := r.Header.Get("X-Signature")
-	tsStr := r.Header.Get("Timestamp")
+	key := r.Header.Get(v.config.APIKeyHeader)
+	sig := r.Header.Get(v.config.SignatureHeader)
+	tsStr := r.Header.Get(v.config.TimestampHeader)
 	traceID := r.Header.Get(v.traceKey)
+	clientIP := r.RemoteAddr
 	ctx := r.GetCtx()
 
-	clientIP := r.RemoteAddr
-	if v.isBanned(ctx, clientIP) {
+	if v.config.EnableIPBan && v.isBanned(ctx, clientIP) {
 		v.log(ctx, "ip banned", traceID)
 		return ErrIPBanned
 	}
 
 	if key == "" || sig == "" || tsStr == "" {
-		v.trackFailure(ctx, clientIP)
+		if v.config.EnableIPBan {
+			v.trackFailure(ctx, clientIP)
+		}
 		v.log(ctx, "missing headers", traceID)
 		return ErrMissingHeader
 	}
+
 	ts, err := security.ParseTimestamp(tsStr)
 	if err != nil || !security.IsTimestampValid(ts) {
-		v.trackFailure(ctx, clientIP)
+		if v.config.EnableIPBan {
+			v.trackFailure(ctx, clientIP)
+		}
 		v.log(ctx, "invalid timestamp", traceID)
 		return ErrInvalidTimestamp
 	}
@@ -59,21 +63,27 @@ func (v *Verifier) VerifyRequest(r *ghttp.Request) error {
 
 	secret, err := v.getSecretFromKey(ctx, key)
 	if err != nil {
-		v.trackFailure(ctx, clientIP)
+		if v.config.EnableIPBan {
+			v.trackFailure(ctx, clientIP)
+		}
 		v.log(ctx, "invalid apiKey", traceID)
 		return ErrInvalidAPIKey
 	}
 
 	signingString := security.BuildSigningString(r.Method, r.URL.Path, r.URL.Query(), body, ts)
 
-	if v.isReplay(ctx, sig, ts) {
-		v.trackFailure(ctx, clientIP)
+	if v.config.EnableReplayCheck && v.isReplay(ctx, sig, ts) {
+		if v.config.EnableIPBan {
+			v.trackFailure(ctx, clientIP)
+		}
 		v.log(ctx, "replay attack", traceID)
 		return ErrReplayAttack
 	}
 
 	if !v.strategy.Verify(signingString, secret, sig) {
-		v.trackFailure(ctx, clientIP)
+		if v.config.EnableIPBan {
+			v.trackFailure(ctx, clientIP)
+		}
 		v.log(ctx, "signature mismatch", traceID)
 		return ErrSignatureMismatch
 	}
@@ -82,9 +92,24 @@ func (v *Verifier) VerifyRequest(r *ghttp.Request) error {
 }
 
 func (v *Verifier) getSecretFromKey(ctx context.Context, apiKey string) (string, error) {
-	if v.cache != nil {
-		if v, err := v.cache.Get(ctx, apiKey); err == nil {
+	key := v.config.CachePrefix + "apiKey:" + apiKey
+	// 优先缓存
+	if v, err := v.cache.Get(ctx, key); err == nil {
+		if v.String() != "" {
 			return v.String(), nil
+		}
+	}
+	// 自定义查库逻辑
+	if v.config.GetSecretFunc != nil {
+		secret, err := v.config.GetSecretFunc(apiKey)
+		if err != nil {
+			return "", err
+		}
+		if secret != "" {
+			if err = v.cache.Set(ctx, key, secret, int(v.config.CacheTTL)); err != nil {
+				v.logger.Errorf(ctx, "cache set SecretFromKey error for %s: %v", apiKey, err)
+			}
+			return secret, nil
 		}
 	}
 	return "", ErrInvalidAPIKey
@@ -103,7 +128,7 @@ func (v *Verifier) isReplay(ctx context.Context, sig string, ts int64) bool {
 	if exists.Int() == 1 {
 		return true
 	}
-	_ = v.cache.Set(ctx, key, 1, int((5 * time.Minute).Seconds()))
+	_ = v.cache.Set(ctx, key, 1, int(v.config.ReplayTTL))
 	return false
 }
 
@@ -112,10 +137,10 @@ func (v *Verifier) trackFailure(ctx context.Context, ip string) {
 
 	failures, _ := v.cache.Increase(ctx, key)
 	if failures == 1 {
-		_ = v.cache.Expire(ctx, key, 15*time.Minute)
+		_ = v.cache.Expire(ctx, key, v.config.BanExpire)
 	}
 	if failures >= 5 {
-		_ = v.cache.Set(ctx, key+":block", 1, int((30 * time.Minute).Seconds()))
+		_ = v.cache.Set(ctx, key+":block", 1, int(v.config.BanDuration))
 	}
 }
 

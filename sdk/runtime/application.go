@@ -22,6 +22,7 @@ import (
 	reg "github.com/jxo-me/plus-core/core/v2/registry"
 	"github.com/jxo-me/plus-core/core/v2/send"
 	"github.com/jxo-me/plus-core/core/v2/task"
+	"github.com/jxo-me/plus-core/pkg/v2/security/auth"
 	"github.com/jxo-me/plus-core/pkg/v2/tus"
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
 	"github.com/jxo-me/plus-core/sdk/v2/message"
@@ -56,6 +57,7 @@ type Application struct {
 	tusReg             reg.IRegistry[*tus.Uploader]
 	websocketReg       reg.IRegistry[*ws.Instance]
 	riakReg            reg.IRegistry[*goriak.Session]
+	verifyReg          reg.IRegistry[*auth.Verifier]
 }
 
 // NewConfig 默认值
@@ -85,6 +87,7 @@ func NewConfig() *Application {
 		tusReg:             new(registry.TusRegistry),
 		websocketReg:       new(registry.WebSocketRegistry),
 		riakReg:            new(registry.RiakRegistry),
+		verifyReg:          new(registry.VerifyRegistry),
 	}
 }
 
@@ -204,4 +207,8 @@ func (a *Application) GetQueueMessage(id, routingKey string, value map[string]in
 	m.SetRoutingKey(routingKey)
 	m.SetValue(value)
 	return m, nil
+}
+
+func (a *Application) VerifyRegistry() reg.IRegistry[*auth.Verifier] {
+	return a.verifyReg
 }
