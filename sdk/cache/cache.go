@@ -79,6 +79,14 @@ func (e *Cache) HashMGet(ctx context.Context, key string, fields ...string) (gva
 	return e.store.HashMGet(ctx, key, fields...)
 }
 
+func (e *Cache) ListLPush(ctx context.Context, key string, values ...interface{}) (int64, error) {
+	return e.store.ListLPush(ctx, key, values...)
+}
+
+func (e *Cache) ListRange(ctx context.Context, key string, start, stop int64) (gvar.Vars, error) {
+	return e.store.ListRange(ctx, key, start, stop)
+}
+
 func (e *Cache) HashVals(ctx context.Context, key string) (gvar.Vars, error) {
 	return e.store.HashVals(ctx, key)
 }
@@ -94,10 +102,6 @@ func (e *Cache) HashGetAll(ctx context.Context, key string) (*gvar.Var, error) {
 // HashDel delete one key:value pair in hashtable cache
 func (e *Cache) HashDel(ctx context.Context, hk, key string) error {
 	return e.store.HashDel(ctx, hk, e.getPrefixKey(key))
-}
-
-func (e *Cache) ListPush(ctx context.Context, key string, values ...interface{}) (int64, error) {
-	return e.store.ListPush(ctx, key, values...)
 }
 
 func (e *Cache) ListRPop(ctx context.Context, key string, count ...int) (*gvar.Var, error) {
