@@ -119,7 +119,7 @@ func (v *Verifier) getSecretFromKey(ctx context.Context, apiKey string) (string,
 
 func (v *Verifier) Debug(ctx context.Context, key string, val ...interface{}) {
 	if v.logger != nil {
-		v.logger.Debugf(ctx, key, val)
+		v.logger.Debugf(ctx, "auth debug [%s] val=%s", key, val)
 	}
 }
 
