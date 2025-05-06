@@ -71,7 +71,9 @@ func (v *Verifier) VerifyRequest(r *ghttp.Request) error {
 	}
 
 	signingString := security.BuildSigningString(r.Method, r.URL.Path, r.URL.Query(), body, ts)
-
+	v.Debug(ctx, "signingString:", signingString)
+	v.Debug(ctx, "secret:", secret)
+	v.Debug(ctx, "sig:", sig)
 	if v.config.EnableReplayCheck && v.isReplay(ctx, sig, ts) {
 		if v.config.EnableIPBan {
 			v.trackFailure(ctx, clientIP)
@@ -115,9 +117,15 @@ func (v *Verifier) getSecretFromKey(ctx context.Context, apiKey string) (string,
 	return "", ErrInvalidAPIKey
 }
 
+func (v *Verifier) Debug(ctx context.Context, key string, val ...interface{}) {
+	if v.logger != nil {
+		v.logger.Debugf(ctx, key, val)
+	}
+}
+
 func (v *Verifier) log(ctx context.Context, reason, traceID string) {
 	if v.logger != nil {
-		v.logger.Errorf(ctx, "auth failed [%s] traceID=%s", reason, traceID)
+		v.logger.Debugf(ctx, "auth failed [%s] traceID=%s", reason, traceID)
 	}
 }
 
