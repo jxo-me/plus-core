@@ -94,25 +94,13 @@ func (v *Verifier) VerifyRequest(r *ghttp.Request) error {
 }
 
 func (v *Verifier) getSecretFromKey(ctx context.Context, apiKey string) (string, error) {
-	key := v.config.CachePrefix + "apiKey:" + apiKey
-	// 优先缓存
-	if v, err := v.cache.Get(ctx, key); err == nil {
-		if v.String() != "" {
-			return v.String(), nil
-		}
+	apiKey = v.config.CachePrefix + "apiKey:" + apiKey
+	secret, err := v.config.GetSecretFunc(ctx, apiKey)
+	if err != nil {
+		return "", err
 	}
-	// 自定义查库逻辑
-	if v.config.GetSecretFunc != nil {
-		secret, err := v.config.GetSecretFunc(ctx, apiKey)
-		if err != nil {
-			return "", err
-		}
-		if secret != "" {
-			if err = v.cache.Set(ctx, key, secret, int(v.config.CacheTTL)); err != nil {
-				v.logger.Errorf(ctx, "cache set SecretFromKey error for %s: %v", apiKey, err)
-			}
-			return secret, nil
-		}
+	if secret != "" {
+		return secret, nil
 	}
 	return "", ErrInvalidAPIKey
 }
