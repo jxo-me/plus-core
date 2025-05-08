@@ -94,7 +94,6 @@ func (v *Verifier) VerifyRequest(r *ghttp.Request) error {
 }
 
 func (v *Verifier) getSecretFromKey(ctx context.Context, apiKey string) (string, error) {
-	apiKey = v.config.CachePrefix + "apiKey:" + apiKey
 	secret, err := v.config.GetSecretFunc(ctx, apiKey)
 	if err != nil {
 		return "", err
