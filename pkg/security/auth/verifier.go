@@ -71,9 +71,9 @@ func (v *Verifier) VerifyRequest(r *ghttp.Request) error {
 	}
 
 	signingString := security.BuildSigningString(r.Method, r.URL.Path, r.URL.Query(), body, ts)
-	v.Debug(ctx, "signingString:", signingString)
-	v.Debug(ctx, "secret:", secret)
-	v.Debug(ctx, "sig:", sig)
+	//v.Debug(ctx, "signingString:", signingString)
+	//v.Debug(ctx, "secret:", secret)
+	//v.Debug(ctx, "sig:", sig)
 	if v.config.EnableReplayCheck && v.isReplay(ctx, sig, ts) {
 		if v.config.EnableIPBan {
 			v.trackFailure(ctx, clientIP)
@@ -103,7 +103,7 @@ func (v *Verifier) getSecretFromKey(ctx context.Context, apiKey string) (string,
 	}
 	// 自定义查库逻辑
 	if v.config.GetSecretFunc != nil {
-		secret, err := v.config.GetSecretFunc(apiKey)
+		secret, err := v.config.GetSecretFunc(ctx, apiKey)
 		if err != nil {
 			return "", err
 		}
