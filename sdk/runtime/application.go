@@ -29,6 +29,7 @@ import (
 	"github.com/jxo-me/plus-core/sdk/v2/registry"
 	"github.com/lesismal/arpc"
 	"github.com/zegl/goriak/v3"
+	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 )
 
@@ -47,6 +48,7 @@ type Application struct {
 	lockerReg          reg.IRegistry[lockerLib.ILocker]
 	memoryServiceReg   reg.IRegistry[task.MemoryService]
 	metricsReg         reg.IRegistry[*metrics.Monitor]
+	mongoReg           reg.IRegistry[*mongo.Client]
 	queueReg           reg.IRegistry[queueLib.IQueue]
 	rabbitMqServiceReg reg.IRegistry[task.RabbitMqService]
 	rocketMqServiceReg reg.IRegistry[task.RocketMqService]
@@ -77,6 +79,7 @@ func NewConfig() *Application {
 		lockerReg:          new(registry.LockerRegistry),
 		memoryServiceReg:   new(registry.MemoryServiceRegistry),
 		metricsReg:         new(registry.MetricsRegistry),
+		mongoReg:           new(registry.MongoRegistry),
 		queueReg:           new(registry.QueueRegistry),
 		rabbitMqServiceReg: new(registry.RabbitMqServiceRegistry),
 		rocketMqServiceReg: new(registry.RocketMqServiceRegistry),
@@ -158,6 +161,10 @@ func (a *Application) MemoryTaskRegister() reg.IRegistry[task.MemoryService] {
 
 func (a *Application) MetricsRegister() reg.IRegistry[*metrics.Monitor] {
 	return a.metricsReg
+}
+
+func (a *Application) MongoRegister() reg.IRegistry[*mongo.Client] {
+	return a.mongoReg
 }
 
 func (a *Application) QueueRegistry() reg.IRegistry[queueLib.IQueue] {

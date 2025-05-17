@@ -12,9 +12,10 @@ require (
 	github.com/gogf/gf/v2 v2.9.0
 	github.com/jxo-me/gf-metrics v0.1.6
 	github.com/jxo-me/gfbot v0.1.19
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.71
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.78
 	github.com/jxo-me/rabbitmq-go v1.0.15
 	github.com/lesismal/arpc v1.2.16
 	github.com/zegl/goriak/v3 v3.2.4
-	google.golang.org/grpc v1.72.0
+	go.mongodb.org/mongo-driver v1.17.3
+	google.golang.org/grpc v1.72.1
 )

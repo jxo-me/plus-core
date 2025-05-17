@@ -25,6 +25,7 @@ import (
 	"github.com/jxo-me/plus-core/pkg/v2/ws"
 	"github.com/lesismal/arpc"
 	"github.com/zegl/goriak/v3"
+	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 )
 
@@ -43,6 +44,7 @@ type IRuntime interface {
 	LockerRegistry() reg.IRegistry[locker.ILocker]
 	MemoryTaskRegister() reg.IRegistry[task.MemoryService]
 	MetricsRegister() reg.IRegistry[*metrics.Monitor]
+	MongoRegister() reg.IRegistry[*mongo.Client]
 	QueueRegistry() reg.IRegistry[queue.IQueue]
 	RabbitTaskRegister() reg.IRegistry[task.RabbitMqService]
 	RocketTaskRegister() reg.IRegistry[task.RocketMqService]
