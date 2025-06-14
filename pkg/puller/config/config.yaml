@@ -1,0 +1,13 @@
+puller:
+  vendors:
+    - TEST
+  windowSize: 15
+  concurrency: 5
+  retryCount: 3
+  timeoutPerWindow: 30
+
+mysql:
+  dsn: "root:password@tcp(127.0.0.1:3306)/gaming?parseTime=true&charset=utf8mb4"
+
+mq:
+  dsn: "amqp://user:password@rabbitmq-host:5672/vhost"
