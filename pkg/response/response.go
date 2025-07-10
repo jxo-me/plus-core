@@ -47,7 +47,6 @@ func JsonRedirect(r *ghttp.Request, code int, message, redirect string, data ...
 		Code:      code,
 		Message:   message,
 		Data:      responseData,
-		Redirect:  redirect,
 	})
 }
 
