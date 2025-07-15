@@ -6,10 +6,10 @@ import (
 )
 
 var (
-	ErrMissingHeader     = gerror.NewCode(gcode.New(210, "missing required headers", nil))
-	ErrInvalidTimestamp  = gerror.NewCode(gcode.New(211, "invalid or expired timestamp", nil))
-	ErrInvalidAPIKey     = gerror.NewCode(gcode.New(212, "invalid api key", nil))
-	ErrSignatureMismatch = gerror.NewCode(gcode.New(213, "signature mismatch", nil))
-	ErrReplayAttack      = gerror.NewCode(gcode.New(214, "replay attack detected", nil))
-	ErrIPBanned          = gerror.NewCode(gcode.New(215, "client ip is banned", nil))
+	ErrMissingHeader     = gerror.NewCode(gcode.New(210, "msg_missing_required_headers", nil))
+	ErrInvalidTimestamp  = gerror.NewCode(gcode.New(211, "msg_invalid_or_expired_timestamp", nil))
+	ErrInvalidAPIKey     = gerror.NewCode(gcode.New(212, "msg_authentication_failed", nil))
+	ErrSignatureMismatch = gerror.NewCode(gcode.New(213, "msg_invalid_signature", nil))
+	ErrReplayAttack      = gerror.NewCode(gcode.New(214, "msg_replay_attack_detected", nil))
+	ErrIPBanned          = gerror.NewCode(gcode.New(215, "msg_client_ip_is_banned", nil))
 )
