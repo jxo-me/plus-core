@@ -9,7 +9,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/jxo-me/plus-core/core/v2 v2.0.74
-	github.com/jxo-me/plus-core/sdk/v2 v2.0.102
+	github.com/jxo-me/plus-core/sdk/v2 v2.0.104
 	github.com/jxo-me/rabbitmq-go v1.0.16
 	github.com/mojocn/base64Captcha v1.3.8
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
