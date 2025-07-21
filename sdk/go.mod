@@ -16,7 +16,7 @@ require (
 	github.com/jxo-me/gf-metrics v0.1.6
 	github.com/jxo-me/gfbot v0.1.19
 	github.com/jxo-me/plus-core/core/v2 v2.0.74
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.84
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.85
 	github.com/jxo-me/rabbitmq-go v1.0.16
 	github.com/lesismal/arpc v1.2.16
 	github.com/nsqio/go-nsq v1.1.0
@@ -24,5 +24,5 @@ require (
 	github.com/zegl/goriak/v3 v3.2.4
 	go.mongodb.org/mongo-driver v1.17.4
 	golang.org/x/text v0.27.0
-	google.golang.org/grpc v1.73.0
+	google.golang.org/grpc v1.64.1
 )
