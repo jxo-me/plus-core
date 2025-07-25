@@ -80,11 +80,9 @@ func (b *Bootstrap) Run() error {
 		glog.Info(b.ctx, "Context canceled")
 	}
 
-	glog.Info(b.ctx, "waitForRunners...")
 	// 等待所有运行中的 goroutine 正常结束
 	b.waitForRunners()
 
-	glog.Info(b.ctx, "cleanup...")
 	// 执行清理阶段
 	return b.cleanup()
 }
@@ -137,6 +135,7 @@ func (b *Bootstrap) runRunners() {
 
 // waitForRunners 等待所有 Runner 正常退出
 func (b *Bootstrap) waitForRunners() {
+	glog.Info(b.ctx, "waitForRunners...")
 	runnerWg.Wait()
 }
 
@@ -147,6 +146,7 @@ func (b *Bootstrap) cleanup() error {
 
 // execPhase 用于统一执行指定阶段的 BootFunc 列表，并添加统一日志
 func (b *Bootstrap) execPhase(name string, fns []boot.BootFunc) error {
+	glog.Info(b.ctx, "cleanup...")
 	for i, fn := range fns {
 		glog.Infof(b.ctx, "[%s #%d] execPhase...\n", name, i)
 		if err := fn(b.ctx, b.app); err != nil {
