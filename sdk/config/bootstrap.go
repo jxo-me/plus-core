@@ -148,7 +148,7 @@ func (b *Bootstrap) cleanup() error {
 // execPhase 用于统一执行指定阶段的 BootFunc 列表，并添加统一日志
 func (b *Bootstrap) execPhase(name string, fns []boot.BootFunc) error {
 	for i, fn := range fns {
-		glog.Errorf(b.ctx, "[%s #%d] execPhase...\n", name, i)
+		glog.Infof(b.ctx, "[%s #%d] execPhase...\n", name, i)
 		if err := fn(b.ctx, b.app); err != nil {
 			glog.Errorf(b.ctx, "[%s #%d] failed: %v", name, i, err)
 			return err
