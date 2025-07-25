@@ -80,9 +80,11 @@ func (b *Bootstrap) Run() error {
 		glog.Info(b.ctx, "Context canceled")
 	}
 
+	glog.Info(b.ctx, "waitForRunners...")
 	// 等待所有运行中的 goroutine 正常结束
 	b.waitForRunners()
 
+	glog.Info(b.ctx, "cleanup...")
 	// 执行清理阶段
 	return b.cleanup()
 }
