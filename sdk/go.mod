@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
-	github.com/casbin/casbin/v2 v2.109.0
+	github.com/casbin/casbin/v2 v2.110.0
 	github.com/go-redsync/redsync/v4 v4.13.0
 	github.com/gogf/gf-jwt/v2 v2.1.0
 	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.9.0
@@ -15,8 +15,8 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.6
 	github.com/jxo-me/gfbot v0.1.19
-	github.com/jxo-me/plus-core/core/v2 v2.0.74
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.85
+	github.com/jxo-me/plus-core/core/v2 v2.0.76
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.86
 	github.com/jxo-me/rabbitmq-go v1.0.16
 	github.com/lesismal/arpc v1.2.16
 	github.com/nsqio/go-nsq v1.1.0
