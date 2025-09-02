@@ -15,8 +15,8 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.6
 	github.com/jxo-me/gfbot v0.1.19
-	github.com/jxo-me/plus-core/core/v2 v2.0.78
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.88
+	github.com/jxo-me/plus-core/core/v2 v2.0.79
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.89
 	github.com/jxo-me/rabbitmq-go v1.0.16
 	github.com/lesismal/arpc v1.2.16
 	github.com/nsqio/go-nsq v1.1.0
