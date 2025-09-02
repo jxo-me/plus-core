@@ -8,11 +8,11 @@ require (
 	github.com/casbin/casbin/v2 v2.121.0
 	github.com/go-redsync/redsync/v4 v4.13.0
 	github.com/gogf/gf-jwt/v2 v2.1.0
-	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.9.1
-	github.com/gogf/gf/v2 v2.9.1
+	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.9.2
+	github.com/gogf/gf/v2 v2.9.2
 	github.com/jxo-me/gf-metrics v0.1.6
 	github.com/jxo-me/gfbot v0.1.19
-	github.com/jxo-me/plus-core/pkg/v2 v2.0.87
+	github.com/jxo-me/plus-core/pkg/v2 v2.0.88
 	github.com/jxo-me/rabbitmq-go v1.0.16
 	github.com/lesismal/arpc v1.2.16
 	github.com/zegl/goriak/v3 v3.2.4

@@ -9,8 +9,8 @@ require (
 	github.com/casbin/casbin/v2 v2.121.0
 	github.com/go-redsync/redsync/v4 v4.13.0
 	github.com/gogf/gf-jwt/v2 v2.1.0
-	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.9.1
-	github.com/gogf/gf/v2 v2.9.1
+	github.com/gogf/gf/contrib/rpc/grpcx/v2 v2.9.2
+	github.com/gogf/gf/v2 v2.9.2
 	github.com/google/uuid v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/jxo-me/gf-metrics v0.1.6
